@@ -1,0 +1,238 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Scenewright — VN authoring for Godot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:opsz@6..96&family=Spectral:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+@@CSS@@
+
+<header class="masthead">
+  <h1 class="wordmark">Scene<span>wright</span></h1>
+  <span class="tagline">vn authoring · godot</span>
+  <div class="mast-right">
+    <button class="btn" id="railToggle">Panel</button>
+    <button class="btn" id="importChars">Import sheets</button>
+    <button class="btn" id="pasteChars">Paste</button>
+    <button class="btn" id="openMap">Map</button>
+    <button class="btn" id="openInspect">Inspect</button>
+    <button class="btn" id="openExport">Export</button>
+    <select class="model" id="model" aria-label="Model"></select>
+    <span class="status"><span class="lamp" id="lamp"></span><span id="lampText">checking</span></span>
+  </div>
+</header>
+
+<div class="shell">
+  <aside class="rail" id="rail">
+    <div class="railtabs">
+      <button data-tab="cast" class="on">Cast</button>
+      <button data-tab="places">Places</button>
+      <button data-tab="content">Content</button>
+      <button data-tab="dir">Direction</button>
+    </div>
+
+    <div class="railpane on" data-pane="cast">
+      <p class="rubric">Characters</p>
+      <div class="chip-list" id="castList"></div>
+      <div id="sheetPanel"></div>
+      <p class="hint" style="margin-top:12px">Drop <code>.character</code> files anywhere on this window to import.</p>
+    </div>
+
+    <div class="railpane" data-pane="places">
+      <p class="rubric">Locations <button id="addPlace" title="Add">+</button></p>
+      <div class="chip-list" id="placeList"></div>
+      <div id="placeForm"></div>
+    </div>
+
+    <div class="railpane" data-pane="content">
+      <p class="rubric">Conversations <button data-new="conversation">+</button></p>
+      <div class="chip-list" id="convList"></div>
+      <p class="rubric later">Quests <button data-new="quest">+</button></p>
+      <div class="chip-list" id="questList"></div>
+      <p class="rubric later">Activities <button data-new="activity">+</button></p>
+      <div class="chip-list" id="actList"></div>
+      <p class="hint" style="margin-top:5px">Things the player repeats. Milestones fire on the Nth time.</p>
+      <p class="rubric later">Repeatables <button data-new="repeatable">+</button></p>
+      <div class="chip-list" id="repList"></div>
+      <p class="rubric later">Characters</p>
+      <div class="row"><button class="btn" id="exportSheets">Export all sheets</button></div>
+      <p class="hint" style="margin-top:6px">Writes every sheet back out with your edits applied.</p>
+      <p class="rubric later">Project</p>
+      <div class="row" style="margin-top:6px">
+        <button class="btn" id="saveProj">Save file</button><button class="btn" id="loadProj">Open file</button>
+      </div>
+    </div>
+
+    <div class="railpane" data-pane="dir">
+      <p class="rubric">Model</p>
+      <div class="field"><label for="temp">Temperature</label>
+        <div class="dial"><input type="range" id="temp" min="0" max="1.6" step=".05" value=".8"><output id="tempOut"></output></div>
+        <p class="hint">Above ~1.0, small models start breaking the JSON format. Long chats generate in short unique waves so lines do not loop.</p></div>
+      <div class="field"><label for="ctx">Memory window</label>
+        <div class="dial"><input type="range" id="ctx" min="2048" max="32768" step="2048" value="16384"><output id="ctxOut"></output></div></div>
+      <div class="field"><label for="burst">Lines per generation</label>
+        <div class="dial"><input type="range" id="burst" min="1" max="10" step="1" value="3"><output id="burstOut"></output></div></div>
+      <p class="rubric later">Prompt scope</p>
+      <div class="field"><label><input type="checkbox" id="useBounds" checked style="width:auto"> Enforce boundaries</label>
+        <p class="hint">Passes hard limits from the sheet to the model as constraints.</p></div>
+      <div class="field"><label><input type="checkbox" id="useAdult" style="width:auto"> Include private profile</label>
+        <p class="hint">Off by default. Sends the private_profile block for chapter-gated content.</p></div>
+      <div class="field"><label><input type="checkbox" id="useConn" checked style="width:auto"> Include connections</label></div>
+      <div class="field"><label><input type="checkbox" id="writePlayer" checked style="width:auto">
+        Write the player's lines too</label>
+        <p class="hint">On, the model drafts what the player says and you edit it. Off, only the
+          player's choice options are written and spoken player lines are rejected.</p></div>
+    </div>
+  </aside>
+
+  <main class="stage">
+    <div class="setup" id="setup"></div>
+    <div class="tree" id="tree"><div class="tree-inner" id="treeInner"></div></div>
+    <div class="pit">
+      <div id="alarmSlot"></div>
+      <div class="pit-inner">
+        <div class="modes" id="modeBar"></div>
+        <div class="compose">
+          <select id="sayAs" aria-label="Speaker" title="Who says the next line"></select>
+          <textarea id="line" rows="1"></textarea>
+          <button class="btn" id="addLine" title="Insert this line without generating">Add line</button>
+          <button class="btn gold" id="go">Write</button>
+          <button class="btn" id="stop" disabled>Stop</button>
+        </div>
+        <div class="notes">
+          <span>Add line inserts what you typed · Enter generates the reply</span>
+          <span>Click a line to edit · click a name to recast · +line after a beat</span>
+          <span id="counter"></span>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<dialog id="sched">
+  <div class="sheet-head">
+    <h3 id="scName">Schedule</h3>
+    <span class="sp"></span>
+    <button class="btn" id="scClear">Clear selected</button>
+    <button class="btn" id="closeSched">Done</button>
+  </div>
+  <div class="sheet-body">
+    <div class="scbar">
+      <span class="lbl">selected</span><span id="scCount">0 slots</span>
+      <span class="lbl">at</span>
+      <select id="scLoc"></select>
+      <input type="text" id="scAct" placeholder="doing what — westshore_classes" style="width:190px">
+      <label class="lbl" style="display:flex;align-items:center;gap:5px;cursor:pointer">
+        <input type="checkbox" id="scBusy"> can't be disturbed</label>
+      <button class="btn gold" id="scApply">Apply</button>
+    </div>
+    <div id="scGrid"></div>
+    <p class="hint" style="margin-top:10px">Click cells to select. Click a day or block heading to take
+      the whole row or column. Shift-click extends. Empty means free and at home.</p>
+  </div>
+</dialog>
+
+<dialog id="paste">
+  <div class="sheet-head">
+    <h3>Paste a character sheet</h3>
+    <span class="sp"></span>
+    <button class="btn gold" id="pasteGo">Import</button>
+    <button class="btn" id="closePaste">Cancel</button>
+  </div>
+  <div class="sheet-body">
+    <p class="hint" style="margin:12px 0 8px">Open the .character file in Notepad, select all, copy, and paste
+      it here. Works when file loading doesn't. Several sheets at once is fine — paste them one after another.</p>
+    <textarea id="pasteBox" spellcheck="false" placeholder='{ "format_version": 1, "id": "...", ... }'></textarea>
+    <div id="pasteMsg"></div>
+  </div>
+</dialog>
+
+<dialog id="map">
+  <div class="sheet-head">
+    <h3>Story map</h3>
+    <button class="btn" id="mpLayout">Auto-arrange</button>
+    <button class="btn" id="mpLink">Draw link</button>
+    <button class="btn" id="mpNew">+ passage</button>
+    <span class="sp"></span>
+    <span class="maphint" id="mpHint">drag to move · scroll to zoom · click a card to open it</span>
+    <button class="btn" id="closeMap">Close</button>
+  </div>
+  <div class="mapwrap" id="mapWrap">
+    <div class="mapcanvas" id="mapCanvas">
+      <svg id="mapEdges"></svg>
+      <div id="mapCards"></div>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="inspect">
+  <div class="sheet-head">
+    <h3>Inspect</h3>
+    <button class="mode on" data-ins="lint">Validate</button>
+    <button class="mode" data-ins="sim">Playthrough</button>
+    <button class="mode" data-ins="reach">Reach</button>
+    <button class="mode" data-ins="week">Week</button>
+    <button class="mode" data-ins="reg">Flags &amp; sprites</button>
+    <button class="mode" data-ins="cov">Coverage</button>
+    <button class="mode" data-ins="stub">Missing characters</button>
+    <span class="sp"></span>
+    <button class="btn" id="closeInspect">Close</button>
+  </div>
+  <div class="sheet-body"><div id="insBody" class="insbody"></div></div>
+</dialog>
+
+<dialog id="graph">
+  <div class="sheet-head">
+    <h3 id="grTitle">Flow</h3>
+    <span class="sp"></span>
+    <button class="btn" id="grSvg">Save SVG</button>
+    <button class="btn" id="closeGraph">Close</button>
+  </div>
+  <div class="sheet-body"><div id="grBody" class="grwrap"></div></div>
+</dialog>
+
+<dialog id="walk">
+  <div class="sheet-head">
+    <h3 id="wkTitle">Walk the routes</h3>
+    <span class="sp"></span>
+    <button class="btn" id="wkRestart">Restart</button>
+    <button class="btn" id="closeWalk">Close</button>
+  </div>
+  <div class="sheet-body">
+    <div class="wkgrid">
+      <div>
+        <div class="wkroutes" id="wkRoutes"></div>
+      </div>
+      <div>
+        <div class="wkplay" id="wkPlay"></div>
+        <div class="wkstate" id="wkState"></div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="editor">
+  <div class="sheet-head">
+    <h3 id="edName">Character</h3>
+    <span class="sp"></span>
+    <button class="btn" id="edSheetOut">Export this sheet</button>
+    <button class="btn" id="closeEditor">Done</button>
+  </div>
+  <div class="sheet-body" id="edBody"></div>
+</dialog>
+
+<dialog id="sheet">
+  <div class="sheet-head">
+    <h3>Export</h3>
+    <button class="mode on" data-fmt="sheets">Character sheets</button>
+    <button class="mode" data-fmt="json">Godot JSON</button>
+    <button class="mode" data-fmt="script">Plain script</button>
+    <span class="sp"></span>
+    <button class="btn" id="copyOut">Copy</button>
+    <button class="btn" id="dlOut">Download</button>
+    <button class="btn" id="closeSheet">Close</button>
+  </div>
+  <div class="sheet-body"><textarea id="dump" spellcheck="false" readonly></textarea></div>
+</dialog>
+
+@@JS@@

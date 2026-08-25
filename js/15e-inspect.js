@@ -1,0 +1,165 @@
+/* ---- inspect UI ---- */
+let insTab='lint';
+function openInspect(tab){insTab=tab||insTab;paintInspect();$('inspect').showModal();}
+$('closeInspect').onclick=()=>$('inspect').close();
+document.querySelectorAll('[data-ins]').forEach(b=>b.onclick=()=>{
+  insTab=b.dataset.ins;
+  document.querySelectorAll('[data-ins]').forEach(x=>x.classList.toggle('on',x===b));
+  paintInspect();});
+
+function paintInspect(){
+  const B=$('insBody');
+  if(insTab==='lint'){
+    const issues=validate();
+    if(!issues.length){B.innerHTML='<div class="clean">Nothing to flag.<br>No dangling references, '+
+      'no unreachable flags, no empty branches.</div>';return;}
+    const n=s=>issues.filter(i=>i.sev===s).length;
+    B.innerHTML='<div class="legend"><span>'+n('err')+' errors</span><span>'+n('warn')+
+      ' warnings</span><span>'+n('info')+' notes</span></div>'+
+      issues.map((i,j)=>'<div class="issue '+i.sev+'"><span class="sev">'+i.sev+'</span>'+
+        '<span class="msg">'+esc(i.msg)+'<span class="where">'+esc(i.where)+'</span>'+
+        (i.fix==='stubs'?'<button class="fix" data-fix="stubs">create stub sheets</button>':'')+
+        '</span></div>').join('');
+    B.querySelectorAll('[data-fix="stubs"]').forEach(b=>b.onclick=()=>{insTab='stub';
+      document.querySelectorAll('[data-ins]').forEach(x=>x.classList.toggle('on',x.dataset.ins==='stub'));
+      paintInspect();});
+    return;
+  }
+
+  if(insTab==='reach'){
+    const {rows,gates}=reachable();
+    B.innerHTML=(gates.length
+      ? '<div class="legend"><span style="color:var(--rose)">'+gates.length+
+        ' gate'+(gates.length===1?'':'s')+' can never open</span></div>'+
+        gates.map(g=>'<div class="issue err"><span class="sev">stuck</span><span class="msg">'+
+          esc(g.key)+' needs '+g.need+' but the whole project can only reach '+g.max+
+          ' — short by '+g.short+'.<span class="where">'+esc(g.where)+'</span></span></div>').join('')
+      : '<div class="clean">Every stat gate is reachable.</div>')+
+      '<p class="rubric later">Every meter</p><table class="regtable">'+
+      '<tr><th>Meter</th><th>Starts</th><th>One-off gain</th><th>Per repeat</th>'+
+      '<th>Loss</th><th>Ceiling</th></tr>'+
+      rows.map(r=>'<tr><td class="k">'+esc(r.key)+'</td><td class="w">'+r.start+
+        '</td><td class="w" style="color:var(--sage)">+'+r.gain+
+        '</td><td class="w" style="color:var(--brass)">'+(r.perRun?'+'+r.perRun+' ×n':'—')+
+        '</td><td class="w" style="color:var(--rose)">-'+r.spend+
+        '</td><td class="k">'+(r.max===Infinity?'no cap':r.max)+'</td></tr>').join('')+'</table>'+
+      (rows.some(r=>r.perRun)?'<p class="hint" style="margin-top:8px">Meters fed by a repeatable '+
+        'activity have no ceiling — the player can grind them. Gates on those are always reachable, '+
+        'but ask how many repeats you are really asking for.</p>':'');
+    return;
+  }
+
+  if(insTab==='week'){
+    const cells=weekGrid();
+    B.innerHTML='<p class="hint" style="margin-bottom:10px">What can happen in each slot. '+
+      'Empty evenings are dead time; crowded ones mean the player misses content.</p>'+
+      '<table class="weekt"><tr><th></th>'+BLOCKS.map(b=>'<th>'+esc(pretty(b))+'</th>').join('')+'</tr>'+
+      DAYS.map(d=>'<tr><th>'+esc(d.slice(0,3))+'</th>'+BLOCKS.map(b=>{
+        const items=cells[d+'|'+b]||[];
+        const free=P.characters.filter(c=>availability(c,d,b).free).length;
+        return '<td class="'+(items.length?'has':'')+'">'+
+          items.slice(0,4).map(i=>'<span class="wk '+i.type+'" title="'+esc(i.title||'')+'">'+
+            esc((i.title||i.id).slice(0,16))+'</span>').join('')+
+          (items.length>4?'<span class="wk more">+'+(items.length-4)+'</span>':'')+
+          (!items.length?'<span class="wkfree">'+free+' free</span>':'')+'</td>';
+      }).join('')+'</tr>').join('')+'</table>'+
+      P.characters.map(c=>'<p class="rubric later">Where '+esc(c.name)+' is</p>'+
+        '<table class="weekt"><tr><th></th>'+BLOCKS.map(b=>'<th>'+esc(pretty(b))+'</th>').join('')+'</tr>'+
+        DAYS.map(d=>'<tr><th>'+esc(d.slice(0,3))+'</th>'+BLOCKS.map(b=>{
+          const a=availability(c,d,b),where=a.where?placeName(a.where):'—';
+          return '<td class="'+(a.free?'':'busycell')+'">'+
+            '<span class="wk '+(a.free?'activity':'quest')+'">'+esc(where.slice(0,16))+'</span>'+
+            '<span class="wkfree">'+esc(a.why.slice(0,18))+'</span></td>';
+        }).join('')+'</tr>').join('')+'</table>').join('');
+    return;
+  }
+
+  if(insTab==='sim'){
+    const r=simulate(90);
+    B.innerHTML='<div class="legend"><span>'+r.log.length+' beats played</span>'+
+      '<span>over '+r.days+' day'+(r.days===1?'':'s')+'</span>'+
+      '<span'+(r.stuck.length?' style="color:var(--rose)"':'')+'>'+r.stuck.length+' never reached</span></div>'+
+      (r.stuck.length?'<p class="rubric">Never reached</p>'+
+        r.stuck.map(s=>'<div class="issue '+(s.grindable?'warn':'err')+'"><span class="sev">'+
+          (s.grindable?'slow':'stuck')+'</span><span class="msg">'+
+          esc(s.item.title||s.item.id)+'<span class="where">'+esc(s.why)+'</span></span></div>').join('')
+        :'<div class="clean">Every piece of content is reachable in a single playthrough.</div>')+
+      '<p class="rubric later">Timeline</p>'+
+      '<table class="regtable"><tr><th>Day</th><th>Block</th><th>What happened</th></tr>'+
+      r.log.slice(0,60).map(l=>'<tr><td class="k">'+l.day+'</td><td class="w">'+esc(pretty(l.block))+
+        '</td><td class="w"><span class="wk '+l.kind+'">'+esc(l.kind)+'</span> '+
+        esc(l.what)+(l.n?' (repeat '+l.n+')':'')+'</td></tr>').join('')+'</table>'+
+      (r.log.length>60?'<p class="hint">…'+(r.log.length-60)+' more</p>':'')+
+      '<p class="rubric later">Meters at the end</p><table class="regtable">'+
+      Object.entries(r.S.stats).filter(([k])=>!k.startsWith('activity.')).sort()
+        .map(([k,v])=>'<tr><td class="k">'+esc(k)+'</td><td class="w">'+v+'</td></tr>').join('')+
+      '</table>';
+    return;
+  }
+
+  if(insTab==='reg'){
+    const reg=flagRegistry(),emo=emotionRegistry();
+    const rows=Object.keys(reg).sort().map(k=>{
+      const r=reg[k],orphan=!r.sets.length||!r.reads.length;
+      return '<tr'+(orphan?' class="orphan"':'')+'><td class="k">'+esc(k)+'</td>'+
+        '<td class="w">'+(r.sets.join(', ')||'—')+'</td><td class="w">'+(r.reads.join(', ')||'—')+'</td></tr>';
+    }).join('');
+    const sprites=Object.keys(emo).map(id=>'<tr><td class="k">'+esc(chr(id)?.name||id)+'</td>'+
+      '<td class="w" colspan="2">'+Object.entries(emo[id]).sort((a,b)=>b[1]-a[1])
+      .map(([e,n])=>'<span class="pill">'+esc(e)+' ×'+n+'</span>').join('')+'</td></tr>').join('');
+    B.innerHTML=(rows?'<table class="regtable"><tr><th>Flag</th><th>Set by</th><th>Read by</th></tr>'+
+      rows+'</table>':'<p class="empty">No flags yet. Add one to a choice or a gate.</p>')+
+      '<p class="rubric later">Sprite expressions needed</p>'+
+      (sprites?'<table class="regtable">'+sprites+'</table>'
+        :'<p class="empty">No emotions recorded yet — they come from generated lines.</p>');
+    return;
+  }
+
+  if(insTab==='cov'){
+    const cov=coverage();
+    const max=Math.max(1,...Object.values(cov).map(c=>c.conv+c.quest+c.rep));
+    B.innerHTML='<div class="legend"><span><i style="background:var(--brass)"></i>conversation</span>'+
+      '<span><i style="background:var(--sky)"></i>quest</span>'+
+      '<span><i style="background:var(--sage)"></i>repeatable</span></div>'+
+      P.characters.map(c=>{
+        const v=cov[c.id]||{conv:0,quest:0,rep:0,routes:0},t=v.conv+v.quest+v.rep;
+        const pc=x=>(x/max*100).toFixed(1)+'%';
+        return '<div class="bar"><span class="nm">'+esc(c.name)+'</span>'+
+          '<span class="track"><span class="fill" style="width:'+pc(v.conv)+';background:var(--brass)"></span>'+
+          '<span class="fill" style="width:'+pc(v.quest)+';background:var(--sky)"></span>'+
+          '<span class="fill" style="width:'+pc(v.rep)+';background:var(--sage)"></span></span>'+
+          '<span class="num">'+t+' lines</span></div>';
+      }).join('')+
+      '<p class="rubric later">By location</p>'+
+      P.locations.map(l=>{
+        const n=P.content.filter(c=>locPart(c.location)===l.id)
+          .reduce((a,c)=>a+(c.type==='repeatable'?(c.lines||[]).length
+            :c.type==='quest'?(c.stages||[]).reduce((m,s)=>m+countLines(s.nodes||[]),0)
+            :countLines(c.nodes||[])),0);
+        return '<div class="bar"><span class="nm">'+esc(l.name)+'</span>'+
+          '<span class="track"><span class="fill" style="width:'+(n/max*100).toFixed(1)+
+          '%;background:var(--ash)"></span></span><span class="num">'+n+' lines</span></div>';
+      }).join('');
+    return;
+  }
+
+  const miss=missingRefs();
+  B.innerHTML=miss.length
+    ? '<p class="hint" style="margin-bottom:12px">These ids appear in imported sheets but have no file of '+
+      'their own. Creating stubs stops the model inventing personalities that contradict what you write later.</p>'+
+      '<table class="regtable"><tr><th>Id</th><th>Referenced by</th><th>Inferred</th></tr>'+
+      miss.map(m=>'<tr><td class="k">'+esc(m.id)+'</td><td class="w">'+esc(m.from.join(', '))+
+        '</td><td class="w">'+esc([m.relation,m.residence,m.district].filter(Boolean).join(' · ')||'—')+
+        '</td></tr>').join('')+'</table>'+
+      '<div class="row" style="margin-top:14px;max-width:420px">'+
+      '<button class="btn gold" id="mkStubs">Add all as stubs</button>'+
+      '<button class="btn" id="dlStubs">Download sheets</button></div>'
+    : '<div class="clean">Every referenced character has a sheet.</div>';
+
+  if($('mkStubs'))$('mkStubs').onclick=()=>{
+    miss.forEach(m=>importSheet(stubSheet(m)));save();paintAll();paintInspect();};
+  if($('dlStubs'))$('dlStubs').onclick=()=>miss.forEach((m,i)=>setTimeout(()=>{
+    const url=URL.createObjectURL(new Blob([JSON.stringify(stubSheet(m),null,2)],{type:'application/json'}));
+    Object.assign(document.createElement('a'),{href:url,download:m.id+'.character'}).click();
+    URL.revokeObjectURL(url);},i*250));
+}
