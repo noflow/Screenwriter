@@ -1,0 +1,23 @@
+# Built output — regenerate with `python build.py`
+# Comment this out if you'd rather commit the bundle so non-developers can grab it.
+scenewright.html
+
+# Editor and OS noise
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Python
+__pycache__/
+*.pyc
+
+# Node, if you ever add tooling
+node_modules/
+
+# Local exports and scratch
+*.local.json
+/out/
+/exports/

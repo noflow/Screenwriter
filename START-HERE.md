@@ -105,3 +105,25 @@ asks the most of the model; an 8B is near its limit on nested choices.
 reports the real cause: encoding, a stray comma, wrong shape.
 
 **Changes don't appear** — you're on a cached copy. Ctrl+Shift+R.
+
+---
+
+## Putting it in Git
+
+`.gitattributes` is included and normalises everything to LF in the repository.
+That's what silences the *"this file uses LF but Git is configured to convert them
+to CRLF"* warning — the files stay LF where it matters, and Windows can still check
+out CRLF locally if you want it to.
+
+If you already committed files before adding it, renormalise once:
+
+    git add --renormalize .
+    git commit -m "Normalise line endings"
+
+`.gitignore` excludes the built `scenewright.html`, since `build.py` regenerates it
+and committing it produces a 225KB diff on every change. If you'd rather commit it
+so someone can download the tool without building, delete that line from
+`.gitignore`.
+
+`build.py` writes LF regardless of platform, so the bundle is byte-identical whether
+it was built on Windows, macOS or Linux.
