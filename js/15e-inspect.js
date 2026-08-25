@@ -143,6 +143,44 @@ function paintInspect(){
     return;
   }
 
+  if(insTab==='godot'){
+    const g=godotCheck(),R=g.registry;
+    const acts=P.content.filter(c=>c.type==='activity').length;
+    const rooms=P.content.filter(c=>roomPart(c.location)).length;
+    const nocap=R.stats.filter(s=>s.max===null&&(s.read_by||[]).length).length;
+    B.innerHTML=
+      (g.fatal?'<div class="issue err" style="margin-bottom:12px"><span class="sev">blocked</span>'+
+        '<span class="msg">'+g.fatal+' fatal mismatch'+(g.fatal===1?'':'es')+
+        ' — the build would load and this content would never appear in play.'+
+        '<span class="where">fix these before exporting</span></span></div>'
+        :'<div class="clean" style="margin-bottom:12px">The export matches what the runtime reads.</div>')+
+      '<table class="regtable"><tr><th>Flags</th><th>Meters</th><th>Counters</th>'+
+      '<th>Room-scoped</th><th>Activities</th></tr><tr>'+
+      '<td class="w">'+R.flags.length+'</td>'+
+      '<td class="w">'+R.stats.length+(nocap?' <span class="pill">'+nocap+' uncapped</span>':'')+'</td>'+
+      '<td class="w">'+R.counters.length+'</td>'+
+      '<td class="w">'+rooms+'</td>'+
+      '<td class="w">'+acts+'</td></tr></table>'+
+      (g.issues.length
+        ? '<p class="rubric later">Seam checks</p>'+
+          g.issues.map(i=>'<div class="issue '+(i.sev==='fatal'?'err':i.sev)+'">'+
+            '<span class="sev">'+i.sev+'</span><span class="msg">'+esc(i.msg)+
+            '<span class="where">'+esc(i.where)+'</span></span></div>').join('')
+        : '')+
+      '<p class="rubric later">Declared state</p><table class="regtable">'+
+      '<tr><th>Key</th><th>Type</th><th>Starts</th><th>Ceiling</th><th>Read by</th></tr>'+
+      R.flags.concat(R.stats.map(s=>Object.assign({},s,{type:'meter'})),
+        R.counters.map(c=>Object.assign({},c,{type:'counter'})))
+        .map(x=>'<tr><td class="k">'+esc(x.key)+'</td><td class="w">'+x.type+
+          '</td><td class="w">'+String(x.initial)+'</td><td class="w">'+
+          (x.type==='meter'?(x.max===null?'<span style="color:var(--rose)">none</span>':x.max):'—')+
+          '</td><td class="w">'+esc((x.read_by||[]).join(', ')||'—')+'</td></tr>').join('')+
+      '</table>'+
+      '<p class="hint" style="margin-top:8px">This is the registry block the export ships. '+
+      'The runtime seeds and clamps from it, and warns on a key that is not in this table.</p>';
+    return;
+  }
+
   const miss=missingRefs();
   B.innerHTML=miss.length
     ? '<p class="hint" style="margin-bottom:12px">These ids appear in imported sheets but have no file of '+

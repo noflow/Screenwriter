@@ -3,33 +3,53 @@ function clean(l){return l.map(n=>n.type==='line'
   ?{type:'line',speaker:n.speaker,text:n.text,emotion:n.emotion||''}
   :n.type==='jump'?{type:'jump',target:n.target||''}
   :{type:'choice',options:n.options.map(o=>({text:o.text,flag:o.flag||'',
+     effects:compileEffects(o.flag),
      requires:o.requires||[],nodes:clean(o.nodes)}))});}
 
 function toJSON(){
   const pick=t=>P.content.filter(c=>c.type===t);
-  return JSON.stringify({format:'scenewright.v2',
+  const acts=activityBlocks();
+  const place=ref=>({location:locPart(ref),room:roomPart(ref)});
+  return JSON.stringify({format:'scenewright.v3',
     characters:P.characters.map(c=>{
       const g=gameReady(c);
       return {id:c.id,name:c.name,color:c.color,
         age:g.profile?.age??null,
+        is_player:isPlayer(c),
         romance_eligible:g.profile.romance_eligible,
         family_only:!!g.boundaries.family_only,
         hard_limits:g.boundaries.hard_limits||[],
         adult_hard_limits:g.private_profile?.adult_preferences?.hard_limits||[],
-        chapters:(c.relationship_chapters||[]).map(x=>({level:x.level,id:x.id,title:x.title})),
+        chapters:(c.relationship_chapters||[]).map(x=>({level:x.level,id:x.id,title:x.title,
+          requires:x.requires||[]})),
+        stat_caps:c.stat_caps||{},
         relationship_defaults:c.relationship_defaults||{}};
     }),
-    locations:P.locations.map(l=>({id:l.id,name:l.name,background:l.background,district:l.district})),
-    conversations:pick('conversation').map(c=>({id:c.id,title:c.title,location:c.location,
-      day:c.day,block:c.block,cast:c.cast||[],chapter:+c.chapter||0,
-      requires:c.requires||[],start:!!c.start,nodes:clean(c.nodes||[])})),
+    // Rooms travel with their location: scenes are authored at "place.room" and
+    // the runtime needs the room table to resolve one.
+    locations:P.locations.map(l=>({id:l.id,name:l.name,background:l.background,
+      district:l.district,type:l.type||'',
+      rooms:(l.rooms||[]).map(r=>({id:r.id,name:r.name,access:r.access||''})),
+      travel_node:l.travel_node!==false})),
+    // The declared state contract — types, starting values and ceilings.
+    registry:stateRegistry(),
+    conversations:pick('conversation').map(c=>Object.assign({id:c.id,title:c.title},
+      place(c.location),
+      {day:c.day,block:c.block,cast:c.cast||[],chapter:+c.chapter||0,
+       requires:c.requires||[],start:!!c.start,
+       replayable:!!c.replayable,sets_flag:c.flag||'',
+       nodes:clean(c.nodes||[])})).concat(acts.conversations),
     quests:pick('quest').map(c=>({id:c.id,title:c.title,giver:c.character||'',hook:c.hook||'',
-      requires:c.requires||[],
-      stages:(c.stages||[]).map(s=>({id:s.id,title:s.title,location:s.location,
-        sets_flag:s.flag||'',requires:s.requires||[],nodes:clean(s.nodes||[])}))})),
-    repeatables:pick('repeatable').map(c=>({id:c.id,character:c.character,location:c.location,
-      blocks:c.block?[c.block]:[],requires:c.requires||[],lines:(c.lines||[]).map(l=>
-        ({text:l.text,emotion:l.emotion||'',min_chapter:+l.min_chapter||0}))}))},null,2);
+      cast:c.cast||[],requires:c.requires||[],
+      stages:(c.stages||[]).map(s=>Object.assign({id:s.id,title:s.title},place(s.location),
+        {sets_flag:s.flag||'',effects:compileEffects(s.flag),
+         requires:s.requires||[],nodes:clean(s.nodes||[])}))})),
+    activities:acts.activities,
+    repeatables:pick('repeatable').map(c=>Object.assign({id:c.id,character:c.character},
+      place(c.location),
+      {days:c.days||(c.day?[c.day]:[]),blocks:c.blocks||(c.block?[c.block]:[]),
+       requires:c.requires||[],lines:(c.lines||[]).map(l=>
+         ({text:l.text,emotion:l.emotion||'',min_chapter:+l.min_chapter||0}))}))},null,2);
 }
 function plain(l,pad){return l.map(n=>n.type==='line'
   ?pad+(chr(n.speaker)?.name||n.speaker).toUpperCase()+'\n'+pad+n.text
@@ -51,7 +71,12 @@ function toSheets(){
 const build=()=>fmt==='sheets'?toSheets():fmt==='json'?toJSON():toScript();
 $('openMap').onclick=openMap;
 $('openInspect').onclick=()=>openInspect();
-$('openExport').onclick=()=>{$('dump').value=build();$('sheet').showModal()};
+$('openExport').onclick=()=>{
+  $('dump').value=build();$('sheet').showModal();
+  const g=godotCheck();
+  if(g.fatal)note(g.fatal+' fatal mismatch'+(g.fatal===1?'':'es')+' between this project and the '+
+    'runtime — content would load and never play. Inspect → Godot lists them.',true);
+};
 $('closeSheet').onclick=()=>$('sheet').close();
 document.querySelectorAll('[data-fmt]').forEach(b=>b.onclick=()=>{fmt=b.dataset.fmt;
   document.querySelectorAll('[data-fmt]').forEach(x=>x.classList.toggle('on',x===b));$('dump').value=build();});

@@ -80,13 +80,30 @@ function paintEditor(){
       '<div class="field edfull"><p class="rubric">Relationship starting values</p>'+
         '<div class="stats">'+STATS.map(s=>'<div class="stat"><label>'+s.slice(0,9)+'</label>'+
         '<input type="text" data-stat="'+s+'" value="'+(+c.relationship_defaults[s]||0)+'"></div>').join('')+
-        '</div></div>'+
+        '</div>'+
+        '<p class="rubric later">Ceilings</p>'+
+        '<div class="stats">'+STATS.map(s=>'<div class="stat"><label>'+s.slice(0,9)+'</label>'+
+        '<input type="text" data-cap="'+s+'" placeholder="none" value="'+
+        (Number.isFinite(+c.stat_caps?.[s])?+c.stat_caps[s]:'')+'"></div>').join('')+
+        '</div>'+
+        '<p class="hint">A meter with no ceiling can be pushed past every gate on it. '+
+        'The game clamps to whatever is set here.</p></div>'+
 
       '<div class="field edfull"><p class="rubric">Chapters</p>'+
         c.relationship_chapters.map((ch,j)=>'<div class="chapline"><span class="lv">'+ch.level+'</span>'+
         '<input value="'+esc(ch.id||'')+'" data-chid="'+j+'"><input value="'+esc(ch.title||'')+'" data-chtitle="'+j+'">'+
+        (ch.level>1
+          ? '<span class="lv" style="opacity:.7">at</span>'+
+            '<select data-chstat="'+j+'"><option value="">no threshold</option>'+
+            STATS.map(s=>'<option value="'+s+'"'+
+              (chapterGate(ch)?.key===s?' selected':'')+'>'+s+'</option>').join('')+'</select>'+
+            '<input type="text" data-chval="'+j+'" style="width:52px" placeholder="n" value="'+
+            (chapterGate(ch)?.value??'')+'">'
+          : '<span class="lv" style="opacity:.55">starts here</span>')+
         '<button data-chx="'+j+'">×</button></div>').join('')+
-        '<button class="btn" id="edAddChap">+ chapter</button></div>'+
+        '<button class="btn" id="edAddChap">+ chapter</button>'+
+        '<p class="hint">Without a threshold a relationship never leaves chapter 1 in play, '+
+        'so anything gated higher can never appear.</p></div>'+
 
       '<div class="field edfull"><label>Conversation topics</label>'+
         tagList('conversation_topics',c.conversation_topics,'ok')+'</div>'+
@@ -137,6 +154,20 @@ function wireEditor(c,adult,romance){
 
   B.querySelectorAll('[data-stat]').forEach(el=>el.oninput=()=>{
     c.relationship_defaults[el.dataset.stat]=parseInt(el.value,10)||0;save();});
+  B.querySelectorAll('[data-cap]').forEach(el=>el.oninput=()=>{
+    c.stat_caps=c.stat_caps||{};
+    const n=parseInt(el.value,10);
+    if(Number.isFinite(n))c.stat_caps[el.dataset.cap]=n;else delete c.stat_caps[el.dataset.cap];
+    save();});
+  const setGate=(j)=>{
+    const ch=c.relationship_chapters[j];
+    const key=B.querySelector('[data-chstat="'+j+'"]')?.value||'';
+    const val=parseInt(B.querySelector('[data-chval="'+j+'"]')?.value,10);
+    ch.requires=(key&&Number.isFinite(val))
+      ? [{type:'stat',character:c.id,key,op:'gte',value:val}] : [];
+    save();};
+  B.querySelectorAll('[data-chstat]').forEach(el=>el.onchange=()=>setGate(+el.dataset.chstat));
+  B.querySelectorAll('[data-chval]').forEach(el=>el.oninput=()=>setGate(+el.dataset.chval));
   B.querySelectorAll('[data-chid]').forEach(el=>el.oninput=()=>{
     c.relationship_chapters[+el.dataset.chid].id=slug(el.value);save();});
   B.querySelectorAll('[data-chtitle]').forEach(el=>el.oninput=()=>{
@@ -148,6 +179,11 @@ function wireEditor(c,adult,romance){
     const n=c.relationship_chapters.length+1;
     c.relationship_chapters.push({level:n,id:'chapter_'+n,title:'New chapter'});
     save();paintEditor();paintSetup();};
+}
+
+/** The meter threshold a chapter opens on, if one is set. */
+function chapterGate(ch){
+  return (ch?.requires||[]).find(r=>r.type==='stat')||null;
 }
 
 $('closeEditor').onclick=()=>{$('editor').close();paintAll();};

@@ -601,6 +601,7 @@
     <button class="mode" data-ins="reg">Flags &amp; sprites</button>
     <button class="mode" data-ins="cov">Coverage</button>
     <button class="mode" data-ins="stub">Missing characters</button>
+    <button class="mode" data-ins="godot">Godot</button>
     <span class="sp"></span>
     <button class="btn" id="closeInspect">Close</button>
   </div>
@@ -2450,13 +2451,30 @@ function paintEditor(){
       '<div class="field edfull"><p class="rubric">Relationship starting values</p>'+
         '<div class="stats">'+STATS.map(s=>'<div class="stat"><label>'+s.slice(0,9)+'</label>'+
         '<input type="text" data-stat="'+s+'" value="'+(+c.relationship_defaults[s]||0)+'"></div>').join('')+
-        '</div></div>'+
+        '</div>'+
+        '<p class="rubric later">Ceilings</p>'+
+        '<div class="stats">'+STATS.map(s=>'<div class="stat"><label>'+s.slice(0,9)+'</label>'+
+        '<input type="text" data-cap="'+s+'" placeholder="none" value="'+
+        (Number.isFinite(+c.stat_caps?.[s])?+c.stat_caps[s]:'')+'"></div>').join('')+
+        '</div>'+
+        '<p class="hint">A meter with no ceiling can be pushed past every gate on it. '+
+        'The game clamps to whatever is set here.</p></div>'+
 
       '<div class="field edfull"><p class="rubric">Chapters</p>'+
         c.relationship_chapters.map((ch,j)=>'<div class="chapline"><span class="lv">'+ch.level+'</span>'+
         '<input value="'+esc(ch.id||'')+'" data-chid="'+j+'"><input value="'+esc(ch.title||'')+'" data-chtitle="'+j+'">'+
+        (ch.level>1
+          ? '<span class="lv" style="opacity:.7">at</span>'+
+            '<select data-chstat="'+j+'"><option value="">no threshold</option>'+
+            STATS.map(s=>'<option value="'+s+'"'+
+              (chapterGate(ch)?.key===s?' selected':'')+'>'+s+'</option>').join('')+'</select>'+
+            '<input type="text" data-chval="'+j+'" style="width:52px" placeholder="n" value="'+
+            (chapterGate(ch)?.value??'')+'">'
+          : '<span class="lv" style="opacity:.55">starts here</span>')+
         '<button data-chx="'+j+'">×</button></div>').join('')+
-        '<button class="btn" id="edAddChap">+ chapter</button></div>'+
+        '<button class="btn" id="edAddChap">+ chapter</button>'+
+        '<p class="hint">Without a threshold a relationship never leaves chapter 1 in play, '+
+        'so anything gated higher can never appear.</p></div>'+
 
       '<div class="field edfull"><label>Conversation topics</label>'+
         tagList('conversation_topics',c.conversation_topics,'ok')+'</div>'+
@@ -2507,6 +2525,20 @@ function wireEditor(c,adult,romance){
 
   B.querySelectorAll('[data-stat]').forEach(el=>el.oninput=()=>{
     c.relationship_defaults[el.dataset.stat]=parseInt(el.value,10)||0;save();});
+  B.querySelectorAll('[data-cap]').forEach(el=>el.oninput=()=>{
+    c.stat_caps=c.stat_caps||{};
+    const n=parseInt(el.value,10);
+    if(Number.isFinite(n))c.stat_caps[el.dataset.cap]=n;else delete c.stat_caps[el.dataset.cap];
+    save();});
+  const setGate=(j)=>{
+    const ch=c.relationship_chapters[j];
+    const key=B.querySelector('[data-chstat="'+j+'"]')?.value||'';
+    const val=parseInt(B.querySelector('[data-chval="'+j+'"]')?.value,10);
+    ch.requires=(key&&Number.isFinite(val))
+      ? [{type:'stat',character:c.id,key,op:'gte',value:val}] : [];
+    save();};
+  B.querySelectorAll('[data-chstat]').forEach(el=>el.onchange=()=>setGate(+el.dataset.chstat));
+  B.querySelectorAll('[data-chval]').forEach(el=>el.oninput=()=>setGate(+el.dataset.chval));
   B.querySelectorAll('[data-chid]').forEach(el=>el.oninput=()=>{
     c.relationship_chapters[+el.dataset.chid].id=slug(el.value);save();});
   B.querySelectorAll('[data-chtitle]').forEach(el=>el.oninput=()=>{
@@ -2518,6 +2550,11 @@ function wireEditor(c,adult,romance){
     const n=c.relationship_chapters.length+1;
     c.relationship_chapters.push({level:n,id:'chapter_'+n,title:'New chapter'});
     save();paintEditor();paintSetup();};
+}
+
+/** The meter threshold a chapter opens on, if one is set. */
+function chapterGate(ch){
+  return (ch?.requires||[]).find(r=>r.type==='stat')||null;
 }
 
 $('closeEditor').onclick=()=>{$('editor').close();paintAll();};
@@ -3471,6 +3508,44 @@ function paintInspect(){
     return;
   }
 
+  if(insTab==='godot'){
+    const g=godotCheck(),R=g.registry;
+    const acts=P.content.filter(c=>c.type==='activity').length;
+    const rooms=P.content.filter(c=>roomPart(c.location)).length;
+    const nocap=R.stats.filter(s=>s.max===null&&(s.read_by||[]).length).length;
+    B.innerHTML=
+      (g.fatal?'<div class="issue err" style="margin-bottom:12px"><span class="sev">blocked</span>'+
+        '<span class="msg">'+g.fatal+' fatal mismatch'+(g.fatal===1?'':'es')+
+        ' — the build would load and this content would never appear in play.'+
+        '<span class="where">fix these before exporting</span></span></div>'
+        :'<div class="clean" style="margin-bottom:12px">The export matches what the runtime reads.</div>')+
+      '<table class="regtable"><tr><th>Flags</th><th>Meters</th><th>Counters</th>'+
+      '<th>Room-scoped</th><th>Activities</th></tr><tr>'+
+      '<td class="w">'+R.flags.length+'</td>'+
+      '<td class="w">'+R.stats.length+(nocap?' <span class="pill">'+nocap+' uncapped</span>':'')+'</td>'+
+      '<td class="w">'+R.counters.length+'</td>'+
+      '<td class="w">'+rooms+'</td>'+
+      '<td class="w">'+acts+'</td></tr></table>'+
+      (g.issues.length
+        ? '<p class="rubric later">Seam checks</p>'+
+          g.issues.map(i=>'<div class="issue '+(i.sev==='fatal'?'err':i.sev)+'">'+
+            '<span class="sev">'+i.sev+'</span><span class="msg">'+esc(i.msg)+
+            '<span class="where">'+esc(i.where)+'</span></span></div>').join('')
+        : '')+
+      '<p class="rubric later">Declared state</p><table class="regtable">'+
+      '<tr><th>Key</th><th>Type</th><th>Starts</th><th>Ceiling</th><th>Read by</th></tr>'+
+      R.flags.concat(R.stats.map(s=>Object.assign({},s,{type:'meter'})),
+        R.counters.map(c=>Object.assign({},c,{type:'counter'})))
+        .map(x=>'<tr><td class="k">'+esc(x.key)+'</td><td class="w">'+x.type+
+          '</td><td class="w">'+String(x.initial)+'</td><td class="w">'+
+          (x.type==='meter'?(x.max===null?'<span style="color:var(--rose)">none</span>':x.max):'—')+
+          '</td><td class="w">'+esc((x.read_by||[]).join(', ')||'—')+'</td></tr>').join('')+
+      '</table>'+
+      '<p class="hint" style="margin-top:8px">This is the registry block the export ships. '+
+      'The runtime seeds and clamps from it, and warns on a key that is not in this table.</p>';
+    return;
+  }
+
   const miss=missingRefs();
   B.innerHTML=miss.length
     ? '<p class="hint" style="margin-bottom:12px">These ids appear in imported sheets but have no file of '+
@@ -3490,6 +3565,205 @@ function paintInspect(){
     const url=URL.createObjectURL(new Blob([JSON.stringify(stubSheet(m),null,2)],{type:'application/json'}));
     Object.assign(document.createElement('a'),{href:url,download:m.id+'.character'}).click();
     URL.revokeObjectURL(url);},i*250));
+}
+
+/* ---- 15f-contract.js ---- */
+/* ============ the Godot contract ============
+   Everything in here exists to make the export and dialogue_director.gd agree:
+   one compiler for effect strings, one declared registry of flags and stats,
+   the activity block the export used to omit, and a check for the seam itself. */
+
+/** "trust +1; boat_sold; mara.comfort -2" -> effect objects the runtime applies.
+    A dotted key moves a relationship meter; a bare word with a number counts;
+    a bare word on its own sets a flag true. Same rules the runtime used to
+    infer at play time — decided once, here, and written into the export. */
+function compileEffects(raw){
+  return String(raw||'').split(';').map(s=>s.trim()).filter(Boolean).map(piece=>{
+    const parts=piece.split(/\s+/);
+    const key=parts[0];
+    const delta=parts.length>1?parseInt(parts[1],10):NaN;
+    if(key.includes('.')){
+      const [character,meter]=key.split('.');
+      return {operation:'add_meter',character,meter,value:Number.isFinite(delta)?delta:1};
+    }
+    if(Number.isFinite(delta))return {operation:'add_value',key,value:delta};
+    return {operation:'set_flag',key,value:true};
+  });
+}
+
+/** Every authored effect string in the project, with where it came from. */
+function effectSources(){
+  const out=[];
+  P.content.forEach(c=>{
+    const w=c.title||c.id;
+    if(c.flag)out.push({raw:c.flag,where:w});
+    (c.stages||[]).forEach(s=>{if(s.flag)out.push({raw:s.flag,where:w});});
+  });
+  walkAll((n,c,p,isOpt)=>{if(isOpt&&n.flag)out.push({raw:n.flag,where:c.title||c.id});});
+  return out;
+}
+
+/** The declared state contract. Types are decided here rather than guessed at
+    runtime, so a key written as a counter in one scene and a switch in another
+    is a reportable conflict instead of a silent coercion. */
+function stateRegistry(){
+  const reg=flagRegistry();
+  const flags=[],stats=[],counters=[],conflicts=[];
+  const kinds={};
+  effectSources().forEach(({raw,where})=>compileEffects(raw).forEach(e=>{
+    if(e.operation==='set_flag'||e.operation==='add_value'){
+      const k=kinds[e.key]=kinds[e.key]||{bool:[],int:[]};
+      k[e.operation==='set_flag'?'bool':'int'].push(where);
+    }
+  }));
+
+  Object.keys(reg).sort().forEach(k=>{
+    const r=reg[k];
+    if(/^activity\./.test(k)){counters.push({key:k,initial:0,read_by:r.reads});return;}
+    if(k.includes('.')){
+      const [cid,stat]=k.split('.');
+      const ch=chr(cid);
+      if(ch){
+        const cap=ch.stat_caps?.[stat];
+        stats.push({key:k,character:cid,stat,
+          initial:+(ch.relationship_defaults?.[stat]??0),
+          min:0,max:Number.isFinite(+cap)?+cap:null,
+          set_by:r.sets,read_by:r.reads});
+        return;
+      }
+    }
+    const k2=kinds[k]||{bool:[],int:[]};
+    const isInt=k2.int.length>0;
+    if(k2.bool.length&&k2.int.length)
+      conflicts.push({key:k,bool:[...new Set(k2.bool)],int:[...new Set(k2.int)]});
+    flags.push({key:k,type:isInt?'int':'bool',initial:isInt?0:false,
+      auto:/^met_/.test(k)||undefined,set_by:r.sets,read_by:r.reads});
+  });
+
+  // Stats that live on a sheet but no condition reads yet still need seeding.
+  P.characters.forEach(c=>Object.keys(c.relationship_defaults||{}).forEach(stat=>{
+    const key=c.id+'.'+stat;
+    if(stats.some(s=>s.key===key))return;
+    const cap=c.stat_caps?.[stat];
+    stats.push({key,character:c.id,stat,initial:+(c.relationship_defaults[stat]||0),
+      min:0,max:Number.isFinite(+cap)?+cap:null,set_by:[],read_by:[]});
+  }));
+
+  P.content.filter(c=>c.type==='activity').forEach(c=>{
+    const key='activity.'+c.id+'.count';
+    if(!counters.some(x=>x.key===key))counters.push({key,initial:0,activity:c.id});
+  });
+
+  return {flags,stats,counters,conflicts};
+}
+
+/** Activities, plus the internal conversations their beats play through.
+    next_beat() hands back a conversation id, so every base and milestone needs
+    one — minted here and marked internal so nothing offers them by place. */
+function activityBlocks(){
+  const activities=[],conversations=[];
+  P.content.filter(c=>c.type==='activity').forEach(c=>{
+    const stages=c.stages||[];
+    const mint=(s,suffix)=>{
+      const id='activity_'+slug(c.id)+'_'+suffix;
+      conversations.push({id,title:(c.title||c.id)+' — '+(s.title||suffix),
+        location:locPart(c.location),room:roomPart(c.location),
+        day:'',block:'',cast:c.cast||[],chapter:0,requires:[],
+        internal:true,replayable:true,start:false,sets_flag:'',
+        nodes:clean(s.nodes||[])});
+      return id;
+    };
+    const base=stages[0]||{nodes:[],flag:''};
+    // Highest first: next_beat() takes the first match and assumes that order.
+    const ms=stages.slice(1).slice().sort((a,b)=>(+b.at||0)-(+a.at||0));
+    activities.push({id:c.id,title:c.title||c.id,character:c.character||'',
+      location:locPart(c.location),room:roomPart(c.location),
+      activation:{days:c.days||(c.day?[c.day]:[]),blocks:c.blocks||(c.block?[c.block]:[])},
+      counter_key:'activity.'+c.id+'.count',
+      requires:c.requires||[],
+      base:{conversation:mint(base,'base'),effects:compileEffects(base.flag)},
+      milestones:ms.map((s,i)=>({at:+s.at||1,once:s.once!==false,title:s.title||'',
+        conversation:mint(s,'ms'+(+s.at||i+1)),
+        requires:s.requires||[],effects:compileEffects(s.flag)}))});
+  });
+  return {activities,conversations};
+}
+
+/* ---- the seam check ---- *
+   validate() checks the project against itself. This checks the project
+   against what dialogue_director.gd will actually do with it. */
+function godotCheck(){
+  const out=[],add=(sev,msg,where)=>out.push({sev,msg,where});
+  const R=stateRegistry();
+
+  R.conflicts.forEach(c=>add('fatal','"'+c.key+'" is set as a switch in '+c.bool.join(', ')+
+    ' and counted in '+c.int.join(', ')+'. One key cannot be both — rename one or make both counters.',
+    'Flags'));
+
+  P.content.filter(c=>c.type==='activity').forEach(c=>{
+    const w=c.title||c.id;
+    if(!c.character)add('fatal','Activity has no character, so nothing can offer it.',w);
+    if(!countLines((c.stages||[])[0]?.nodes||[]))
+      add('fatal','Activity has no "every time" dialogue, so ordinary repeats play nothing.',w);
+    (c.stages||[]).slice(1).forEach(s=>{
+      if(!countLines(s.nodes||[]))add('err','Milestone "'+s.title+'" has no lines and will play silence.',w);
+    });
+  });
+
+  const placeCheck=(ref,w,what)=>{
+    if(!ref)return;
+    if(!loc(locPart(ref)))return add('fatal',what+' points at "'+locPart(ref)+
+      '", which is not in the location registry, so the runtime cannot place it.',w);
+    if(roomPart(ref)&&!roomOf(ref))add('fatal',what+' names room "'+roomPart(ref)+
+      '", which does not exist in '+(loc(locPart(ref))?.name||'')+'.',w);
+  };
+  P.content.forEach(c=>{
+    const w=c.title||c.id;
+    placeCheck(c.location,w,'This item');
+    (c.stages||[]).forEach((s,i)=>placeCheck(s.location,w,'Stage '+(i+1)));
+  });
+
+  R.stats.filter(s=>s.max===null).forEach(s=>{
+    const gates=(s.read_by||[]).length;
+    if(gates)add('warn','"'+s.key+'" has no ceiling, so choices can push it past every gate on it. '+
+      'Set a cap in Edit sheet & limits.','Stats');
+  });
+
+  const chapterGates=[];
+  const scanReqs=(reqs,w)=>(reqs||[]).forEach(r=>{
+    if(r.type==='chapter'&&+r.value>1)chapterGates.push({who:r.character,level:+r.value,where:w});
+  });
+  P.content.forEach(c=>{scanReqs(c.requires,c.title||c.id);
+    (c.stages||[]).forEach(s=>scanReqs(s.requires,c.title||c.id));
+    if(+c.chapter>1&&(c.cast||[]).length)
+      (c.cast||[]).forEach(id=>{if(!isPlayer(chr(id)))chapterGates.push({who:id,level:+c.chapter,where:c.title||c.id});});
+  });
+  [...new Set(chapterGates.map(g=>g.who))].forEach(who=>{
+    const ch=chr(who);if(!ch)return;
+    const ruled=(ch.relationship_chapters||[]).some(x=>(x.requires||[]).length);
+    if(!ruled){
+      const gs=chapterGates.filter(g=>g.who===who);
+      add('err',ch.name+' has content gated at chapter '+Math.max(...gs.map(g=>g.level))+
+        ' but no chapter has a threshold, so they stay at 1 forever and '+gs.length+
+        ' item'+(gs.length===1?'':'s')+' can never play. Add requirements to their chapters.','Chapters');
+    }
+  });
+
+  Object.keys(flagRegistry()).filter(k=>/^met_/.test(k)).forEach(k=>{
+    const id=k.slice(4);
+    if(!chr(id))return;      // validate() already reports this as an error
+    const appears=P.content.some(c=>(c.cast||[]).includes(id));
+    if(!appears)add('err','"'+k+'" is read by a gate but '+(chr(id).name)+
+      ' is not in the cast of anything, so they are never met.','Flags');
+  });
+
+  const dull=P.content.filter(c=>c.type==='conversation'&&c.day==='monday'&&c.block==='evening');
+  if(dull.length>2)add('warn',dull.length+' conversations sit on the default monday / evening, '+
+    'so each is offerable one block a week. Widen the day or block, or clear them.','Schedule');
+
+  const rank={fatal:0,err:1,warn:2};
+  return {issues:out.sort((a,b)=>rank[a.sev]-rank[b.sev]),registry:R,
+    fatal:out.filter(i=>i.sev==='fatal').length};
 }
 
 /* ---- 16-map.js ---- */
@@ -4308,33 +4582,53 @@ function clean(l){return l.map(n=>n.type==='line'
   ?{type:'line',speaker:n.speaker,text:n.text,emotion:n.emotion||''}
   :n.type==='jump'?{type:'jump',target:n.target||''}
   :{type:'choice',options:n.options.map(o=>({text:o.text,flag:o.flag||'',
+     effects:compileEffects(o.flag),
      requires:o.requires||[],nodes:clean(o.nodes)}))});}
 
 function toJSON(){
   const pick=t=>P.content.filter(c=>c.type===t);
-  return JSON.stringify({format:'scenewright.v2',
+  const acts=activityBlocks();
+  const place=ref=>({location:locPart(ref),room:roomPart(ref)});
+  return JSON.stringify({format:'scenewright.v3',
     characters:P.characters.map(c=>{
       const g=gameReady(c);
       return {id:c.id,name:c.name,color:c.color,
         age:g.profile?.age??null,
+        is_player:isPlayer(c),
         romance_eligible:g.profile.romance_eligible,
         family_only:!!g.boundaries.family_only,
         hard_limits:g.boundaries.hard_limits||[],
         adult_hard_limits:g.private_profile?.adult_preferences?.hard_limits||[],
-        chapters:(c.relationship_chapters||[]).map(x=>({level:x.level,id:x.id,title:x.title})),
+        chapters:(c.relationship_chapters||[]).map(x=>({level:x.level,id:x.id,title:x.title,
+          requires:x.requires||[]})),
+        stat_caps:c.stat_caps||{},
         relationship_defaults:c.relationship_defaults||{}};
     }),
-    locations:P.locations.map(l=>({id:l.id,name:l.name,background:l.background,district:l.district})),
-    conversations:pick('conversation').map(c=>({id:c.id,title:c.title,location:c.location,
-      day:c.day,block:c.block,cast:c.cast||[],chapter:+c.chapter||0,
-      requires:c.requires||[],start:!!c.start,nodes:clean(c.nodes||[])})),
+    // Rooms travel with their location: scenes are authored at "place.room" and
+    // the runtime needs the room table to resolve one.
+    locations:P.locations.map(l=>({id:l.id,name:l.name,background:l.background,
+      district:l.district,type:l.type||'',
+      rooms:(l.rooms||[]).map(r=>({id:r.id,name:r.name,access:r.access||''})),
+      travel_node:l.travel_node!==false})),
+    // The declared state contract — types, starting values and ceilings.
+    registry:stateRegistry(),
+    conversations:pick('conversation').map(c=>Object.assign({id:c.id,title:c.title},
+      place(c.location),
+      {day:c.day,block:c.block,cast:c.cast||[],chapter:+c.chapter||0,
+       requires:c.requires||[],start:!!c.start,
+       replayable:!!c.replayable,sets_flag:c.flag||'',
+       nodes:clean(c.nodes||[])})).concat(acts.conversations),
     quests:pick('quest').map(c=>({id:c.id,title:c.title,giver:c.character||'',hook:c.hook||'',
-      requires:c.requires||[],
-      stages:(c.stages||[]).map(s=>({id:s.id,title:s.title,location:s.location,
-        sets_flag:s.flag||'',requires:s.requires||[],nodes:clean(s.nodes||[])}))})),
-    repeatables:pick('repeatable').map(c=>({id:c.id,character:c.character,location:c.location,
-      blocks:c.block?[c.block]:[],requires:c.requires||[],lines:(c.lines||[]).map(l=>
-        ({text:l.text,emotion:l.emotion||'',min_chapter:+l.min_chapter||0}))}))},null,2);
+      cast:c.cast||[],requires:c.requires||[],
+      stages:(c.stages||[]).map(s=>Object.assign({id:s.id,title:s.title},place(s.location),
+        {sets_flag:s.flag||'',effects:compileEffects(s.flag),
+         requires:s.requires||[],nodes:clean(s.nodes||[])}))})),
+    activities:acts.activities,
+    repeatables:pick('repeatable').map(c=>Object.assign({id:c.id,character:c.character},
+      place(c.location),
+      {days:c.days||(c.day?[c.day]:[]),blocks:c.blocks||(c.block?[c.block]:[]),
+       requires:c.requires||[],lines:(c.lines||[]).map(l=>
+         ({text:l.text,emotion:l.emotion||'',min_chapter:+l.min_chapter||0}))}))},null,2);
 }
 function plain(l,pad){return l.map(n=>n.type==='line'
   ?pad+(chr(n.speaker)?.name||n.speaker).toUpperCase()+'\n'+pad+n.text
@@ -4356,7 +4650,12 @@ function toSheets(){
 const build=()=>fmt==='sheets'?toSheets():fmt==='json'?toJSON():toScript();
 $('openMap').onclick=openMap;
 $('openInspect').onclick=()=>openInspect();
-$('openExport').onclick=()=>{$('dump').value=build();$('sheet').showModal()};
+$('openExport').onclick=()=>{
+  $('dump').value=build();$('sheet').showModal();
+  const g=godotCheck();
+  if(g.fatal)note(g.fatal+' fatal mismatch'+(g.fatal===1?'':'es')+' between this project and the '+
+    'runtime — content would load and never play. Inspect → Godot lists them.',true);
+};
 $('closeSheet').onclick=()=>$('sheet').close();
 document.querySelectorAll('[data-fmt]').forEach(b=>b.onclick=()=>{fmt=b.dataset.fmt;
   document.querySelectorAll('[data-fmt]').forEach(x=>x.classList.toggle('on',x===b));$('dump').value=build();});

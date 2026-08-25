@@ -1,7 +1,10 @@
 extends Node
 class_name DialogueDirector
 
-## Loads and plays content exported from Scenewright (format: scenewright.v2).
+## Loads and plays content exported from Scenewright (format: scenewright.v3).
+##
+## v3 adds the declared state registry (flag and meter types, starting values,
+## ceilings), rooms alongside locations, activities, and chapter thresholds.
 ##
 ## Handles three content types:
 ##   conversations — branching node trees, played once or gated by chapter
@@ -22,6 +25,7 @@ signal content_started(content_id: String, location_id: String, background: Stri
 signal content_finished(content_id: String)
 signal flag_changed(key: String, value: Variant)
 signal quest_stage_completed(quest_id: String, stage_id: String)
+signal chapter_advanced(character_id: String, level: int)
 
 var characters: Dictionary = {}     ## id -> {name, color, chapters, defaults}
 var locations: Dictionary = {}      ## id -> {name, background, district}
@@ -36,8 +40,17 @@ var chapters: Dictionary = {}       ## character_id -> current relationship leve
 var seen: Dictionary = {}           ## content_id -> true
 var quest_stage: Dictionary = {}    ## quest_id -> index of the next unplayed stage
 
+## The declared state contract from the export: which flags and meters exist,
+## what type they are, where they start, and what they may not exceed. Types are
+## decided by the authoring tool now, not inferred here from punctuation.
+var registry: Dictionary = {}
+var _bounds: Dictionary = {}        ## key -> {"min": float, "max": float}
+var _declared: Dictionary = {}      ## key -> true; anything else is a typo
+var _chapter_rules: Dictionary = {} ## character_id -> Array of {level, requires}
+
 var _active_id: String = ""
 var _active_quest: String = ""
+var _active_flag: String = ""
 var _stack: Array = []
 var _pending: Array = []
 var _rng := RandomNumberGenerator.new()
@@ -73,6 +86,7 @@ func load_content(path: String) -> bool:
 			"chapters": c.get("chapters", []),
 			"defaults": c.get("relationship_defaults", {}),
 		}
+		_chapter_rules[c.get("id", "")] = c.get("chapters", [])
 		# Start every character at chapter 1 unless a save says otherwise.
 		if not chapters.has(c.get("id", "")):
 			chapters[c.get("id", "")] = 1
@@ -85,6 +99,8 @@ func load_content(path: String) -> bool:
 	locations.clear()
 	for l: Dictionary in data.get("locations", []):
 		locations[l.get("id", "")] = l
+
+	_load_registry(data.get("registry", {}))
 
 	conversations.clear()
 	for c: Dictionary in data.get("conversations", []):
@@ -102,19 +118,103 @@ func load_content(path: String) -> bool:
 	for a: Dictionary in data.get("activities", []):
 		activities[a.get("id", "")] = a
 
+	# Chapters may already qualify at their starting meter values.
+	for id: String in characters:
+		_check_chapter(id)
+
 	return true
+
+
+# ---------------------------------------------------------------- the state contract
+
+## Seeds every declared flag, meter and counter, and remembers the bounds so
+## nothing can drift past a gate. Safe to call on a save load as well: values
+## already present are left alone.
+func _load_registry(reg: Dictionary) -> void:
+	registry = reg
+
+	for f: Dictionary in reg.get("flags", []):
+		var key: String = f.get("key", "")
+		if key == "":
+			continue
+		_declared[key] = true
+		if not flags.has(key):
+			flags[key] = f.get("initial", false)
+
+	for s: Dictionary in reg.get("stats", []):
+		var key: String = s.get("key", "")
+		if key == "":
+			continue
+		_declared[key] = true
+		var lo: Variant = s.get("min", null)
+		var hi: Variant = s.get("max", null)
+		if lo != null or hi != null:
+			_bounds[key] = {
+				"min": float(lo) if lo != null else -INF,
+				"max": float(hi) if hi != null else INF,
+			}
+		if not stats.has(key):
+			stats[key] = _clamp_key(key, float(s.get("initial", 0)))
+
+	for c: Dictionary in reg.get("counters", []):
+		var key: String = c.get("key", "")
+		if key == "":
+			continue
+		_declared[key] = true
+		if not stats.has(key):
+			stats[key] = float(c.get("initial", 0))
+
+
+func _clamp_key(key: String, value: float) -> float:
+	if not _bounds.has(key):
+		return value
+	var b: Dictionary = _bounds[key]
+	return clampf(value, b["min"], b["max"])
+
+
+func _warn_undeclared(key: String) -> void:
+	if registry.is_empty() or _declared.has(key) or key.begins_with("met_"):
+		return
+	push_warning("DialogueDirector: '%s' is not in the exported registry — likely a typo, or the export is stale." % key)
+
+
+## Moves a character up as soon as a chapter's requirements are satisfied.
+## Without this every relationship sits at 1 and chapter-gated content is dead.
+func _check_chapter(character_id: String) -> void:
+	var rules: Array = _chapter_rules.get(character_id, [])
+	if rules.is_empty():
+		return
+	var level: int = int(chapters.get(character_id, 1))
+	var best: int = level
+	for r: Dictionary in rules:
+		var need: int = int(r.get("level", 0))
+		var reqs: Array = r.get("requires", [])
+		if need > best and not reqs.is_empty() and check_all(reqs):
+			best = need
+	if best > level:
+		chapters[character_id] = best
+		chapter_advanced.emit(character_id, best)
 
 
 # ---------------------------------------------------------------- queries
 
 ## Conversations available right now, given where the player is and when.
-func available_conversations(location_id: String, day: String, block: String) -> Array[String]:
+func available_conversations(location_id: String, day: String, block: String,
+		room_id: String = "") -> Array[String]:
 	var out: Array[String] = []
 	for id: String in conversations:
 		var c: Dictionary = conversations[id]
-		if seen.has(id):
+		# Activity and milestone dialogue is played through do_activity, never offered by place.
+		if bool(c.get("internal", false)):
+			continue
+		if seen.has(id) and not bool(c.get("replayable", false)):
 			continue
 		if c.get("location", "") != location_id:
+			continue
+		# A scene pinned to a room only offers itself in that room. Pass "" for
+		# room_id if the game does not track rooms and it matches anything.
+		var want_room: String = String(c.get("room", ""))
+		if want_room != "" and room_id != "" and want_room != room_id:
 			continue
 		if c.get("day", "") != "" and c.get("day", "") != day:
 			continue
@@ -129,7 +229,8 @@ func available_conversations(location_id: String, day: String, block: String) ->
 
 
 ## One idle line for a character, or "" if they have nothing to say here.
-func idle_line(character_id: String, location_id: String = "", block: String = "") -> Dictionary:
+func idle_line(character_id: String, location_id: String = "", block: String = "",
+		day: String = "") -> Dictionary:
 	var pool: Array = []
 	for r: Dictionary in repeatables:
 		if r.get("character", "") != character_id:
@@ -138,6 +239,9 @@ func idle_line(character_id: String, location_id: String = "", block: String = "
 			continue
 		var blocks: Array = r.get("blocks", [])
 		if block != "" and not blocks.is_empty() and not blocks.has(block):
+			continue
+		var days: Array = r.get("days", [])
+		if day != "" and not days.is_empty() and not days.has(day):
 			continue
 		if not check_all(r.get("requires", [])):
 			continue
@@ -221,8 +325,10 @@ func open_choices() -> Array[int]:
 
 func adjust_stat(character_id: String, key: String, delta: float) -> void:
 	var k := "%s.%s" % [character_id, key]
-	stats[k] = float(stats.get(k, 0.0)) + delta
+	_warn_undeclared(k)
+	stats[k] = _clamp_key(k, float(stats.get(k, 0.0)) + delta)
 	flag_changed.emit(k, stats[k])
+	_check_chapter(character_id)
 
 
 func meet(character_id: String) -> void:
@@ -283,7 +389,8 @@ func play_conversation(id: String) -> void:
 	var c: Dictionary = conversations[id]
 	_active_id = id
 	_active_quest = ""
-	_begin(c.get("nodes", []), c.get("location", ""))
+	_active_flag = String(c.get("sets_flag", ""))
+	_begin(c.get("nodes", []), c.get("location", ""), c.get("cast", []))
 
 
 ## Plays the next unplayed stage of a quest. Returns false when it's done.
@@ -301,7 +408,8 @@ func play_quest_stage(quest_id: String) -> bool:
 	var stage: Dictionary = stages[idx]
 	_active_id = quest_id + "/" + str(stage.get("id", idx))
 	_active_quest = quest_id
-	_begin(stage.get("nodes", []), stage.get("location", ""))
+	_active_flag = ""
+	_begin(stage.get("nodes", []), stage.get("location", ""), q.get("cast", []))
 	return true
 
 
@@ -341,9 +449,14 @@ func quest_location(quest_id: String) -> String:
 	return stages[idx].get("location", "")
 
 
-func _begin(nodes: Array, location_id: String) -> void:
+func _begin(nodes: Array, location_id: String, cast: Array = []) -> void:
 	_pending.clear()
 	_stack = [{"nodes": nodes, "index": 0}]
+	# Anyone on screen counts as met. Nothing else sets met_*, so every gate on
+	# it would otherwise stay false for the whole game.
+	for who: String in cast:
+		if who != "" and not bool(flags.get("met_" + who, false)):
+			meet(who)
 	var bg: String = locations.get(location_id, {}).get("background", "")
 	content_started.emit(_active_id, location_id, bg)
 	advance()
@@ -416,6 +529,10 @@ func has_choice() -> bool:
 func _finish() -> void:
 	seen[_active_id] = true
 
+	if _active_flag != "":
+		set_flag(_active_flag)
+		_active_flag = ""
+
 	if _active_quest != "":
 		var q: Dictionary = quests[_active_quest]
 		var idx: int = int(quest_stage.get(_active_quest, 0))
@@ -469,7 +586,7 @@ func next_beat(activity_id: String) -> Dictionary:
 
 
 func _milestone_reqs(m: Dictionary, n: int) -> Array:
-	var out: Array = []
+	var out: Array = (m.get("requires", []) as Array).duplicate()
 	var cond: Dictionary = m.get("condition", {})
 	for key: String in cond:
 		match key:
@@ -521,6 +638,11 @@ func _apply_effect(e: Dictionary) -> void:
 		"set_flag":
 			flags[e.get("key", "")] = e.get("value", true)
 			flag_changed.emit(e.get("key", ""), flags[e.get("key", "")])
+		"add_value":
+			var k: String = e.get("key", "")
+			_warn_undeclared(k)
+			flags[k] = int(flags.get(k, 0)) + int(e.get("value", 0))
+			flag_changed.emit(k, flags[k])
 		"set_value":
 			flags[e.get("key", "")] = e.get("value", true)
 			flag_changed.emit(e.get("key", ""), flags[e.get("key", "")])
@@ -570,14 +692,17 @@ func _apply_one(effect: String) -> void:
 	var key := parts[0]
 
 	if parts.size() == 1:
+		_warn_undeclared(key)
 		flags[key] = true
 		flag_changed.emit(key, flags[key])
 		return
 
 	var delta := parts[1].to_int()
+	_warn_undeclared(key)
 	if key.contains("."):
-		stats[key] = float(stats.get(key, 0.0)) + float(delta)
+		stats[key] = _clamp_key(key, float(stats.get(key, 0.0)) + float(delta))
 		flag_changed.emit(key, stats[key])
+		_check_chapter(key.get_slice(".", 0))
 	else:
 		flags[key] = int(flags.get(key, 0)) + delta
 		flag_changed.emit(key, flags[key])
@@ -601,3 +726,6 @@ func load_state(state: Dictionary) -> void:
 	seen = state.get("seen", {})
 	quest_stage = state.get("quest_stage", {})
 	stats = state.get("stats", {})
+	# A save written before a key existed is missing it; seeding fills the gaps
+	# without disturbing anything the player has already changed.
+	_load_registry(registry)

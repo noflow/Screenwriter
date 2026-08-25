@@ -29,6 +29,7 @@
  "js/15c-reach.js",
  "js/15d-simulate.js",
  "js/15e-inspect.js",
+ "js/15f-contract.js",
  "js/16-map.js",
  "js/17-authored-in.js",
  "js/18-authored-out.js",

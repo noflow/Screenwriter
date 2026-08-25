@@ -25,7 +25,7 @@ a copy of, back up, or hand to someone else.
     manifest.json       load order (regenerate by sorting js/ filenames)
     _markup.html        shared markup template with @@CSS@@ / @@JS@@ slots
     css/app.css         all styles
-    js/                 35 modules, loaded in filename order
+    js/                 36 modules, loaded in filename order
 
 ## The modules
 
