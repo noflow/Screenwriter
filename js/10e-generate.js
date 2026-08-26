@@ -103,7 +103,8 @@ async function run(){
   const c=cur();if(!c)return;
   const canRunEmpty=mode==='choice'||mode==='variants'||mode==='chat'||
     (mode==='play'&&$('writePlayer')?.checked&&(c.nodes||c.stages)&&countLines(rootList()));
-  const hasPlan=mode==='scene'&&!!c.scenePlan?.outline;
+  const planTarget=typeof scenePlanTarget==='function'?scenePlanTarget(c):c;
+  const hasPlan=mode==='scene'&&!!planTarget?.scenePlan?.outline;
   if(!input&&!canRunEmpty&&!hasPlan)return;
   if(c.type!=='repeatable'&&mode!=='scene'&&!(c.cast||[]).length)
     return raise('Mark at least one character as present, top right.');
@@ -143,8 +144,13 @@ async function run(){
         'it was probably cut short. Raise the memory window in the Direction tab.');
 
       // Take whatever the model worked out about the setting, if it is real.
-      if(d.title)c.title=String(d.title).slice(0,60);
-      if(!c.id||/^scene_\d+$/.test(c.id))c.id=slug(d.title||c.title||c.id);
+      if(c.type==='activity'){
+        if(d.title&&(!planTarget.title||/^New milestone$/i.test(planTarget.title)))
+          planTarget.title=String(d.title).slice(0,60);
+      }else{
+        if(d.title)c.title=String(d.title).slice(0,60);
+        if(!c.id||/^scene_\d+$/.test(c.id))c.id=slug(d.title||c.title||c.id);
+      }
       if(d.location&&loc(d.location))c.location=d.location;
       if(d.block&&BLOCKS.includes(d.block))c.block=d.block;
       const found=[...new Set(nodes.flatMap(function pick(n){
@@ -155,7 +161,7 @@ async function run(){
         ? d.cast.filter(x=>ids.includes(x)) : [],found))];
 
       // Writing into a focused branch extends that path instead of the root.
-      const target=focusPath.length?listAt(focusPath):(c.nodes=c.nodes||[]);
+      const target=focusPath.length?listAt(focusPath):rootList();
       nodes.forEach(n=>target.push(n));
       clearAlarm();save();paintAll();
       $('tree').scrollTop=$('tree').scrollHeight;

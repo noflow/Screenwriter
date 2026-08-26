@@ -17,9 +17,10 @@ function paintBody(){
 
 function slugline(c){
   const l=loc(locPart(c.location)),ch=(chr(c.character)||chr(c.cast?.[0]))?.relationship_chapters?.find(x=>x.level===+c.chapter);
+  const days=(c.type==='conversation'||c.type==='activity')?contentDays(c):[c.day].filter(Boolean);
   return '<div class="slug"><span><b>'+esc(c.id||'no_id')+'</b></span>'+
     '<span>'+esc(c.location?placeName(c.location):'no location')+'</span>'+
-    '<span>'+esc(pretty(c.day))+' · '+esc(pretty(c.block))+'</span>'+
+    '<span>'+esc(days.length?days.map(pretty).join(' / '):'any day')+' · '+esc(pretty(c.block))+'</span>'+
     (ch?'<span>ch '+ch.level+' · '+esc(ch.title)+'</span>':'')+
     '<span>'+(c.cast||[]).map(id=>esc(chr(id)?.name||id)).join(', ')+'</span></div>';
 }
@@ -45,14 +46,20 @@ function renderList(list,path){
         '<button data-act="up">↑</button><button data-act="down">↓</button>'+
         '<button data-act="addline">+line</button>'+
         '<button data-act="fork">fork</button><button data-act="narrate">narrate</button>'+
-        '<button data-act="jump">jump</button><button data-act="del">del</button></div>'+
+        '<button data-act="jump">jump</button><button data-act="del">del</button>'+
+        (cur().type==='activity'?'<label class="success-toggle'+(n.activitySuccess?' on':'')+'" '+
+          'title="Advance this activity’s successful-completion counter"><input type="checkbox" '+
+          'data-node-success="'+p.join('.')+'"'+(n.activitySuccess?' checked':'')+'> Counts as success</label>':'')+
+        '</div>'+
         '<div class="line-node"><div class="who-l" data-act="speaker" style="color:'+c.color+'">'+esc(c.name)+
         (n.emotion?'<span class="emo">'+esc(n.emotion)+'</span>':'')+'</div>'+
         '<div class="said" contenteditable="plaintext-only" data-act="text">'+dress(n.text)+'</div></div></div>';
     }
     if(n.type==='jump'){
+      const selected=P.content.find(x=>x.uid===n._map_target_uid)||
+        P.content.find(x=>x.type==='conversation'&&x.id===n.target)||P.content.find(x=>x.id===n.target);
       const opts=P.content.filter(x=>x.uid!==cur().uid).map(x=>
-        '<option value="'+esc(x.id)+'"'+(x.id===n.target?' selected':'')+'>'+
+        '<option value="'+esc(x.uid)+'"'+(x.uid===selected?.uid?' selected':'')+'>'+
         esc(x.title||x.id)+' ('+x.type+')</option>').join('');
       return '<div class="node" data-p="'+p.join('.')+'"><div class="tools">'+
         '<button data-act="up">↑</button><button data-act="down">↓</button>'+
@@ -69,6 +76,7 @@ function renderList(list,path){
           const h=path.concat(i,j),on=h.join('.')===focusPath.join('.');
           return '<div class="branch'+(on?' on':'')+'"><div class="branch-head">'+
             '<input class="opt-text" value="'+esc(o.text)+'" data-opt="'+h.join('.')+'">'+
+            (cur().type==='activity'?'<label class="success-toggle'+(o.activitySuccess?' on':'')+'" title="Advance this activity’s successful-completion counter"><input type="checkbox" data-success="'+h.join('.')+'"'+(o.activitySuccess?' checked':'')+'> Counts as success</label>':'')+
             '<button class="branch-here" data-here="'+h.join('.')+'">'+(on?'writing here':'write here')+'</button>'+
             '<button class="branch-rewrite" data-rewrite="'+h.join('.')+'">rewrite</button>'+
             '</div><div class="optcond">'+condEditor(o.requires,'opt:'+h.join('.'))+
@@ -76,7 +84,7 @@ function renderList(list,path){
             renderList(o.nodes,h)+'</div>';
         }).join('')+'</div></div>';
     }
-    return '<div class="node" data-p="'+p.join('.')+'"><div class="tools">'+
+      return '<div class="node" data-p="'+p.join('.')+'"><div class="tools">'+
       '<button data-act="up">↑</button><button data-act="down">↓</button>'+
       '<button data-act="addopt">+ option</button><button data-act="del">del</button></div>'+
       '<div class="choice-node"><div class="choice-head">Player chooses</div>'+
@@ -85,6 +93,7 @@ function renderList(list,path){
         return '<div class="branch'+(on?' on':'')+'"><div class="branch-head">'+
           '<input class="opt-text" value="'+esc(o.text)+'" data-opt="'+h.join('.')+'">'+
           '<input class="flag" placeholder="trust +1" value="'+esc(o.flag||'')+'" data-flag="'+h.join('.')+'">'+
+          (cur().type==='activity'?'<label class="success-toggle'+(o.activitySuccess?' on':'')+'" title="Advance this activity’s successful-completion counter"><input type="checkbox" data-success="'+h.join('.')+'"'+(o.activitySuccess?' checked':'')+'> Counts as success</label>':'')+
           '<button class="branch-go" data-cont="'+h.join('.')+'">'+
             ((o.nodes||[]).length?'continue':'write this branch')+'</button>'+
           ((o.nodes||[]).length?'<button class="branch-rewrite" data-rewrite="'+h.join('.')+'">rewrite</button>':'')+
@@ -116,6 +125,18 @@ function wireTree(){
     optAt(el.dataset.opt.split('.').map(Number)).text=el.value;save()});
   inner.querySelectorAll('[data-flag]').forEach(el=>el.oninput=()=>{
     optAt(el.dataset.flag.split('.').map(Number)).flag=el.value;save()});
+  inner.querySelectorAll('[data-success]').forEach(el=>el.onchange=()=>{
+    const c=cur(),o=optAt(el.dataset.success.split('.').map(Number));
+    o.activitySuccess=el.checked;
+    if(el.checked)c.incrementsOn='explicit_success';
+    save();paintBody();
+  });
+  inner.querySelectorAll('[data-node-success]').forEach(el=>el.onchange=()=>{
+    const c=cur(),n=nodeAt(el.dataset.nodeSuccess.split('.').map(Number));
+    n.activitySuccess=el.checked;
+    if(el.checked)c.incrementsOn='explicit_success';
+    save();paintBody();
+  });
   inner.querySelectorAll('[data-cont]').forEach(b=>b.onclick=async()=>{
     if(busy)return;
     const p=b.dataset.cont.split('.').map(Number);
@@ -146,7 +167,10 @@ function wireTree(){
     const h=b.dataset.here.split('.').map(Number);
     focusPath=focusPath.join('.')===h.join('.')?[]:h;paintBody();});
   inner.querySelectorAll('[data-jump]').forEach(el=>el.onchange=()=>{
-    nodeAt(el.dataset.jump.split('.').map(Number)).target=el.value;save();});
+    const n=nodeAt(el.dataset.jump.split('.').map(Number)),target=P.content.find(x=>x.uid===el.value);
+    n.target=target?.id||'';
+    if(target)n._map_target_uid=target.uid;else delete n._map_target_uid;
+    save();});
   wireConds(inner);
 }
 

@@ -13,21 +13,32 @@ function simulate(maxDays){
     const b=p.trim().split(/\s+/);
     return n+(b.length>1?(parseInt(b[1],10)||0):1);},0);
 
-  const run=(list,depth)=>{
+  const run=(list,depth,activityId)=>{
+    let succeeded=false;
     (list||[]).forEach(n=>{
+      if(n.type==='line'){
+        if(activityId&&n.activitySuccess)succeeded=true;
+        return;
+      }
       if(n.type==='gate'){
         const open=n.options.filter(o=>allMet(o.requires,S));
-        if(open.length&&depth<12){applyFlag(open[0].flag,S);run(open[0].nodes,depth+1);}
+        if(open.length&&depth<12){
+          if(activityId&&open[0].activitySuccess)succeeded=true;
+          applyFlag(open[0].flag,S);
+          if(run(open[0].nodes,depth+1,activityId))succeeded=true;
+        }
         return;
       }
       if(n.type==='choice'){
         const open=n.options.filter(o=>allMet(o.requires,S));
         if(!open.length)return;
         const best=open.reduce((a,b)=>worth(b.flag)>worth(a.flag)?b:a);
+        if(activityId&&best.activitySuccess)succeeded=true;
         applyFlag(best.flag,S);
-        if(depth<12)run(best.nodes,depth+1);
+        if(depth<12&&run(best.nodes,depth+1,activityId))succeeded=true;
       }
     });
+    return succeeded;
   };
 
   for(let day=1;day<=maxDays;day++){
@@ -36,21 +47,35 @@ function simulate(maxDays){
       const dayName=DAYS[(day-1)%7];
       P.content.forEach(c=>{
         if(c.type==='repeatable')return;
+        const offeredDays=(c.type==='activity'||c.type==='conversation')?contentDays(c):[c.day].filter(Boolean);
+        if(offeredDays.length&&!offeredDays.includes(dayName))return;
         if(c.block&&c.block!==block)return;
         if(c.type!=='activity'&&played.has(c.id))return;
         if(!allMet(c.requires,S))return;
         if(c.type==='quest'&&c.after&&!played.has(c.after))return;
 
         if(c.type==='activity'){
-          const k='activity.'+c.id+'.count';
-          S.stats[k]=(S.stats[k]||0)+1;
-          const n=S.stats[k];
+          const k=activityCounterKey(c);
+          const n=S.stats[k]||0;
+          const semantics=c.milestoneSemantics||c._authored?.milestone_semantics||
+            ((c.incrementsOn||c._authored?.increments_on)==='explicit_success'?'after_successes':'projected_attempt');
+          const thresholdCount=semantics==='projected_attempt'?n+1:n;
           const ms=(c.stages||[]).slice(1).sort((a,b)=>(+b.at||0)-(+a.at||0))
-            .find(s=>+s.at<=n&&allMet(s.requires,S)&&!played.has(c.id+'#'+s.id));
+            .find(s=>+s.at<=thresholdCount&&allMet(s.requires,S)&&
+              (s.once===false||!played.has(c.id+'#'+s.id)));
           const beat=ms||(c.stages||[])[0];
-          if(ms)played.add(c.id+'#'+ms.id);
-          applyFlag(beat.flag,S);run(beat.nodes,0);
-          if(ms)log.push({day,block,what:c.title+' — '+ms.title,kind:'milestone',n});
+          const routeSucceeded=run(beat.nodes,0,c.id);
+          // Explicit-success activities only count when the selected route marks
+          // success. Legacy activities count every finished route.
+          const explicit=(c.incrementsOn||c._authored?.increments_on)==='explicit_success';
+          const success=!explicit||routeSucceeded;
+          if(success){
+            S.stats[k]=n+1;
+            applyFlag(beat.flag,S);
+            if(ms&&ms.once!==false)played.add(c.id+'#'+ms.id);
+          }
+          if(ms)log.push({day,block,what:c.title+' — '+ms.title,kind:'milestone',n,
+            success});
           didSomething=true;return;
         }
 

@@ -6,6 +6,11 @@ const SCENE_TEMPLATES={
   confrontation:{label:'Confrontation',goal:'A hidden problem can no longer be avoided.',tension:'Each person wants something incompatible.',beat:'One person says the thing they were avoiding.',tone:'tense, direct, emotionally honest',ending:'Work toward a compromise, or leave the conflict unresolved.'},
   quest:{label:'Quest handoff',goal:'A character asks the player for help with a concrete problem.',tension:'The request costs something or has an unclear motive.',beat:'The player learns why this matters personally.',tone:'purposeful, character-led',ending:'Take the task, negotiate terms, or decline.'}
 };
+/** Activity milestones are scenes too. Keep each stage's plan beside its own
+    dialogue so planning one milestone never overwrites another. */
+function scenePlanTarget(c=cur()){
+  return c?.type==='activity'?(c.stages?.[stageIx]||c):c;
+}
 function newPlannedScene(){
   if(cur())return cur();
   const uid='u'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
@@ -56,16 +61,18 @@ function plannerBrief(p){
 
 function putPlanOnScene(){
   const c=newPlannedScene(),p=plannerFields();
-  p.brief=plannerBrief(p);c.scenePlan=p;c.premise=p.brief;
+  const target=scenePlanTarget(c);
+  p.brief=plannerBrief(p);target.scenePlan=p;target.premise=p.brief;
   const place=P.locations.find(l=>l.id===p.setting||l.name.toLowerCase()===p.setting.toLowerCase());
   if(place)c.location=place.id;
-  if(p.goal&&(!c.title||c.title==='Planned scene'))c.title=p.goal.slice(0,60);
+  if(p.goal&&c.type==='activity'&&(!target.title||/^New milestone$/i.test(target.title)))target.title=p.goal.slice(0,60);
+  else if(p.goal&&(!c.title||c.title==='Planned scene'))c.title=p.goal.slice(0,60);
   save();paintSetup();paintContent();
   return c;
 }
 
 function openPlanner(){
-  const p=cur()?.scenePlan||{};
+  const p=scenePlanTarget()?.scenePlan||{};
   $('pTemplate').innerHTML='<option value="">— start from scratch —</option>'+Object.entries(SCENE_TEMPLATES)
     .map(([id,t])=>'<option value="'+id+'">'+t.label+'</option>').join('');
   const gate=p.statGate||{};
@@ -158,7 +165,7 @@ async function draftSceneOutline(){
 
 function writeSceneFromPlan(){
   const c=putPlanOnScene();
-  if(!c.scenePlan.outline)return note('Draft or paste an outline first.',true);
+  if(!scenePlanTarget(c)?.scenePlan?.outline)return note('Draft or paste an outline first.',true);
   $('planner').close();mode='scene';$('line').value='';paintModes();run();
 }
 

@@ -11,6 +11,65 @@ const slug=s=>String(s).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const dress=s=>esc(s).replace(/\*([^*\n]+)\*/g,'<em class="dir">$1</em>');
 const pretty=s=>String(s??'').replace(/_/g,' ');
+/** Conversations and activities may be offered on several days. `day` remains
+    the primary/legacy day so schedules and older project files keep working. */
+function contentDays(c){
+  const raw=Array.isArray(c?.days)?c.days:(c?.day?[c.day]:[]);
+  return [...new Set(raw.filter(d=>DAYS.includes(d)))];
+}
+function setContentDays(c,days){
+  c.days=[...new Set((days||[]).filter(d=>DAYS.includes(d)))];
+  c.day=c.days[0]||'';
+}
+function setContentBlock(c,block){
+  c.block=BLOCKS.includes(block)?block:'';
+  if(c.type==='activity')c.blocks=c.block?[c.block]:[];
+}
+/** Renames content and keeps the modeled references that use an activity id in
+    sync. Custom counter keys stay custom; only the default derived key follows. */
+function renameContentId(c,raw){
+  const old=c.id,next=slug(raw),ambiguous=P.content.some(x=>x!==c&&x.id===old);
+  c.id=next;
+  if(old===next)return next;
+  const rewriteEffects=target=>{
+    if(c.type!=='activity'||!Array.isArray(target?.effects))return;
+    target.effects.forEach(e=>{
+      if(e?.operation==='complete_activity'&&e.value===old)e.value=next;
+    });
+  };
+  const scan=list=>(list||[]).forEach(n=>{
+    if(n.type==='jump'&&n.target===old&&
+      (n._map_target_uid===c.uid||(!n._map_target_uid&&!ambiguous)))n.target=next;
+    rewriteEffects(n);rewriteEffects(n._orig);
+    if(n.type==='choice'||n.type==='gate')(n.options||[]).forEach(o=>{
+      rewriteEffects(o);rewriteEffects(o._orig);scan(o.nodes);
+    });
+  });
+  P.content.forEach(item=>{
+    if(item.type==='quest'||item.type==='activity')(item.stages||[]).forEach(s=>scan(s.nodes));
+    else scan(item.nodes);
+  });
+  if(c.type==='quest')P.content.filter(x=>x.type==='quest'&&x.after===old).forEach(x=>x.after=next);
+  if(c.type!=='activity')return next;
+  const oldDefault='activity.'+old+'.count';
+  if(!c.counterKey||c.counterKey===oldDefault)c.counterKey='activity.'+next+'.count';
+  if(c._authored?.counter_key===oldDefault)c._authored.counter_key=c.counterKey;
+  if(c._authored?.source?.counter_key===oldDefault)c._authored.source.counter_key=c.counterKey;
+  if(c._authored?.source)c._authored.source.id=next;
+  P.content.filter(x=>x.type==='quest').forEach(q=>(q.stages||[]).forEach(s=>{
+    const rules=[
+      ['completion','completion'],
+      ['hiddenUntil','hidden_until']
+    ];
+    rules.forEach(([field,authoredField])=>{
+      const rule=s[field]||(s._authored&&s._authored[authoredField]);
+      if(rule?.event!=='activity_count_at_least'||rule.activity!==old)return;
+      rule.activity=next;s[field]=rule;
+      if(s._authored?.[authoredField])s._authored[authoredField]=rule;
+    });
+  }));
+  return next;
+}
 const cur=()=>P.content.find(c=>c.uid===sel);
 const NARRATOR={id:'__narrator__',name:'Narration',color:'#938599'};
 /** Port Alder creates this person from the user's choices for every new save.

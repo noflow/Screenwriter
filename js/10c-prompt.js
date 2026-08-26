@@ -43,13 +43,16 @@ function playerRule(){
 
 function sceneBrief(){
   const c=cur(),l=loc(locPart(c.location));
+  const target=typeof scenePlanTarget==='function'?scenePlanTarget(c):c;
   const bits=['# Scene','Title: '+(c.title||'untitled')];
   const pb=placeBrief(c.location);
   if(pb)bits.push('Location: '+pb);
-  bits.push('When: '+pretty(c.day)+', '+pretty(c.block));
+  const days=(c.type==='conversation'||c.type==='activity')?contentDays(c):[c.day].filter(Boolean);
+  bits.push('When: '+(days.length?days.map(pretty).join(' or '):'any day')+', '+pretty(c.block));
   present().forEach(ch=>{
-    const a=availability(ch,c.day,c.block);
-    bits.push(ch.name+' is '+(a.free?'free':'occupied')+' then ('+a.why+').');
+    const checks=contentAvailability(ch,c);
+    bits.push(ch.name+' availability: '+checks.map(a=>pretty(a.day)+' — '+
+      (a.free?'free':'occupied')+' ('+a.why+')').join('; ')+'.');
   });
   const owner=chr(c.character)||present()[0];
   const ch=owner?.relationship_chapters?.find(x=>x.level===+c.chapter);
@@ -59,7 +62,7 @@ function sceneBrief(){
     else
       bits.push('Relationship stage: '+ch.level+' — '+ch.title+'. Write at that level of closeness, not beyond it.');
   }
-  if(c.premise)bits.push('Premise: '+c.premise);
+  if(target?.premise||c.premise)bits.push('Premise: '+(target?.premise||c.premise));
   return bits.join('\n');
 }
 
@@ -90,7 +93,7 @@ function buildPrompt(input){
   const ids=speakableIds(c).join(', ');
 
   if(mode==='scene'){
-    const plan=c.scenePlan||{};
+    const plan=(typeof scenePlanTarget==='function'?scenePlanTarget(c):c)?.scenePlan||{};
     const planned=plan.outline
       ? '# Approved beat outline\n'+plan.outline+'\n\n# Original plan\n'+(plan.brief||input)
       : input;

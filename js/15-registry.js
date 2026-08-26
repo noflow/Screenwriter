@@ -4,7 +4,7 @@ function walkAll(cb){
     if(n.type==='choice'||n.type==='gate')n.options.forEach((o,j)=>{cb(o,c,p.concat(j),true);rec(o.nodes,c,p.concat(j));});
   });
   P.content.forEach(c=>{
-    if(c.type==='quest')(c.stages||[]).forEach((s,i)=>rec(s.nodes||[],c,['s'+i]));
+    if(c.type==='quest'||c.type==='activity')(c.stages||[]).forEach((s,i)=>rec(s.nodes||[],c,['s'+i]));
     else if(c.type!=='repeatable')rec(c.nodes||[],c,[]);
   });
 }
@@ -58,7 +58,12 @@ function flagRegistry(){
     readReqs(c.requires,w);
     writeEffects(c.flag,w);
     (c.stages||[]).forEach(s=>{readReqs(s.requires,w);
-      writeEffects(s.flag,w);});
+      writeEffects(s.flag,w);
+      const completion=s.completion||(s._authored&&s._authored.completion);
+      if(completion?.event==='activity_count_at_least'&&completion.activity)
+        touch('activity.'+completion.activity+'.count','reads',w+' · '+(s.title||s.id),
+          {kind:'counter',state_key:'activity.'+completion.activity+'.count',value:+completion.value||0});
+    });
   });
   walkAll((n,c,p,isOpt)=>{
     const w=c.title||c.id;

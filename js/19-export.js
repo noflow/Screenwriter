@@ -1,11 +1,4 @@
 /* ============ export ============ */
-function clean(l){return l.map(n=>n.type==='line'
-  ?{type:'line',speaker:n.speaker,text:n.text,emotion:n.emotion||''}
-  :n.type==='jump'?{type:'jump',target:n.target||''}
-  :n.type==='gate'?{type:'gate',options:n.options.map(o=>({text:o.text,flag:o.flag||'',requires:o.requires||[],nodes:clean(o.nodes)}))}
-  :{type:'choice',options:n.options.map(o=>({text:o.text,flag:o.flag||'',
-     effects:compileEffects(o.flag),
-     requires:o.requires||[],nodes:clean(o.nodes)}))});}
 
 function toJSON(){
   const pick=t=>P.content.filter(c=>c.type===t);
@@ -40,12 +33,17 @@ function toJSON(){
       {day:c.day,block:c.block,cast:c.cast||[],chapter:+c.chapter||0,
        requires:c.requires||[],start:!!c.start,
        replayable:!!c.replayable,sets_flag:c.flag||'',
-       nodes:clean(c.nodes||[])})).concat(acts.conversations),
+       days:contentDays(c),nodes:clean(c.nodes||[])})).concat(acts.conversations),
     quests:pick('quest').map(c=>({id:c.id,title:c.title,giver:c.character||'',hook:c.hook||'',
       cast:c.cast||[],requires:c.requires||[],
       stages:(c.stages||[]).map(s=>Object.assign({id:s.id,title:s.title},place(s.location),
         {sets_flag:s.flag||'',effects:compileEffects(s.flag),
-         requires:s.requires||[],nodes:clean(s.nodes||[])}))})),
+         requires:s.requires||[],
+         ...((s.completion||(s._authored&&s._authored.completion))
+           ?{completion:s.completion||(s._authored&&s._authored.completion)}:{}),
+         ...((s.hiddenUntil||(s._authored&&s._authored.hidden_until))
+           ?{hidden_until:s.hiddenUntil||(s._authored&&s._authored.hidden_until)}:{}),
+         nodes:clean(s.nodes||[])}))})),
     activities:acts.activities,
     repeatables:pick('repeatable').map(c=>Object.assign({id:c.id,character:c.character},
       place(c.location),
@@ -55,6 +53,7 @@ function toJSON(){
 }
 function plain(l,pad){return l.map(n=>n.type==='line'
   ?pad+(chr(n.speaker)?.name||n.speaker).toUpperCase()+'\n'+pad+n.text
+  :n.type==='jump'?pad+'→ '+(n.target||'(unset)')
   :n.options.map((o,i)=>pad+'['+(i+1)+'] '+o.text+'\n'+plain(o.nodes,pad+'    ')).join('\n')).join('\n\n');}
 function toScript(){
   return P.content.map(c=>{
@@ -62,6 +61,9 @@ function toScript(){
     if(c.type==='repeatable')return h+'\n'+(c.lines||[]).map(l=>'· '+l.text).join('\n');
     if(c.type==='quest')return h+'\n'+(c.stages||[]).map((s,i)=>
       '-- stage '+(i+1)+': '+s.title+' --\n'+plain(s.nodes,'')).join('\n\n');
+    if(c.type==='activity')return h+'\n'+(c.stages||[]).map((s,i)=>
+      '-- '+(i===0?'ordinary visit':'after '+(+s.at||1)+' successes')+': '+s.title+' --\n'+
+      plain(s.nodes||[],'')).join('\n\n');
     return h+'\n'+plain(c.nodes||[],'');
   }).join('\n\n\n');
 }
@@ -103,13 +105,15 @@ document.querySelectorAll('[data-new]').forEach(b=>b.onclick=()=>{
   const base={uid,type:t,id:t+'_'+(P.content.filter(c=>c.type===t).length+1),
     title:'New '+t,location:P.locations[0]?.id||'',day:'monday',block:'evening',
     chapter:1,cast:[],premise:''};
-  if(t==='conversation')base.nodes=[];
+  if(t==='conversation'){base.nodes=[];base.days=['monday'];}
   if(t==='quest'){base.stages=[{id:'stage_1',title:'Opening',location:base.location,nodes:[],flag:''}];
     base.character=npcs()[0]?.id||'';base.hook='';}
   if(t==='repeatable'){base.lines=[];base.character=npcs()[0]?.id||'';}
   if(t==='activity'){
     base.character=npcs()[0]?.id||'';
+    base.name=base.title;
     base.cast=[base.character].filter(Boolean);
+    base.days=['monday'];base.incrementsOn='explicit_success';base.repeatLimit='once_per_block';
     base.stages=[{id:'base',title:'Every time',at:0,nodes:[],flag:'',requires:[],once:false}];
   }
   P.content.push(base);sel=uid;focusPath=[];stageIx=0;save();paintAll();

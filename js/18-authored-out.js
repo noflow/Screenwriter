@@ -83,7 +83,12 @@ function mergeActivation(orig,item,locRef){
   const had=k=>orig&&Object.prototype.hasOwnProperty.call(orig,k);
   if(had('block')&&item.block)out.block=item.block;
   else if(!orig&&item.block)out.block=item.block;
-  if(had('day')&&item.day)out.day=item.day;
+  const days=contentDays(item);
+  if(Array.isArray(item.days)){
+    out.days=days;delete out.day;
+  }else if(had('days'))out.days=days;
+  else if(had('day')&&item.day)out.day=item.day;
+  else if(!orig&&item.day)out.day=item.day;
   // item.location is already "location_id" or "location_id.room_id" — the game's format.
   if(had('location'))out.location=item.location||orig.location;
   else if(!orig&&item.location)out.location=item.location;
@@ -146,7 +151,8 @@ function buildNodes(group){
   // A jump to passage "conv__x" resolves to node "x" inside the merged graph.
   const resolve=t=>{
     if(!t)return undefined;
-    return t.includes('__')?t.split('__').slice(1).join('__'):t;
+    return t.startsWith(group.base+'__')?t.slice(group.base.length+2):
+      (t.includes('__')?t.split('__').slice(1).join('__'):t);
   };
 
   /** Emits a chain and returns the id of its first node, or a passthrough target. */
@@ -181,6 +187,10 @@ function buildNodes(group){
           if(n.emotion)body.expression=n.emotion; else delete body.expression;}
         if(n._orig&&Object.prototype.hasOwnProperty.call(n._orig,'next'))body.next=n._orig.next;
         else delete body.next;
+        if(group.activityId){
+          const effects=syncActivityEffects(body.effects,group.activityId,n.activitySuccess);
+          if(effects.length)body.effects=effects;else delete body.effects;
+        }
         nodes[id]=body;
         link(id);
         continue;
@@ -194,8 +204,9 @@ function buildNodes(group){
           const target=emit(o.nodes,null);
           const c=Object.assign({},o._orig,{id:o._oid||slug(o.text||('opt_'+(i+1))).slice(0,28),text:o.text});
           if(o._tone)c.tone=o._tone;
-          const fx=flagToEffects(o.flag);
-          if(fx.length)c.effects=fx;
+          let fx=flagToEffects(o.flag);
+          if(group.activityId)fx=syncActivityEffects(fx,group.activityId,o.activitySuccess);
+          if(fx.length)c.effects=fx;else if(group.activityId)delete c.effects;
           delete c.condition;delete c.conditions;
           const conditions=requiresToConditions(o.requires);
           if(conditions.length)c.conditions=conditions;
@@ -213,8 +224,9 @@ function buildNodes(group){
         nodes[id].branches=(n.options||[]).map((o,i)=>{
           const target=emit(o.nodes,null);
           const branch=Object.assign({},o._orig,{id:o._oid||('branch_'+(i+1)),text:o.text});
-          const fx=flagToEffects(o.flag);
-          if(fx.length)branch.effects=fx;
+          let fx=flagToEffects(o.flag);
+          if(group.activityId)fx=syncActivityEffects(fx,group.activityId,o.activitySuccess);
+          if(fx.length)branch.effects=fx;else if(group.activityId)delete branch.effects;
           delete branch.condition;delete branch.conditions;
           const conditions=requiresToConditions(o.requires);
           if(conditions.length)branch.conditions=conditions;
@@ -245,12 +257,12 @@ function conversationOut(group){
     nodes
   };
   if(a.repetition)out.repetition=a.repetition;
+  if(group.main.title)out.title=group.main.title;
+  if(a.internal!==undefined)out.internal=!!a.internal;
+  if(a.replayable!==undefined)out.replayable=!!a.replayable;
+  if(group.activityId)out.activity_id=group.activityId;
   if(group.main.premise)out.summary=group.main.premise;
-  const consequence=group.main.scenePlan?.consequence||{};
-  const planned=[];
-  if(consequence.memoryId)planned.push({operation:'create_memory',character:consequence.character,value:consequence.memoryId});
-  if(+consequence.chapter>1)planned.push({operation:'unlock_relationship_chapter',character:consequence.character,level:+consequence.chapter});
-  if(consequence.identity)planned.push(Object.assign({operation:'change_identity',character:consequence.character},consequence.identity));
+  const planned=plannedSceneEffects(group.main.scenePlan);
   const completion=(a.completion_effects||[]).concat(planned);
   if(completion.length)out.completion_effects=completion;
   const cond=requiresToCondition(group.main.requires);
@@ -269,6 +281,8 @@ function questOut(c){
     const orig=(a.objectives||[])[i];
     o.completion=s.completion||(s._authored&&s._authored.completion)||(orig&&orig.completion)||
       {event:'conversation_completed',conversation:s.id};
+    const hidden=s.hiddenUntil||(s._authored&&s._authored.hidden_until)||(orig&&orig.hidden_until);
+    if(hidden)o.hidden_until=hidden;
     return o;
   });
 
@@ -320,40 +334,62 @@ function questOut(c){
 /** An activity exports as a counter plus milestones, each pointing at a conversation. */
 function activityOut(c){
   const base=(c.stages||[])[0]||{nodes:[]};
-  const key='activity.'+c.id+'.count';
-  const out={
+  const a=c._authored||{};
+  const source=a.source||{};
+  const baseOut=Object.assign({},base._activitySource||source.base||{},
+    {conversation:base._conversationId||c.id+'__base',title:base.title||'Every time'});
+  delete baseOut.effects;
+  const baseEffects=flagToEffects(base.flag).concat(plannedSceneEffects(base.scenePlan));
+  if(baseEffects.length)baseOut.effects=baseEffects;
+  const out=Object.assign({},source,{
     id:c.id,
+    kind:c.kind||a.kind||'social_activity',
     title:c.title,
     character:c.character||'',
     location:c.location||'',
-    activation:{blocks:c.block?[c.block]:[],days:c.day?[c.day]:[]},
-    counter_key:key,
-    increments_on:'completed',
-    base:{conversation:c.id+'__base'},
+    activation:activityActivation(c),
+    counter_key:activityCounterKey(c),
+    repeat_limit:activityRepeatLimit(c),
+    increments_on:c.incrementsOn||a.increments_on||'explicit_success',
+    milestone_semantics:c.milestoneSemantics||a.milestone_semantics||
+      ((c.incrementsOn||a.increments_on)==='explicit_success'?'after_successes':'projected_attempt'),
+    base:baseOut,
     milestones:(c.stages||[]).slice(1)
-      .sort((a,b)=>(+b.at||0)-(+a.at||0))          // highest first: most specific wins
+      .slice().sort((x,y)=>(+y.at||0)-(+x.at||0))  // highest first: most specific wins
       .map(s=>{
-        const m={at:+s.at||1,conversation:c.id+'__'+(s.id||'ms'),
-          once:s.once!==false,
-          condition:Object.assign({value_at_least:[key,+s.at||1]},requiresToCondition(s.requires)||{})};
-        const fx=flagToEffects(s.flag);
+        const m=Object.assign({},s._activitySource||{},
+          {id:s.id||'ms',title:s.title||'',at:+s.at||1,
+            conversation:s._conversationId||c.id+'__'+(s.id||'ms'),once:s.once!==false});
+        delete m.condition;delete m.conditions;delete m.effects;
+        const conditions=requiresToConditions(s.requires);
+        if(conditions.length)m.conditions=conditions;
+        const fx=flagToEffects(s.flag).concat(plannedSceneEffects(s.scenePlan));
         if(fx.length)m.effects=fx;
         return m;
       })
-  };
-  const fx=flagToEffects(base.flag);
-  if(fx.length)out.base.effects=fx;
+  });
+  if(activityName(c))out.name=activityName(c);else delete out.name;
+  if(c.category)out.category=c.category;else delete out.category;
+  if(Object.prototype.hasOwnProperty.call(source,'summary')||c.premise)out.summary=c.premise||'';
+  delete out.condition;delete out.conditions;
+  const conditions=requiresToConditions(c.requires);
+  if(conditions.length)out.conditions=conditions;
+  if(a.success_flag)out.success_flag=a.success_flag;
+  delete out.once_per_block;delete out.repeat_period;delete out.once_per_period;delete out.period_lock;
+  if(!out.repeat_limit)delete out.repeat_limit;
   return out;
 }
 
 /** Each activity stage also needs its dialogue exported as a conversation. */
 function activityConversations(c){
   return (c.stages||[]).map((s,i)=>{
-    const group={base:c.id+'__'+(i===0?'base':(s.id||'ms'+i)),main:{
-      id:c.id+'__'+(i===0?'base':(s.id||'ms'+i)),
+    const id=s._conversationId||c.id+'__'+(i===0?'base':(s.id||'ms'+i));
+    const group={base:id,activityId:c.id,main:{
+      id,title:s.title,
       nodes:s.nodes||[],block:c.block,location:c.location,
-      premise:s.title,requires:[],_authored:{type:'activity_beat'}
-    },parts:[]};
+      premise:s.premise||s.title,requires:[],
+      _authored:{type:'activity_beat',internal:true,replayable:true}
+    },parts:s._parts||[]};
     return conversationOut(group);
   }).filter(x=>Object.keys(x.nodes).length);
 }

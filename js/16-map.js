@@ -1,12 +1,25 @@
 /* ============ story map ============ */
 let mapZ=1,mapX=0,mapY=0,linkFrom=null,mapSel=null;
 
+/** Map identities use uid: quest and activity ids intentionally may be the same. */
+function mapItem(key){return P.content.find(c=>c.uid===key);}
+
+/** A saved map link remembers the exact card while the authored jump keeps its id. */
+function mapJumpTarget(n){
+  return mapItem(n._map_target_uid)||P.content.find(c=>c.type==='conversation'&&c.id===n.target)||
+    P.content.find(c=>c.id===n.target);
+}
+
 /** Every link between content items, from jump nodes anywhere in a tree. */
 function links(){
   const out=[];
   const scan=(list,c,via)=>list.forEach(n=>{
-    if(n.type==='jump'&&n.target)out.push({from:c.id,to:n.target,label:via?.text||'',reqs:via?.requires||[]});
-    if(n.type==='choice')n.options.forEach(o=>scan(o.nodes,c,o));
+    if(n.type==='jump'&&n.target){
+      const target=mapJumpTarget(n);
+      if(target)out.push({from:c.uid,to:target.uid,target:n.target,node:n,
+        label:via?.text||'',reqs:via?.requires||[]});
+    }
+    if(n.type==='choice'||n.type==='gate')n.options.forEach(o=>scan(o.nodes,c,o));
   });
   P.content.forEach(c=>{
     if(c.type==='quest'||c.type==='activity')(c.stages||[]).forEach(s=>scan(s.nodes||[],c,null));
@@ -14,8 +27,9 @@ function links(){
   });
   // A quest chain is a link even though no jump node expresses it.
   P.content.forEach(c=>{
-    if(c.type==='quest'&&c.after&&P.content.some(x=>x.id===c.after))
-      out.push({from:c.after,to:c.id,label:'then',reqs:[],chain:true});
+    const previous=c.type==='quest'&&c.after
+      ?P.content.find(x=>x.type==='quest'&&x.id===c.after):null;
+    if(previous)out.push({from:previous.uid,to:c.uid,label:'then',reqs:[],chain:true});
   });
   return out;
 }
@@ -24,7 +38,7 @@ function passHeight(c){return c.requires?.length?86:72;}
 
 /** Parallel edges between the same two cards get spread apart, or their labels collide. */
 function edgeGeom(l,rank,total){
-  const a=P.content.find(c=>c.id===l.from),b=P.content.find(c=>c.id===l.to);
+  const a=mapItem(l.from),b=mapItem(l.to);
   if(!a||!b)return null;
   const spread=(rank-(total-1)/2);
   const ay=(a.y||0)+passHeight(a)/2+spread*24;
@@ -71,24 +85,24 @@ function edgeLabel(text,mx,my,cls){
 function autoLayout(){
   const L=links(),inbound={};
   L.forEach(l=>inbound[l.to]=(inbound[l.to]||0)+1);
-  const roots=P.content.filter(c=>!inbound[c.id]||c.start);
+  const roots=P.content.filter(c=>!inbound[c.uid]||c.start);
   const depth={},seen=new Set();
   let layer=roots.length?roots:P.content.slice(0,1),d=0;
   while(layer.length&&d<40){
     const next=[];
     layer.forEach(c=>{
-      if(!c||seen.has(c.id))return;
-      seen.add(c.id);depth[c.id]=d;
-      L.filter(l=>l.from===c.id).forEach(l=>{
-        const t=P.content.find(x=>x.id===l.to);
-        if(t&&!seen.has(t.id))next.push(t);});
+      if(!c||seen.has(c.uid))return;
+      seen.add(c.uid);depth[c.uid]=d;
+      L.filter(l=>l.from===c.uid).forEach(l=>{
+        const t=mapItem(l.to);
+        if(t&&!seen.has(t.uid))next.push(t);});
     });
     layer=next;d++;
   }
-  P.content.filter(c=>!seen.has(c.id)).forEach(c=>depth[c.id]=d);
+  P.content.filter(c=>!seen.has(c.uid)).forEach(c=>depth[c.uid]=d);
   const rows={};
   P.content.forEach(c=>{
-    const col=depth[c.id]||0;rows[col]=rows[col]||0;
+    const col=depth[c.uid]||0;rows[col]=rows[col]||0;
     c.x=60+col*330;c.y=40+rows[col]*126;rows[col]++;
   });
   save();paintMap();
@@ -123,8 +137,9 @@ function paintMap(){
   cards.innerHTML=P.content.map(c=>{
     const n=c.type==='repeatable'?(c.lines||[]).length+' variants'
       :c.type==='quest'?(c.stages||[]).length+' stages'
+      :c.type==='activity'?Math.max(0,(c.stages||[]).length-1)+' milestones'
       :countLines(c.nodes||[])+' lines · '+routes(c.nodes||[],[]).length+' routes';
-    return '<div class="pass '+c.type+(inbound[c.id]?'':' orphan')+(sel===c.uid?' sel':'')+
+    return '<div class="pass '+c.type+(inbound[c.uid]?'':' orphan')+(sel===c.uid?' sel':'')+
       (linkFrom===c.uid?' linksrc':'')+'" data-m="'+c.uid+'" '+
       'style="left:'+(c.x||0)+'px;top:'+(c.y||0)+'px">'+
       (c.start?'<span class="start">START</span>':'')+
@@ -195,10 +210,10 @@ function wireMap(L){
       const src=P.content.find(x=>x.uid===linkFrom);
       if(src&&src.type==='quest'&&c.type==='quest'){c.after=src.id;linkFrom=null;save();paintMap();return;}
       if(src&&src.type!=='repeatable'){
-        const list=src.type==='quest'
+        const list=(src.type==='quest'||src.type==='activity')
           ?(src.stages[src.stages.length-1].nodes=src.stages[src.stages.length-1].nodes||[])
           :(src.nodes=src.nodes||[]);
-        list.push({type:'jump',target:c.id});
+        list.push({type:'jump',target:c.id,_map_target_uid:c.uid});
       }
       linkFrom=null;save();paintMap();
     };
@@ -218,20 +233,21 @@ function wireMap(L){
       e.stopPropagation();
       const l=L[+p.dataset.e];
       if(l.chain){
-        const t=P.content.find(c=>c.id===l.to);
+        const t=mapItem(l.to);
         if(t){t.after='';save();paintMap();}
         return;
       }
-      const src=P.content.find(c=>c.id===l.from);
+      const src=mapItem(l.from);
       if(!src)return;
       const strip=list=>{
         for(let i=list.length-1;i>=0;i--){
-          if(list[i].type==='jump'&&list[i].target===l.to){list.splice(i,1);return true;}
-          if(list[i].type==='choice')for(const o of list[i].options)if(strip(o.nodes))return true;
+          if(list[i]===l.node){list.splice(i,1);return true;}
+          if(list[i].type==='choice'||list[i].type==='gate')
+            for(const o of list[i].options)if(strip(o.nodes))return true;
         }
         return false;
       };
-      if(src.type==='quest')(src.stages||[]).some(s=>strip(s.nodes||[]));
+      if(src.type==='quest'||src.type==='activity')(src.stages||[]).some(s=>strip(s.nodes||[]));
       else strip(src.nodes||[]);
       save();paintMap();
     };
@@ -283,10 +299,11 @@ function paintEdgesOnly(){
 }
 
 function authoredNote(d){
-  if(!(d.quests||[]).length&&!(d.conversations||[]).length)return '';
+  if(!(d.quests||[]).length&&!(d.conversations||[]).length&&!(d.activities||[]).length)return '';
   const r=importAuthored(d);
   const bits=[];
   if(r.quests.length)bits.push(r.quests.length+' quest'+(r.quests.length===1?'':'s'));
+  if(r.activities.length)bits.push(r.activities.length+' activit'+(r.activities.length===1?'y':'ies'));
   if(r.conversations.length)bits.push(r.conversations.length+' conversation'+(r.conversations.length===1?'':'s'));
   if(r.messages)bits.push(r.messages+' text message'+(r.messages===1?'':'s')+' kept');
   if(r.skipped.length)bits.push(r.skipped.length+' skipped');

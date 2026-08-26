@@ -105,7 +105,7 @@ function wireConds(root){
   root.querySelectorAll('[data-cf]').forEach(el=>{
     const h=()=>{const p=el.dataset.cf.split(':'),field=p.pop(),i=+p.pop(),owner=p.join(':');
       const r=reqsOf(owner)[i];if(!r)return;
-      r[field]=field==='value'?(parseInt(el.value,10)||0):el.value;
+      r[field]=field==='value'?(Number(el.value)||0):el.value;
       save();paintSetup();paintBody();};
     el.tagName==='SELECT'?el.onchange=h:el.onblur=h;
   });

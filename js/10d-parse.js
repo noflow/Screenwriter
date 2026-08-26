@@ -94,7 +94,7 @@ function parseRoleplayScene(raw,c){
   const complete=options.filter(o=>o.nodes.length);
   if(complete.length>1)result.nodes.push({type:'choice',options:complete.slice(0,4)});
 
-  const gate=c.scenePlan?.statGate;
+  const gate=(typeof scenePlanTarget==='function'?scenePlanTarget(c):c)?.scenePlan?.statGate;
   if(gate&&outcomeLines.length){
     const buckets={high:[],middle:[],low:[]};let active='';
     outcomeLines.forEach(rawLine=>{
@@ -111,10 +111,12 @@ function parseRoleplayScene(raw,c){
       const lowValue=Math.min(value-1,Math.max(0,+gate.lowValue||0));
       const options=[
         {text:name+' '+gate.key+' ≥ '+value,requires:[{type:'stat',character:gate.character,key:gate.key,op:'gte',value}],flag:gate.highEffect||'',nodes:high},
-        {text:name+' '+gate.key+' ≤ '+(gate.middle?lowValue:value-1),requires:[{type:'stat',character:gate.character,key:gate.key,op:'lte',value:gate.middle?lowValue:value-1}],flag:gate.lowEffect||'',nodes:low}
+        // Ordered gates make the final low outcome a true fallback. This covers
+        // fractional meters (49.5) instead of leaving a gap between >=50 and <=49.
+        {text:name+' '+gate.key+' < '+(gate.middle?lowValue+1:value),requires:[],flag:gate.lowEffect||'',nodes:low}
       ];
-      if(gate.middle&&middle.length)options.splice(1,0,{text:name+' '+gate.key+' '+(lowValue+1)+'–'+(value-1),
-        requires:[{type:'stat',character:gate.character,key:gate.key,op:'gte',value:lowValue+1},{type:'stat',character:gate.character,key:gate.key,op:'lte',value:value-1}],flag:gate.middleEffect||'',nodes:middle});
+      if(gate.middle&&middle.length)options.splice(1,0,{text:name+' '+gate.key+' > '+lowValue+' and < '+value,
+        requires:[{type:'stat',character:gate.character,key:gate.key,op:'gte',value:lowValue+0.000001}],flag:gate.middleEffect||'',nodes:middle});
       result.nodes.push({type:'gate',options});
     }
   }

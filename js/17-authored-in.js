@@ -25,6 +25,7 @@ function effectsToFlag(effects){
       case 'unlock_relationship_chapter': return 'chapter:'+e.character+':'+e.level;
       case 'add_character_stat': return 'stat:'+e.character+':'+e.key+' '+(v>=0?'+':'')+v;
       case 'add_player_value': return 'playerstat:'+e.section+':'+e.key+' '+(v>=0?'+':'')+v;
+      case 'complete_activity': return '';
       default:            return e.key||e.operation;
     }
   }).filter(Boolean).join('; ');
@@ -86,7 +87,7 @@ function locFromRef(ref){
 }
 
 /** Converts one authored conversation into 1..n Scenewright passages. */
-function convertConversation(conv,sheet,report){
+function convertConversation(conv,sheet,report,options={}){
   const nodes=conv.nodes||{};
   const start=conv.start_node||Object.keys(nodes)[0];
   if(!start)return;
@@ -97,12 +98,15 @@ function convertConversation(conv,sheet,report){
   Object.values(nodes).forEach(n=>{
     bump(n.next);
     (n.choices||[]).forEach(c=>bump(c.next));
+    (n.branches||[]).forEach(c=>bump(c.next));
   });
   const shared=new Set(Object.keys(inbound).filter(id=>inbound[id]>1&&id!==start));
 
   const cast=new Set();
   const made=[];
   const passageId=id=>id===start?conv.id:conv.id+'__'+id;
+  const completesActivity=n=>(n?.effects||[]).some(e=>e?.operation==='complete_activity'&&
+    (!options.activityId||e.value===options.activityId));
 
   /** Walks a linear run from `id`, stopping at a shared node (emitting a jump to it). */
   const walk=(id,seen)=>{
@@ -114,16 +118,19 @@ function convertConversation(conv,sheet,report){
 
       if(n.stage_direction)
         out.push({type:'line',speaker:'__narrator__',text:'*'+n.stage_direction+'*',
-          emotion:'',_nid:n.line?id+'__sd':id,_orig:n.line?null:n});
+          emotion:'',activitySuccess:!n.line&&completesActivity(n),
+          _nid:n.line?id+'__sd':id,_orig:n.line?null:n});
 
       if(n.line){
         if(n.speaker)cast.add(n.speaker);
         out.push({type:'line',speaker:n.speaker||'__narrator__',text:n.line,
-          emotion:(n.emotion||n.expression||'').toLowerCase(),_nid:id,_orig:n});
+          emotion:(n.emotion||n.expression||'').toLowerCase(),
+          activitySuccess:completesActivity(n),_nid:id,_orig:n});
       }
 
-      if(n.choices){
-        out.push({type:'choice',_nid:id,options:n.choices.map(c=>{
+      const branchDefs=n.choices||n.branches;
+      if(branchDefs){
+        out.push({type:n.branches?'gate':'choice',_nid:id,options:branchDefs.map(c=>{
           const branch=[];
           const t=c.next;
           if(t&&nodes[t]){
@@ -131,6 +138,7 @@ function convertConversation(conv,sheet,report){
             else branch.push(...walk(t,new Set(seen)));
           }
           return {text:c.text||c.id||'…',flag:effectsToFlag(c.effects),
+            activitySuccess:!!c.activity_success||completesActivity(c),
             requires:toRequires(c.conditions||c.condition,sheet.id),nodes:branch,
             _oid:c.id,_tone:c.tone,_orig:c};
         })});
@@ -153,16 +161,17 @@ function convertConversation(conv,sheet,report){
       id:passageId(nodeId),
       title:isMain?(conv.title||pretty(conv.id)):pretty(nodeId),
       location:locFromRef(act.location),
-      day:act.day||'monday',
+      day:(act.days||[])[0]||act.day||'monday',
+      days:Array.isArray(act.days)?act.days.slice():undefined,
       block:act.block||'morning',
       chapter:1,
       cast:[],
       start:isMain&&(act.event==='new_game_started'),
       premise:conv.summary||'',
-      requires:toRequires(conv.condition,sheet.id),
+      requires:toRequires(conv.conditions||conv.condition,sheet.id),
       nodes:body,
       _authored:{type:conv.type,repetition:conv.repetition,activation:act,locRef:act.location,
-        completion_effects:conv.completion_effects}
+        completion_effects:conv.completion_effects,internal:conv.internal,replayable:conv.replayable}
     });
   };
 
@@ -171,11 +180,12 @@ function convertConversation(conv,sheet,report){
 
   const castList=[...cast].filter(id=>id!=='player'&&id!=='__narrator__');
   made.forEach(m=>m.cast=castList.length?castList:[sheet.id]);
-  made.forEach(m=>{
-    const at=P.content.findIndex(x=>x.id===m.id);
+  if(options.append!==false)made.forEach(m=>{
+    const at=P.content.findIndex(x=>x.type==='conversation'&&x.id===m.id);
     at>=0?P.content[at]=m:P.content.push(m);
   });
-  report.conversations.push(conv.id+(made.length>1?' (+'+(made.length-1)+' split)':''));
+  if(options.report!==false)report.conversations.push(conv.id+(made.length>1?' (+'+(made.length-1)+' split)':''));
+  return made;
 }
 
 /** Converts one authored quest. Objectives become stages. */
@@ -189,7 +199,9 @@ function convertQuest(q,sheet,report){
     nodes:[],
     flag:'',
     requires:toRequires(o.completion,sheet.id),
-    _authored:{completion:o.completion}
+    completion:o.completion,
+    hiddenUntil:o.hidden_until,
+    _authored:{completion:o.completion,hidden_until:o.hidden_until}
   }));
 
   // Branches become a final stage whose choices set each branch's rules.
@@ -224,18 +236,73 @@ function convertQuest(q,sheet,report){
     _authored:{category:q.category,failure:q.failure,completion_effects:q.completion_effects,
       objectives:q.objectives,branches:q.branches,activation:act}
   };
-  const at=P.content.findIndex(x=>x.id===item.id);
+  const at=P.content.findIndex(x=>x.type==='quest'&&x.id===item.id);
   at>=0?P.content[at]=item:P.content.push(item);
   report.quests.push(q.id+' ('+stages.length+' stages)');
 }
 
+/** Rebuilds a social activity from its counter definition and internal beat
+    conversations. Referenced beats are not also imported as ordinary Talk topics. */
+function convertActivity(a,sheet,report,conversations){
+  const act=a.activation||{},byId=new Map((conversations||[]).map(c=>[c.id,c]));
+  const beat=(ref,title,activityId)=>{
+    const conv=byId.get(ref);
+    if(!conv)return {nodes:[],parts:[],cast:[]};
+    const made=convertConversation(conv,sheet,report,{append:false,report:false,activityId})||[];
+    return {nodes:made[0]?.nodes||[],parts:made.slice(1),cast:made[0]?.cast||[],
+      premise:made[0]?.premise||title,title:conv.title||''};
+  };
+  const baseRef=a.base?.conversation||a.conversation||'';
+  const baseBeat=beat(baseRef,'Every time',a.id);
+  const base={id:'base',title:a.base?.title||'Every time',at:0,nodes:baseBeat.nodes,
+    flag:effectsToFlag(a.base?.effects),requires:[],once:false,_parts:baseBeat.parts,
+    premise:baseBeat.premise,_conversationId:baseRef,_activitySource:a.base};
+  const stages=[base];
+  (a.milestones||[]).slice().sort((x,y)=>(+x.at||0)-(+y.at||0)).forEach((m,i)=>{
+    const b=beat(m.conversation,m.title||'Milestone '+(i+1),a.id);
+    stages.push({id:m.id||'ms_'+(i+1),title:m.title||b.title||'Milestone '+(i+1),at:+m.at||1,
+      nodes:b.nodes,flag:effectsToFlag(m.effects),requires:toRequires(m.conditions||m.condition,sheet.id),
+      once:m.once!==false,_parts:b.parts,premise:b.premise,_conversationId:m.conversation,
+      _activitySource:m});
+  });
+  const days=Array.isArray(act.days)?act.days.slice():(act.day?[act.day]:[]);
+  const blocks=Array.isArray(act.blocks)?act.blocks.slice():(act.block?[act.block]:[]);
+  const item={uid:'a_'+a.id,type:'activity',id:a.id,title:a.title||a.name||pretty(a.id),
+    name:a.name||a.title||pretty(a.id),kind:a.kind||'social_activity',character:a.character||sheet.id,
+    location:locFromRef(a.location||act.location),day:days[0]||'monday',days,
+    block:blocks[0]||'evening',blocks,chapter:1,
+    cast:[...new Set([a.character||sheet.id,...baseBeat.cast].filter(Boolean))],
+    premise:a.summary||'',category:a.category||'',
+    requires:toRequires(a.conditions||a.condition,sheet.id),stages,
+    counterKey:a.counter_key||'activity.'+a.id+'.count',
+    repeatLimit:a.repeat_limit||(a.once_per_block?'once_per_block':''),
+    incrementsOn:a.increments_on||'completed',
+    milestoneSemantics:a.milestone_semantics||
+      (a.increments_on==='explicit_success'?'after_successes':'projected_attempt'),
+    _authored:{source:a,kind:a.kind,name:a.name,category:a.category,summary:a.summary,
+      increments_on:a.increments_on,repeat_limit:a.repeat_limit,success_flag:a.success_flag,
+      activation:act,counter_key:a.counter_key,condition:a.condition,
+      milestone_semantics:a.milestone_semantics,base:a.base,milestones:a.milestones}
+  };
+  const at=P.content.findIndex(x=>x.type==='activity'&&x.id===item.id);
+  at>=0?P.content[at]=item:P.content.push(item);
+  report.activities.push(a.id+' ('+(stages.length-1)+' milestones)');
+}
+
 /** Entry point — call after importSheet(). Returns a short report. */
 function importAuthored(sheet){
-  const report={quests:[],conversations:[],messages:0,skipped:[]};
+  const report={quests:[],activities:[],conversations:[],messages:0,skipped:[]};
+  const claimed=new Set();
+  (sheet.activities||[]).forEach(a=>{
+    if(a.base?.conversation)claimed.add(a.base.conversation);
+    (a.milestones||[]).forEach(m=>{if(m.conversation)claimed.add(m.conversation);});
+    try{convertActivity(a,sheet,report,sheet.conversations||[]);}
+    catch(e){report.skipped.push('activity '+(a.id||'?')+': '+e.message);}
+  });
   (sheet.quests||[]).forEach(q=>{
     try{convertQuest(q,sheet,report);}catch(e){report.skipped.push('quest '+(q.id||'?')+': '+e.message);}
   });
-  (sheet.conversations||[]).forEach(c=>{
+  (sheet.conversations||[]).filter(c=>!claimed.has(c.id)).forEach(c=>{
     try{convertConversation(c,sheet,report);}catch(e){report.skipped.push('conv '+(c.id||'?')+': '+e.message);}
   });
   report.messages=(sheet.text_messages||[]).length;

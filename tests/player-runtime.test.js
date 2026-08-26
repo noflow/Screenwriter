@@ -33,6 +33,9 @@ vm.runInContext(`
   function roomPart(){ return ''; }
   function roomOf(){ return null; }
   function availability(){ return {free:true,why:'available',where:''}; }
+  function contentAvailability(character,item){
+    return [{day:item.day||'monday',free:true,why:'available',where:''}];
+  }
   function placeName(ref){ return ref; }
   function links(){ return []; }
   function countLines(nodes){
@@ -79,6 +82,20 @@ vm.runInContext(`
   globalThis.GHOST_ERRORS=validate().filter(x=>x.sev==='err').map(x=>x.msg);
   P.characters.push({id:'old_player',name:'Old Player',profile:{is_player:true}});
   globalThis.LEGACY_RESULT={npcIds:npcs().map(c=>c.id),runtimeId:playerChar().id};
+  P.characters.pop();
+  P.content.push(
+    {uid:'activity-shared',type:'activity',id:'shared_story',title:'Shared activity',
+      character:'emma_rowan',location:'home',day:'monday',days:['monday'],block:'evening',
+      cast:['emma_rowan'],requires:[],incrementsOn:'explicit_success',stages:[
+        {id:'base',title:'Base',at:0,once:false,requires:[],flag:'',nodes:[
+          {type:'line',speaker:'emma_rowan',text:'Done.',activitySuccess:true}]}]},
+    {uid:'quest-shared',type:'quest',id:'shared_story',title:'Shared quest',character:'emma_rowan',
+      location:'home',day:'monday',block:'evening',cast:['emma_rowan'],requires:[],stages:[
+        {id:'watch',title:'Watch',location:'home',requires:[],flag:'',nodes:[
+          {type:'line',speaker:'emma_rowan',text:'Quest.',emotion:''}],
+          completion:{event:'activity_count_at_least',activity:'shared_story',value:1}}]}
+  );
+  globalThis.SAME_ID_ERRORS=validate().filter(x=>x.sev==='err'&&x.msg.includes('Two ')).map(x=>x.msg);
 `, context);
 
 const result = JSON.parse(JSON.stringify(context.RESULT));
@@ -104,5 +121,6 @@ assert(ghostErrors.some(message => message.includes('ghost') && message.includes
 const legacyResult = JSON.parse(JSON.stringify(context.LEGACY_RESULT));
 assert.deepEqual(legacyResult.npcIds, ['emma_rowan']);
 assert.equal(legacyResult.runtimeId, 'player');
+assert.deepEqual(JSON.parse(JSON.stringify(context.SAME_ID_ERRORS)), []);
 
 console.log('player-runtime regression tests passed');

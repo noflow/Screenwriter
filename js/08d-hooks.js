@@ -69,7 +69,7 @@ async function draftHook(c,hook){
     const last=item.stages[item.stages.length-1];
     last.flag=('quest_'+hook+'_done'+(last.flag?'; '+last.flag:''));
 
-    const at=P.content.findIndex(x=>x.id===hook);
+    const at=P.content.findIndex(x=>x.type==='quest'&&x.id===hook);
     at>=0?P.content[at]=item:P.content.push(item);
     sel=uid;stageIx=0;focusPath=[];save();paintAll();
     note('Drafted "'+esc(item.title)+'" — '+stages.length+' objectives. Edit the completion conditions.');

@@ -34,8 +34,9 @@ function validate(){
   P.content.forEach(c=>{
     const w=c.title||c.id;
     if(!c.id)add('err','Content has no export id.',w);
-    else if(ids.has(c.id))add('err','Two items export as "'+c.id+'". One will overwrite the other.',w);
-    ids.add(c.id);
+    const typedId=c.type+'\u0000'+c.id;
+    if(c.id&&ids.has(typedId))add('err','Two '+c.type+' items export as "'+c.id+'". One will overwrite the other.',w);
+    ids.add(typedId);
 
     if(c.location&&!loc(locPart(c.location)))
       add('err','Points at location "'+locPart(c.location)+'", which is not in the registry.',w);
@@ -56,12 +57,14 @@ function validate(){
       if(!c.location)return;
       const ch2=chr(id);
       if(isPlayer(ch2))return;          // the player is wherever the scene is
-      const a=availability(ch2,c.day,c.block);
-      if(a.where&&locPart(a.where)!==locPart(c.location))
-        add('warn',ch2.name+' is at '+placeName(a.where)+' on '+pretty(c.day)+' '+pretty(c.block)+
-          ', not '+placeName(c.location)+'.',w);
-      else if(!a.free)
-        add('warn',ch2.name+' is unavailable then ('+a.why+').',w);
+      const checks=contentAvailability(ch2,c);
+      const elsewhere=checks.filter(a=>a.where&&locPart(a.where)!==locPart(c.location));
+      const unavailable=checks.filter(a=>!a.free);
+      if(elsewhere.length)
+        add('warn',ch2.name+' is somewhere else on '+elsewhere.map(a=>pretty(a.day)+' ('+
+          placeName(a.where)+')').join(', ')+', not '+placeName(c.location)+'.',w);
+      if(unavailable.length)
+        add('warn',ch2.name+' is unavailable on '+unavailable.map(a=>pretty(a.day)+' ('+a.why+')').join(', ')+'.',w);
     });
     const questPeople=c.type==='quest'?[c.character,...(c.questPlan?.participants||[])]:[];
     if(c.type!=='repeatable'&&![...(c.cast||[]),...questPeople]
@@ -91,6 +94,15 @@ function validate(){
     if(c.type==='quest')(c.stages||[]).forEach((s,i)=>{
       checkReqs(s.requires,'stage');
       if(!countLines(s.nodes||[]))add('warn','Stage '+(i+1)+' ("'+s.title+'") has no lines.',w);
+      const completion=s.completion||(s._authored&&s._authored.completion);
+      const hidden=s.hiddenUntil||(s._authored&&s._authored.hidden_until);
+      [[completion,'waits for'],[hidden,'is hidden until']].forEach(([rule,verb])=>{
+        if(rule?.event!=='activity_count_at_least')return;
+        const activity=P.content.find(x=>x.type==='activity'&&x.id===rule.activity);
+        if(!activity)add('err','Stage '+(i+1)+' '+verb+' activity "'+(rule.activity||'')+
+          '", but that activity does not exist.',w);
+        if((+rule.value||0)<1)add('err','Stage '+(i+1)+' needs a positive activity completion count.',w);
+      });
       if(s.location&&!loc(locPart(s.location)))
         add('err','Stage '+(i+1)+' points at a location not in the registry.',w);
     });
@@ -165,37 +177,60 @@ function validate(){
     add('warn','No passage is marked as a start. Nothing has an obvious entry point.','Story map');
   P.content.forEach(c=>{
     if(c.type==='repeatable'||c.start)return;
-    if(!inb[c.id]&&!(c.requires||[]).length&&!c.location)
+    if(!inb[c.uid]&&!(c.requires||[]).length&&!c.location)
       add('warn','"'+(c.title||c.id)+'" has no inbound link, no gate, and no location — nothing can reach it.','Story map');
   });
 
   P.content.filter(c=>c.type==='quest'&&c.after).forEach(c=>{
-    if(!P.content.some(x=>x.id===c.after))
+    if(!P.content.some(x=>x.type==='quest'&&x.id===c.after))
       add('err','"'+(c.title||c.id)+'" starts after "'+c.after+'", which does not exist.','Chains');
     const path=new Set([c.id]);let cur2=c.after;
     while(cur2){
       if(path.has(cur2)){add('err','Quest chain loops: '+[...path].join(' → ')+' → '+cur2+
         '. Nothing in that loop can ever start.','Chains');break;}
       path.add(cur2);
-      cur2=P.content.find(x=>x.id===cur2)?.after;
+      cur2=P.content.find(x=>x.type==='quest'&&x.id===cur2)?.after;
     }
   });
 
   P.content.filter(c=>c.type==='activity').forEach(c=>{
     const w=c.title||c.id;
     if(!c.character)add('err','Activity has no character assigned.',w);
+    if((c.incrementsOn||c._authored?.increments_on||'completed')!=='explicit_success')
+      add('err','This imported activity still counts every finished attempt. Change “Count when” to a marked successful branch before game export.',w);
+    (c.stages||[]).forEach(s=>(s.requires||[]).forEach(r=>{
+      if((r.type==='stat'||r.type==='custom_stat'||r.type==='chapter'||r.type==='met'||r.type==='memory')&&
+         !authoredChr(r.character))add('err','Milestone gate refers to "'+r.character+'", which has no sheet.',w);
+    }));
     const ms=(c.stages||[]).slice(1);
+    const milestoneIds=new Set();
     if(!countLines((c.stages||[])[0]?.nodes||[]))
       add('warn','Activity has no "every time" dialogue, so ordinary repeats play nothing.',w);
     const seen2={};
     ms.forEach(s=>{
+      if(!s.id)add('err','A milestone has no export id.',w);
+      else if(milestoneIds.has(s.id))add('err','Two milestones use id "'+s.id+'". Once-only tracking would treat them as one.',w);
+      milestoneIds.add(s.id);
       if(!countLines(s.nodes||[]))add('warn','Milestone "'+s.title+'" has no lines.',w);
       const n=+s.at||0;
       if(seen2[n]&&!(s.requires||[]).length&&!(seen2[n].requires||[]).length)
-        add('warn','Two milestones both fire on repeat '+n+' with no condition between them — '+
+        add('warn','Two milestones both unlock after '+n+' successful completions with no condition between them — '+
           'only one will ever run.',w);
       seen2[n]=s;
     });
+    if((c.incrementsOn||c._authored?.increments_on)==='explicit_success'){
+      const successCount=list=>{let marked=0;
+        const scan=items=>(items||[]).forEach(n=>{
+        if(n.type==='line'&&n.activitySuccess){marked++;return;}
+        if(n.type!=='choice'&&n.type!=='gate')return;
+        (n.options||[]).forEach(o=>{if(o.activitySuccess)marked++;scan(o.nodes);});
+      });
+        scan(list);return marked;};
+      (c.stages||[]).forEach((s,i)=>{
+        if(!successCount(s.nodes))add('err',(i?'Milestone "'+(s.title||s.id)+'"':'The ordinary visit')+
+          ' has no route marked “Counts as success,” so completing it cannot advance the activity.',w);
+      });
+    }
   });
 
   const miss=missingRefs();

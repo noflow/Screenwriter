@@ -39,6 +39,60 @@ function compileEffects(raw){
   });
 }
 
+/** Replaces only this activity's completion marker while preserving unrelated
+    imported node effects. This lets a terminal line be the explicit success. */
+function syncActivityEffects(effects,activityId,successful){
+  const out=(effects||[]).filter(e=>!(activityId&&e?.operation==='complete_activity'&&
+    (!e.value||e.value===activityId))).map(e=>Object.assign({},e));
+  if(activityId&&successful)out.push({operation:'complete_activity',value:activityId});
+  return out;
+}
+function activityCounterKey(c){return c.counterKey||c._authored?.counter_key||'activity.'+c.id+'.count';}
+function activityRepeatLimit(c){
+  return Object.prototype.hasOwnProperty.call(c,'repeatLimit')?c.repeatLimit||'':
+    c._authored?.repeat_limit||c._authored?.source?.repeat_limit||'';
+}
+function activityName(c){
+  return Object.prototype.hasOwnProperty.call(c,'name')?c.name||'':
+    c._authored?.name||c._authored?.source?.name||c.title||'';
+}
+function activityActivation(c){
+  const out=Object.assign({},c._authored?.activation||{});
+  out.days=contentDays(c);
+  out.blocks=c.blocks||(c.block?[c.block]:[]);
+  delete out.day;delete out.block;
+  if(Object.prototype.hasOwnProperty.call(out,'location'))out.location=c.location||out.location;
+  return out;
+}
+/** Typed effects produced by the planner's lasting-consequence controls. Activity
+    stages attach these to their success commit, not to ordinary conversation end. */
+function plannedSceneEffects(scenePlan){
+  const consequence=scenePlan?.consequence||{},out=[];
+  if(consequence.memoryId)out.push({operation:'create_memory',character:consequence.character,
+    value:consequence.memoryId});
+  if(+consequence.chapter>1)out.push({operation:'unlock_relationship_chapter',
+    character:consequence.character,level:+consequence.chapter});
+  if(consequence.identity)out.push(Object.assign({operation:'change_identity',
+    character:consequence.character},consequence.identity));
+  return out;
+}
+
+/** Project dialogue nodes -> runtime nodes. Activity choices and terminal lines
+    receive a completion effect only when the author marked that route successful. */
+function clean(l,activityId){return (l||[]).map(n=>{
+  if(n.type==='line'){
+    const out={type:'line',speaker:n.speaker,text:n.text,emotion:n.emotion||''};
+    const effects=syncActivityEffects(n._orig?.effects,activityId,n.activitySuccess);
+    if(effects.length)out.effects=effects;
+    return out;
+  }
+  if(n.type==='jump')return {type:'jump',target:n.target||''};
+  const kind=n.type==='gate'?'gate':'choice';
+  return {type:kind,options:(n.options||[]).map(o=>({text:o.text,flag:o.flag||'',
+    effects:syncActivityEffects(compileEffects(o.flag),activityId,o.activitySuccess),
+    requires:o.requires||[],nodes:clean(o.nodes,activityId)}))};
+});}
+
 /** Every authored effect string in the project, with where it came from. */
 function effectSources(){
   const out=[];
@@ -119,7 +173,7 @@ function stateRegistry(){
   });
 
   P.content.filter(c=>c.type==='activity').forEach(c=>{
-    const key='activity.'+c.id+'.count';
+    const key=activityCounterKey(c);
     if(!counters.some(x=>x.key===key))counters.push({key,initial:0,activity:c.id});
   });
 
@@ -138,22 +192,37 @@ function activityBlocks(){
       conversations.push({id,title:(c.title||c.id)+' — '+(s.title||suffix),
         location:locPart(c.location),room:roomPart(c.location),
         day:'',block:'',cast:c.cast||[],chapter:0,requires:[],
-        internal:true,replayable:true,start:false,sets_flag:'',
-        nodes:clean(s.nodes||[])});
+        internal:true,replayable:true,start:false,sets_flag:'',activity_id:c.id,
+        nodes:clean(s.nodes||[],c.id)});
       return id;
     };
     const base=stages[0]||{nodes:[],flag:''};
     // Highest first: next_beat() takes the first match and assumes that order.
     const ms=stages.slice(1).slice().sort((a,b)=>(+b.at||0)-(+a.at||0));
-    activities.push({id:c.id,title:c.title||c.id,character:c.character||'',
+    const activity={id:c.id,kind:c.kind||c._authored?.kind||'social_activity',
+      title:c.title||c.id,character:c.character||'',
       location:locPart(c.location),room:roomPart(c.location),
-      activation:{days:c.days||(c.day?[c.day]:[]),blocks:c.blocks||(c.block?[c.block]:[])},
-      counter_key:'activity.'+c.id+'.count',
+      activation:activityActivation(c),
+      counter_key:activityCounterKey(c),
+      repeat_limit:activityRepeatLimit(c),
+      increments_on:c.incrementsOn||c._authored?.increments_on||'completed',
+      milestone_semantics:c.milestoneSemantics||c._authored?.milestone_semantics||
+        ((c.incrementsOn||c._authored?.increments_on)==='explicit_success'?'after_successes':'projected_attempt'),
       requires:c.requires||[],
-      base:{conversation:mint(base,'base'),effects:compileEffects(base.flag)},
-      milestones:ms.map((s,i)=>({at:+s.at||1,once:s.once!==false,title:s.title||'',
+      base:{conversation:mint(base,'base'),effects:compileEffects(base.flag).concat(
+        plannedSceneEffects(base.scenePlan))},
+      milestones:ms.map((s,i)=>({id:s.id||'ms_'+(i+1),at:+s.at||1,
+        once:s.once!==false,title:s.title||'',
         conversation:mint(s,'ms'+(+s.at||i+1)),
-        requires:s.requires||[],effects:compileEffects(s.flag)}))});
+        requires:s.requires||[],effects:compileEffects(s.flag).concat(
+          plannedSceneEffects(s.scenePlan))}))};
+    if(c._authored?.success_flag)activity.success_flag=c._authored.success_flag;
+    if(!activity.repeat_limit)delete activity.repeat_limit;
+    const source=c._authored?.source||{};
+    if(activityName(c))activity.name=activityName(c);
+    if(c.category||source.category)activity.category=c.category||source.category;
+    if(c.premise||source.summary)activity.summary=c.premise||source.summary;
+    activities.push(activity);
   });
   return {activities,conversations};
 }
@@ -172,8 +241,22 @@ function godotCheck(){
   P.content.filter(c=>c.type==='activity').forEach(c=>{
     const w=c.title||c.id;
     if(!c.character)add('fatal','Activity has no character, so nothing can offer it.',w);
+    if((c.incrementsOn||c._authored?.increments_on||'completed')!=='explicit_success')
+      add('fatal','Activity still uses legacy completion counting. Convert it to a marked successful branch.',w);
     if(!countLines((c.stages||[])[0]?.nodes||[]))
       add('fatal','Activity has no "every time" dialogue, so ordinary repeats play nothing.',w);
+    const successCount=list=>{let marked=0;
+      const scan=items=>(items||[]).forEach(n=>{
+      if(n.type==='line'&&n.activitySuccess){marked++;return;}
+      if(n.type!=='choice'&&n.type!=='gate')return;
+      (n.options||[]).forEach(o=>{if(o.activitySuccess)marked++;scan(o.nodes);});
+    });
+      scan(list);return marked;};
+    if((c.incrementsOn||c._authored?.increments_on)==='explicit_success')
+      (c.stages||[]).forEach((s,i)=>{
+        if(!successCount(s.nodes))add('fatal',(i?'Milestone "'+(s.title||s.id)+'"':'The ordinary visit')+
+          ' has no route marked “Counts as success,” so completing it cannot advance the activity.',w);
+      });
     (c.stages||[]).slice(1).forEach(s=>{
       if(!countLines(s.nodes||[]))add('err','Milestone "'+s.title+'" has no lines and will play silence.',w);
     });

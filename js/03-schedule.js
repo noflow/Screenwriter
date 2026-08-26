@@ -45,11 +45,20 @@ function availability(c,day,block){
   if(cell)return {free:!cell.unavailable,
     why:pretty(cell.activity||cell.location),
     where:cell.location||slug(cell.activity||'')};
-  const home=c.home?.residence_id||(c.home?.residence?slug(c.home.residence):null);
+  const home=c.home?.location_id||c.home?.residence_id||(c.home?.residence?slug(c.home.residence):null);
   if((sc.days_off||[]).includes(day))return {free:true,why:'day off',where:home};
   const pref=(sc.preferred_social_blocks||[]).includes(block);
   return {free:true,why:pref?'free · prefers this time':'free',where:home};
 }
 function whereIs(c,day,block){
   return availability(c,day,block).where||null;
+}
+
+/** Availability for every day on which a conversation/activity can run.
+    An empty day list means any day, so checks must cover the whole week. */
+function contentAvailability(character,item){
+  const multi=item?.type==='conversation'||item?.type==='activity';
+  const chosen=multi?contentDays(item):[item?.day].filter(Boolean);
+  const days=chosen.length?chosen:(multi?DAYS:[]);
+  return days.map(day=>Object.assign({day},availability(character,day,item?.block)));
 }

@@ -18,7 +18,7 @@ function paintModes(){
   if(!m.some(x=>x[0]===mode))mode=m[0][0];
   const dangling=c.type!=='repeatable'?emptyBranches().length:0;
   bar.innerHTML=m.map(([k,l])=>'<button class="mode'+(mode===k?' on':'')+'" data-mode="'+k+'">'+l+'</button>').join('')+
-    (c.type==='conversation'?'<button class="mode" id="openPlanner">Plan scene</button>':'')+
+    (c.type==='conversation'||c.type==='activity'?'<button class="mode" id="openPlanner">Plan scene</button>':'')+
     (dangling?'<button class="mode fill" id="fillEmpty">Continue '+dangling+
       ' unfinished branch'+(dangling===1?'':'es')+'</button>':'')+
     (c.type!=='repeatable'?'<span class="as">as <select id="playAs">'+

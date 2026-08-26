@@ -51,7 +51,7 @@ function weekGrid(){
   const cells={};
   P.content.forEach(c=>{
     if(c.type==='repeatable')return;
-    const days=c.type==='activity'?(c.day?[c.day]:DAYS):[c.day||'monday'];
+    const days=(c.type==='activity'||c.type==='conversation')?(contentDays(c).length?contentDays(c):DAYS):[c.day||'monday'];
     days.forEach(d=>{
       const k=d+'|'+(c.block||'evening');
       (cells[k]=cells[k]||[]).push(c);

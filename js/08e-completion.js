@@ -5,6 +5,7 @@ const COMPLETIONS=[
   ['value_set','when a value is chosen',['key','allowed_values']],
   ['list_size_at_least','when a list reaches a size',['key','value']],
   ['meter_at_least','when a meter reaches a level',['character','meter','value']],
+  ['activity_count_at_least','after an activity succeeds N times',['activity','value']],
   ['quest_completed','after another quest',['quest']],
   ['item_acquired','when an item is obtained',['item']],
   ['days_elapsed','after N in-game days',['value']]
@@ -23,11 +24,15 @@ function completionEditor(s,owner){
       '<option value="">— pick —</option>'+P.content.filter(x=>x.type==='quest').map(x=>
       '<option value="'+esc(x.id)+'"'+(x.id===c.quest?' selected':'')+'>'+esc(x.title||x.id)+'</option>'
       ).join('')+'</select>';
+    if(f==='activity')return '<select data-cp="'+owner+':activity">'+
+      '<option value="">— pick activity —</option>'+P.content.filter(x=>x.type==='activity').map(x=>
+      '<option value="'+esc(x.id)+'"'+(x.id===c.activity?' selected':'')+'>'+esc(x.title||x.id)+'</option>'
+      ).join('')+'</select>';
     if(f==='character')return '<select data-cp="'+owner+':character">'+P.characters.map(x=>
       '<option value="'+esc(x.id)+'"'+(x.id===c.character?' selected':'')+'>'+esc(x.name)+'</option>'
       ).join('')+'</select>';
     const ph={node:'node id',key:'player.life_path',allowed_values:'college, employment',
-      value:'2',meter:'trust',item:'front_door_key'}[f]||f;
+      value:c.event==='activity_count_at_least'?'5':'2',meter:'trust',item:'front_door_key'}[f]||f;
     return '<input data-cp="'+owner+':'+f+'" value="'+esc(v)+'" placeholder="'+ph+'" '+
       'style="width:'+(f==='allowed_values'?150:f==='value'?52:112)+'px">';
   };
