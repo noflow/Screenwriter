@@ -18,6 +18,9 @@ function flagToEffects(flag){
     if(chapter)return {operation:'unlock_relationship_chapter',character:chapter[1].trim(),level:+chapter[2]};
     const custom=piece.match(/^stat:([^:]+):([^\s:]+)\s+([+-]?\d+)$/i);
     if(custom)return {operation:'add_character_stat',character:custom[1].trim(),key:custom[2].trim(),value:+custom[3]};
+    const playerValue=piece.match(/^playerstat:(attributes|needs):([^\s:]+)\s+([+-]?\d+)$/i);
+    if(playerValue)return {operation:'add_player_value',section:playerValue[1].toLowerCase(),
+      key:playerValue[2].trim(),value:+playerValue[3]};
     if(piece.includes('=')){
       const [k,v]=piece.split('=');
       const val=v.trim();
@@ -307,6 +310,8 @@ function questOut(c){
     if(plan.earliestBlock)out.activation.earliest_block=plan.earliestBlock;
   }
   if(plan.deadline)out.deadline_note=plan.deadline;
+  const participants=[c.character,...(Array.isArray(plan.participants)?plan.participants:[])].filter(Boolean);
+  if(participants.length)out.participants=[...new Set(participants)];
   const cond=requiresToCondition(c.requires);
   if(cond&&!out.activation.event)Object.assign(out.activation,cond);
   return out;

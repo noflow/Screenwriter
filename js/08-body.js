@@ -103,7 +103,8 @@ function wireTree(){
   inner.querySelectorAll('[data-act="speaker"]').forEach(el=>el.onclick=()=>{
     const n=nodeAt(el.closest('.node').dataset.p.split('.').map(Number));
     // Narration sits at the end of the cycle so one more click always reaches it.
-    let pool=(cur().cast?.length?cur().cast:P.characters.map(c=>c.id));
+    let pool=(cur().cast?.length?cur().cast:npcs().map(c=>c.id))
+      .filter(id=>!isPlayer(chr(id)));
     const pc=playerChar();
     if($('writePlayer')?.checked&&pc&&!pool.includes(pc.id))pool=[pc.id].concat(pool);
     if(!$('writePlayer')?.checked)pool=pool.filter(id=>!isPlayer(chr(id)));

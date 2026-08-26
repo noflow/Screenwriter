@@ -3,12 +3,11 @@
 function reachable(){
   const gain={},spend={},perRun={};
   // repeat=true means the source can fire again, so it sets no ceiling at all.
-  const take=(flag,repeat)=>String(flag||'').split(';').forEach(p=>{
-    const bits=p.trim().split(/\s+/);
-    if(bits.length<2||!bits[0].includes('.'))return;
-    const n=parseInt(bits[1],10)||0;
-    if(repeat&&n>0){perRun[bits[0]]=(perRun[bits[0]]||0)+n;return;}
-    (n>=0?gain:spend)[bits[0]]=((n>=0?gain:spend)[bits[0]]||0)+Math.abs(n);
+  const take=(flag,repeat)=>compileEffects(flag).forEach(e=>{
+    if(e.operation!=='add_meter'&&e.operation!=='add_character_stat')return;
+    const key=e.character+'.'+(e.meter||e.key),n=+e.value||0;
+    if(repeat&&n>0){perRun[key]=(perRun[key]||0)+n;return;}
+    (n>=0?gain:spend)[key]=((n>=0?gain:spend)[key]||0)+Math.abs(n);
   });
   P.content.forEach(c=>{
     const rep=c.type==='activity';

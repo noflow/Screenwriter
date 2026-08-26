@@ -24,6 +24,7 @@ function effectsToFlag(effects){
       case 'create_memory': return 'memory:'+e.character+':'+v;
       case 'unlock_relationship_chapter': return 'chapter:'+e.character+':'+e.level;
       case 'add_character_stat': return 'stat:'+e.character+':'+e.key+' '+(v>=0?'+':'')+v;
+      case 'add_player_value': return 'playerstat:'+e.section+':'+e.key+' '+(v>=0?'+':'')+v;
       default:            return e.key||e.operation;
     }
   }).filter(Boolean).join('; ');
@@ -219,7 +220,7 @@ function convertQuest(q,sheet,report){
     requires:toRequires(act.event==='quest_completed'?act:q.condition,sheet.id),
     stages:stages.length?stages:[{id:'stage_1',title:'Opening',location:'',nodes:[],flag:done,requires:[]}],
     questPlan:{category:q.category||'character_story',summary:q.summary||'',earliestBlock:act.earliest_block||'',
-      rewards:'',deadline:q.deadline_note||'',event:scheduled},
+      rewards:'',participants:Array.isArray(q.participants)?q.participants:[],deadline:q.deadline_note||'',event:scheduled},
     _authored:{category:q.category,failure:q.failure,completion_effects:q.completion_effects,
       objectives:q.objectives,branches:q.branches,activation:act}
   };

@@ -26,12 +26,10 @@ function validate(){
     if(cids.has(c.id))add('err','Two characters share the id "'+c.id+'".','Cast');
     cids.add(c.id);
   });
-  const pcs=P.characters.filter(isPlayer);
-  if(pcs.length>1)add('err','More than one sheet is flagged as the player character: '+
-    pcs.map(c=>c.name).join(', ')+'.','Cast');
-  if(!pcs.length&&P.characters.length)
-    add('warn','No sheet is marked as the player character, so the model has no idea who the '+
-      'person playing is. Flag one in Edit sheet & limits.','Cast');
+  const fixedPlayers=P.characters.filter(isPlayer);
+  if(fixedPlayers.length)add('warn','Fixed player sheet'+(fixedPlayers.length===1?'':'s')+' ('+
+    fixedPlayers.map(c=>c.name).join(', ')+') will be ignored. Port Alder creates the Player '+
+    'from each user’s choices when a new game starts.','Cast');
 
   P.content.forEach(c=>{
     const w=c.title||c.id;
@@ -65,14 +63,21 @@ function validate(){
       else if(!a.free)
         add('warn',ch2.name+' is unavailable then ('+a.why+').',w);
     });
-    if(c.type!=='repeatable'&&!(c.cast||[]).filter(id=>!isPlayer(chr(id))).length)
+    const questPeople=c.type==='quest'?[c.character,...(c.questPlan?.participants||[])]:[];
+    if(c.type!=='repeatable'&&![...(c.cast||[]),...questPeople]
+      .some(id=>id&&authoredChr(id)&&!isPlayer(authoredChr(id))))
       add('warn','No NPC is marked present, so there is nobody for the player to talk to.',w);
 
     const checkReqs=(reqs,label)=>(reqs||[]).forEach(r=>{
-      if((r.type==='stat'||r.type==='chapter'||r.type==='met'||r.type==='memory')&&!chr(r.character))
-        add('err','A '+label+' gate refers to "'+r.character+'", which has no sheet.',w);
+      if(r.type==='stat'||r.type==='custom_stat'||r.type==='chapter'||r.type==='met'||r.type==='memory'){
+        if(isRuntimePlayerId(r.character))
+          add('err','A '+label+' gate uses the Player as an NPC relationship. Use a Player value '+
+            'or state flag instead; the Player has no fixed character sheet.',w);
+        else if(!authoredChr(r.character))
+          add('err','A '+label+' gate refers to "'+r.character+'", which has no sheet.',w);
+      }
       if(r.type==='chapter'){
-        const n=(chr(r.character)?.relationship_chapters||[]).length;
+        const n=(authoredChr(r.character)?.relationship_chapters||[]).length;
         if(n&&+r.value>n)add('err','Gated on chapter '+r.value+' but that character only has '+n+'.',w);
       }
     });
@@ -118,20 +123,25 @@ function validate(){
   const reg=flagRegistry(),keys=Object.keys(reg);
   keys.forEach(k=>{
     const r=reg[k];
-    const seeded=k.includes('.')&&chr(k.split('.')[0])?.relationship_defaults?.[k.split('.')[1]]!==undefined;
+    const seeded=(r.character_refs||[]).some(ref=>{
+      const ch=authoredChr(ref.character);
+      return ch&&(ch.relationship_defaults?.[ref.key]!==undefined||ch.custom_stats?.[ref.key]!==undefined);
+    });
     const auto=k.startsWith('met_');
     if(!r.sets.length&&!seeded&&!auto)
       add('warn','"'+k+'" is required somewhere but nothing ever sets it.',r.reads.join(', '));
     if(!r.reads.length)
       add('info','"'+k+'" is set but no condition reads it.',r.sets.join(', '));
-    if(auto&&!chr(k.slice(4))){
+    if(auto&&!authoredChr(k.slice(4))){
       const near=P.characters.find(c=>c.id.startsWith(k.slice(4))||k.slice(4).startsWith(c.id));
       add('err','"'+k+'" checks meeting "'+k.slice(4)+'", who has no sheet.'+
         (near?' Did you mean met_'+near.id+'?':''),r.reads.join(', ')||'Flags');
     }
-    if(k.includes('.')&&!chr(k.split('.')[0]))
-      add('err','"'+k+'" refers to character "'+k.split('.')[0]+'", who has no sheet.',
+    (r.character_refs||[]).forEach(ref=>{
+      if(authoredChr(ref.character))return;
+      add('err','"'+k+'" refers to character "'+ref.character+'", who has no sheet.',
         (r.reads.concat(r.sets)).join(', '));
+    });
   });
   keys.forEach((a,i)=>keys.slice(i+1).forEach(b=>{
     if(a!==b&&lev(a,b)<=2&&Math.min(a.length,b.length)>4)

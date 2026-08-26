@@ -5,13 +5,17 @@ document.querySelectorAll('.railtabs button').forEach(b=>b.onclick=()=>{
 });
 
 function paintCast(){
-  $('castList').innerHTML=P.characters.length?P.characters.map((c,i)=>
-    '<div class="chip'+(selChar===i?' on':'')+(isPlayer(c)?' pc':'')+'" data-c="'+i+'">'+
+  const runtime='<div class="chip pc" style="cursor:default" title="Created from this user’s new-game choices">'+
+    '<span class="swatch" style="background:'+RUNTIME_PLAYER.color+'"></span>Player'+
+    '<span class="tag">RUNTIME</span></div>';
+  const sheets=P.characters.map((c,i)=>({c,i}));
+  $('castList').innerHTML=runtime+(sheets.length?sheets.map(({c,i})=>
+    '<div class="chip'+(selChar===i?' on':'')+(isPlayer(c)?' legacy-player':'')+'" data-c="'+i+'">'+
     '<span class="swatch" style="background:'+c.color+'"></span>'+
-    esc(c.name)+'<span class="tag">'+(isPlayer(c)?'PLAYER'
+    esc(c.name)+'<span class="tag">'+(isPlayer(c)?'OLD PLAYER · IGNORED'
       :esc(c.profile?.role?pretty(c.profile.role):c.id))+'</span>'+
     '<button class="x" data-cx="'+i+'">×</button></div>').join('')
-    :'<p class="empty">No characters. Press Import sheets, or drop .character files onto the window.</p>';
+    :'<p class="empty">No NPC sheets yet. Import them or drop .character files onto the window.</p>');
   $('castList').querySelectorAll('.chip').forEach(el=>el.onclick=e=>{
     if(e.target.dataset.cx!==undefined)return;
     selChar=selChar===+el.dataset.c?null:+el.dataset.c;paintCast();paintSheet();});

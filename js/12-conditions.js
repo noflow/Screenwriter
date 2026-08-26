@@ -10,6 +10,8 @@ function condLabel(r){
   if(r.type==='custom_stat')return (chr(r.character)?.name||r.character)+' '+(statDefinition(r.key)?.label||r.key)+' '+op+' '+r.value;
   if(r.type==='met')   return 'met '+(chr(r.character)?.name||r.character);
   if(r.type==='memory')return (chr(r.character)?.name||r.character)+' remembers '+r.key+(r.op==='is_false'?' (not yet)':'');
+  const state=stateAssignment(r.key);
+  if(state)return state.key+' = '+stateValueText(state.value)+(r.op==='is_false'?' (not)':'');
   return r.key+' '+op+(r.op==='is_true'||r.op==='is_false'?'':' '+r.value);
 }
 
@@ -26,7 +28,14 @@ function condMet(r,S){
     const found=memories.includes(r.key);
     return r.op==='is_false'?!found:found;
   }
-  else                     have=S.flags[r.key];
+  else{
+    const state=stateAssignment(r.key);
+    if(state){
+      const equal=S.flags[state.key]===state.value;
+      return r.op==='is_false'?!equal:equal;
+    }
+    have=S.flags[r.key];
+  }
 
   if(r.op==='is_true')  return have===true||num(have)>0;
   if(r.op==='is_false') return !(have===true||num(have)>0);
@@ -37,7 +46,7 @@ const allMet=(reqs,S)=>(reqs||[]).every(r=>condMet(r,S));
 
 function condEditor(reqs,owner){
   return (reqs||[]).map((r,i)=>{
-    const who=P.characters.map(c=>'<option value="'+esc(c.id)+'"'+(c.id===r.character?' selected':'')+'>'+
+    const who=npcs().map(c=>'<option value="'+esc(c.id)+'"'+(c.id===r.character?' selected':'')+'>'+
       esc(c.name)+'</option>').join('');
     let mid='';
     if(r.type==='stat')mid='<select data-cf="'+owner+':'+i+':character">'+who+'</select>'+
@@ -62,7 +71,7 @@ function condEditor(reqs,owner){
   '<button class="add" data-cadd="'+owner+':stat">+ stat</button>'+
   (customStatDefs().length?'<button class="add" data-cadd="'+owner+':custom_stat">+ custom stat</button>':'')+
   '<button class="add" data-cadd="'+owner+':chapter">+ chapter</button>'+
-  '<button class="add" data-cadd="'+owner+':flag">+ flag</button>'+
+  '<button class="add" data-cadd="'+owner+':flag">+ flag / value</button>'+
   '<button class="add" data-cadd="'+owner+':met">+ met</button>'+
   '<button class="add" data-cadd="'+owner+':memory">+ memory</button>';
 }
@@ -80,7 +89,7 @@ function wireConds(root){
     const [owner,type]=b.dataset.cadd.split(':').slice(0,2).length===2&&b.dataset.cadd.startsWith('opt:')
       ? [b.dataset.cadd.slice(0,b.dataset.cadd.lastIndexOf(':')),b.dataset.cadd.split(':').pop()]
       : [b.dataset.cadd.slice(0,b.dataset.cadd.lastIndexOf(':')),b.dataset.cadd.split(':').pop()];
-    const id=P.characters[0]?.id||'';
+    const id=npcs()[0]?.id||'';
     reqsOf(owner).push(type==='stat'?{type:'stat',character:id,key:'love',op:'gte',value:50}
       :type==='custom_stat'?{type:'custom_stat',character:id,key:customStatDefs()[0]?.id||'',op:'gte',value:0}
       :type==='chapter'?{type:'chapter',character:id,op:'gte',value:2}

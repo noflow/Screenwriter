@@ -10,6 +10,7 @@ function isAdult(c){const a=+(c.profile?.age); return Number.isFinite(a)&&a>=18;
 function openEditor(i){
   edIx=i;const c=P.characters[i];if(!c)return;
   $('edName').textContent=c.name;
+  $('edSheetOut').disabled=isPlayer(c);
   paintEditor();
   $('editor').showModal();
 }
@@ -51,10 +52,10 @@ function paintEditor(){
       '<div class="field"><label>Skills / strengths</label>'+tagList('characteristics.strengths',c.characteristics.strengths,'ok')+'</div>'+
       '<div class="field edfull"><label>Identity change history</label>'+tagList('identity.history',c.identity.history,'ok')+
         '<p class="hint">Use short milestones such as <code>comes_out_to_player</code>. A scene can change the live identity with an identity-change effect.</p></div>'+
-      '<div class="field edfull"><label><input type="checkbox" id="edPC" style="width:auto"'+
-        (isPlayer(c)?' checked':'')+'> This is the player character</label>'+
-        '<p class="hint">The person playing. Their words come from choice options, never from '+
-        'generated dialogue, and they are in every scene regardless of schedule.</p></div>'+
+      '<div class="field edfull"><div class="guard">'+(isPlayer(c)
+        ? 'This is an old fixed Player sheet and will not export. Remove it from Cast when you no longer need it. '
+        : 'This is an NPC sheet. ')+'The Player is created from each user’s choices when a new game starts '+
+        'and never needs a character sheet here.</div></div>'+
 
       '<div class="field edfull"><p class="rubric" style="margin-top:6px">Limits</p></div>'+
 
@@ -162,10 +163,6 @@ function wireEditor(c,adult,romance){
   $('edGender').oninput=e=>{c.profile.gender_identity=e.target.value.trim();save();paintSheet();};
   $('edPronouns').oninput=e=>{c.identity.pronouns=e.target.value.trim();save();};
   $('edPresentation').oninput=e=>{c.identity.presentation=e.target.value.trim();save();};
-  $('edPC').onchange=e=>{
-    if(e.target.checked)P.characters.forEach(x=>{if(x!==c&&x.profile)x.profile.is_player=false;});
-    c.profile.is_player=e.target.checked;
-    save();paintCast();paintEditor();paintPresence();};
   $('edFam').onchange=e=>{c.boundaries.family_only=e.target.checked;save();paintSheet();};
   $('edAlc').onchange=e=>{c.boundaries.alcohol_consent=e.target.value;save();};
   $('edProt').oninput=e=>{c.boundaries.protection_policy=e.target.value;save();};
@@ -240,6 +237,7 @@ function gameReady(c){
 
 $('edSheetOut').onclick=()=>{
   const c=P.characters[edIx];
+  if(!c||isPlayer(c))return raise('The runtime Player is created for each new game and has no character sheet to export.');
   const url=URL.createObjectURL(new Blob([JSON.stringify(sheetOut(c),null,2)],{type:'application/json'}));
   Object.assign(document.createElement('a'),{href:url,download:c.id+'.character'}).click();
   URL.revokeObjectURL(url);

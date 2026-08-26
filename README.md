@@ -9,13 +9,21 @@ step that puts it back together into a single file you can move around freely.
 one file needs no build step. Requires the local server (it can't run from `file://`).
 
     cd path\to\scenewright
-    python -m http.server 8000
-    # then open http://localhost:8000/index.html
+    python -m http.server 8765
+    # then open http://127.0.0.1:8765/index.html
 
 **Finished build** — `scenewright.html` is self-contained. This is the one to keep
 a copy of, back up, or hand to someone else.
 
     python build.py
+
+The Player is a built-in runtime role, not a `.character` package. Port Alder
+creates the user's identity and game-state sheet separately for every new game.
+
+Run the focused state/player and quest-workshop regression checks with:
+
+    node tests/player-runtime.test.js
+    node tests/quest-workshop.test.js
 
 ## Layout
 
@@ -25,7 +33,7 @@ a copy of, back up, or hand to someone else.
     manifest.json       load order (regenerate by sorting js/ filenames)
     _markup.html        shared markup template with @@CSS@@ / @@JS@@ slots
     css/app.css         all styles
-    js/                 40 modules, loaded in filename order
+    js/                 41 modules, loaded in filename order
 
 ## The modules
 
@@ -49,6 +57,7 @@ Numeric prefixes are load order, not importance.
     08f-activity        activities and milestones
     08g-quest           quest stages
     08h-quest-builder   story arcs, rewards, and follow-up calendar events
+    08i-quest-workshop  conversational quest planning and plain-text conversion
     09-modes            mode bar, placeholders
     10-brief            charBrief, boundsBrief — what the model is told
     10b-speakers        who may speak, player rules

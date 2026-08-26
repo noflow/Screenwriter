@@ -92,7 +92,7 @@ async function run(){
   // Whole-scene mode can start from nothing — it makes the content item itself.
   if(mode==='scene'&&!cur()){
     if(!input)return note('Describe the scene first.',true);
-    if(!P.characters.length)return note('Import a character sheet first.',true);
+    if(!npcs().length)return note('Import an NPC character sheet first.',true);
     const uid='u'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
     P.content.push({uid,type:'conversation',id:'scene_'+(P.content.length+1),title:'New scene',
       location:P.locations[0]?.id||'',day:'monday',block:'evening',chapter:1,
@@ -112,11 +112,8 @@ async function run(){
   busy=true;$('go').disabled=true;$('stop').disabled=false;abort=new AbortController();
   const meId=$('sayAs')?.value||$('playAs')?.value;
   if(mode==='play'&&input&&meId){
-    const speaker=meId==='__player__'?(playerChar()?.id||'__player__'):meId;
-    if(speaker==='__player__')
-      note('No sheet is flagged as the player character, so that line has nowhere to go. '+
-        'Flag one in Edit sheet & limits.',true);
-    else listAt(focusPath).push({type:'line',speaker,text:input,emotion:''});
+    const speaker=isRuntimePlayerId(meId)?'player':meId;
+    listAt(focusPath).push({type:'line',speaker,text:input,emotion:''});
   }
   $('line').value='';$('line').style.height='auto';paintBody();
 

@@ -3,18 +3,36 @@
    one compiler for effect strings, one declared registry of flags and stats,
    the activity block the export used to omit, and a check for the seam itself. */
 
-/** "trust +1; boat_sold; mara.comfort -2" -> effect objects the runtime applies.
-    A dotted key moves a relationship meter; a bare word with a number counts;
-    a bare word on its own sets a flag true. Same rules the runtime used to
-    infer at play time — decided once, here, and written into the export. */
+function knownMetricName(key){
+  const built=[...(typeof STAT_KEYS==='undefined'?[]:STAT_KEYS),...(typeof STATS==='undefined'?[]:STATS)];
+  const custom=typeof customStatDefs==='function'?customStatDefs().map(s=>s.id):[];
+  return built.includes(key)||custom.includes(key);
+}
+
+/** "emma.trust +1; sandbox.active; player.life_path=college" -> typed effects.
+    A dot alone means nothing: only an explicit numeric NPC-meter change is a meter. */
 function compileEffects(raw){
   return String(raw||'').split(';').map(s=>s.trim()).filter(Boolean).map(piece=>{
+    if(piece.startsWith('!'))return {operation:'set_flag',key:piece.slice(1).trim(),value:false};
+    let match=piece.match(/^memory:([^:]+):(.+)$/i);
+    if(match)return {operation:'create_memory',character:match[1].trim(),value:match[2].trim()};
+    match=piece.match(/^chapter:([^:]+):(\d+)$/i);
+    if(match)return {operation:'unlock_relationship_chapter',character:match[1].trim(),level:+match[2]};
+    match=piece.match(/^stat:([^:]+):([^\s:]+)\s+([+-]?\d+)$/i);
+    if(match)return {operation:'add_character_stat',character:match[1].trim(),key:match[2].trim(),value:+match[3]};
+    match=piece.match(/^playerstat:(attributes|needs):([^\s:]+)\s+([+-]?\d+)$/i);
+    if(match)return {operation:'add_player_value',section:match[1].toLowerCase(),key:match[2].trim(),value:+match[3]};
+    const assignment=stateAssignment(piece);
+    if(assignment)return {operation:'set_value',key:assignment.key,value:assignment.value};
+
     const parts=piece.split(/\s+/);
     const key=parts[0];
     const delta=parts.length>1?parseInt(parts[1],10):NaN;
-    if(key.includes('.')){
+    if(Number.isFinite(delta)&&key.includes('.')){
       const [character,meter]=key.split('.');
-      return {operation:'add_meter',character,meter,value:Number.isFinite(delta)?delta:1};
+      if(authoredChr(character)||knownMetricName(meter))
+        return {operation:'add_meter',character,meter,value:delta};
+      return {operation:'add_value',key,value:delta};
     }
     if(Number.isFinite(delta))return {operation:'add_value',key,value:delta};
     return {operation:'set_flag',key,value:true};
@@ -39,45 +57,66 @@ function effectSources(){
 function stateRegistry(){
   const reg=flagRegistry();
   const flags=[],stats=[],counters=[],conflicts=[];
-  const kinds={};
-  effectSources().forEach(({raw,where})=>compileEffects(raw).forEach(e=>{
-    if(e.operation==='set_flag'||e.operation==='add_value'){
-      const k=kinds[e.key]=kinds[e.key]||{bool:[],int:[]};
-      k[e.operation==='set_flag'?'bool':'int'].push(where);
-    }
-  }));
+  const state={};
+  const merge=(a,b)=>[...new Set([...(a||[]),...(b||[])])];
+  const valueType=value=>typeof value==='number'?(Number.isInteger(value)?'int':'number'):
+    typeof value==='boolean'?'bool':typeof value==='string'?'string':'variant';
+  const addState=(key,r)=>{
+    const row=state[key]=state[key]||{key,kinds:[],types:{},sets:[],reads:[]};
+    row.kinds=merge(row.kinds,r.kinds);row.sets=merge(row.sets,r.sets);row.reads=merge(row.reads,r.reads);
+    (r.kinds||[]).forEach(kind=>{
+      if(kind==='flag')row.types.bool=merge(row.types.bool,r.sets.concat(r.reads));
+      if(kind==='counter')row.types.int=merge(row.types.int,r.sets.concat(r.reads));
+    });
+    (r.values||[]).forEach(value=>{
+      const type=valueType(value);row.types[type]=merge(row.types[type],r.sets.concat(r.reads));
+    });
+  };
 
   Object.keys(reg).sort().forEach(k=>{
-    const r=reg[k];
-    if(/^activity\./.test(k)){counters.push({key:k,initial:0,read_by:r.reads});return;}
-    if(k.includes('.')){
-      const [cid,stat]=k.split('.');
-      const ch=chr(cid);
-      if(ch){
-        const cap=ch.stat_caps?.[stat];
-        stats.push({key:k,character:cid,stat,
-          initial:+(ch.relationship_defaults?.[stat]??0),
-          min:0,max:Number.isFinite(+cap)?+cap:null,
-          set_by:r.sets,read_by:r.reads});
-        return;
-      }
+    const r=reg[k],ref=(r.character_refs||[])[0];
+    if(ref){
+      const ch=authoredChr(ref.character),stat=ref.key;
+      const def=typeof statDefinition==='function'?statDefinition(stat):null;
+      const cap=ch?.stat_caps?.[stat];
+      const initial=ch?.relationship_defaults?.[stat]??ch?.custom_stats?.[stat]??def?.default??0;
+      stats.push({key:ref.character+'.'+stat,character:ref.character,stat,initial:+initial||0,
+        min:Number.isFinite(+def?.minimum)?+def.minimum:0,
+        max:Number.isFinite(+cap)?+cap:Number.isFinite(+def?.maximum)?+def.maximum:null,
+        set_by:r.sets,read_by:r.reads,invalid:!ch||undefined});
+      return;
     }
-    const k2=kinds[k]||{bool:[],int:[]};
-    const isInt=k2.int.length>0;
-    if(k2.bool.length&&k2.int.length)
-      conflicts.push({key:k,bool:[...new Set(k2.bool)],int:[...new Set(k2.int)]});
-    flags.push({key:k,type:isInt?'int':'bool',initial:isInt?0:false,
-      auto:/^met_/.test(k)||undefined,set_by:r.sets,read_by:r.reads});
+    if((r.kinds||[]).includes('player_value'))return;
+    addState(r.state_key||k,r);
+  });
+
+  Object.values(state).sort((a,b)=>a.key.localeCompare(b.key)).forEach(row=>{
+    if(/^activity\./.test(row.key)){
+      counters.push({key:row.key,initial:0,set_by:row.sets,read_by:row.reads});return;
+    }
+    let types=Object.keys(row.types);
+    if(types.includes('number')&&types.includes('int'))types=types.filter(t=>t!=='int');
+    if(types.length>1)conflicts.push({key:row.key,types:types.map(type=>({type,where:row.types[type]}))});
+    const type=types.includes('string')?'string':types.includes('number')?'number':
+      types.includes('int')?'int':types.includes('variant')?'variant':'bool';
+    const initial=type==='string'?'':type==='int'||type==='number'?0:type==='variant'?null:false;
+    flags.push({key:row.key,type,initial,auto:/^met_/.test(row.key)||undefined,
+      set_by:row.sets,read_by:row.reads});
   });
 
   // Stats that live on a sheet but no condition reads yet still need seeding.
-  P.characters.forEach(c=>Object.keys(c.relationship_defaults||{}).forEach(stat=>{
-    const key=c.id+'.'+stat;
-    if(stats.some(s=>s.key===key))return;
-    const cap=c.stat_caps?.[stat];
-    stats.push({key,character:c.id,stat,initial:+(c.relationship_defaults[stat]||0),
-      min:0,max:Number.isFinite(+cap)?+cap:null,set_by:[],read_by:[]});
-  }));
+  npcs().forEach(c=>{
+    const seed=(values,custom)=>Object.keys(values||{}).forEach(stat=>{
+      const key=c.id+'.'+stat;if(stats.some(s=>s.key===key))return;
+      const def=custom&&typeof statDefinition==='function'?statDefinition(stat):null;
+      const cap=c.stat_caps?.[stat];
+      stats.push({key,character:c.id,stat,initial:+values[stat]||0,
+        min:Number.isFinite(+def?.minimum)?+def.minimum:0,
+        max:Number.isFinite(+cap)?+cap:Number.isFinite(+def?.maximum)?+def.maximum:null,
+        set_by:[],read_by:[]});
+    });
+    seed(c.relationship_defaults,false);seed(c.custom_stats,true);
+  });
 
   P.content.filter(c=>c.type==='activity').forEach(c=>{
     const key='activity.'+c.id+'.count';
@@ -126,8 +165,8 @@ function godotCheck(){
   const out=[],add=(sev,msg,where)=>out.push({sev,msg,where});
   const R=stateRegistry();
 
-  R.conflicts.forEach(c=>add('fatal','"'+c.key+'" is set as a switch in '+c.bool.join(', ')+
-    ' and counted in '+c.int.join(', ')+'. One key cannot be both — rename one or make both counters.',
+  R.conflicts.forEach(c=>add('fatal','"'+c.key+'" is used with incompatible types: '+
+    c.types.map(t=>t.type+' in '+t.where.join(', ')).join('; ')+'. Use one state type for this key.',
     'Flags'));
 
   P.content.filter(c=>c.type==='activity').forEach(c=>{

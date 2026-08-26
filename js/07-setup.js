@@ -51,9 +51,8 @@ function paintSetup(){
 function paintPresence(){
   const c=cur(),box=$('presence');if(!c||!box)return;
   c.cast=c.cast||[];
-  box.innerHTML=P.characters.map(ch=>{
-    if(isPlayer(ch))return '<span class="pres in pc" title="The player is always in the scene">'+
-      '<span class="dot"></span>'+esc(ch.name)+'</span>';
+  box.innerHTML='<span class="pres in pc" title="Created from this user’s choices when a new game starts">'+
+    '<span class="dot"></span>Player <small>runtime</small></span>'+npcs().map(ch=>{
     const a=availability(ch,c.day,c.block),here=whereIs(ch,c.day,c.block);
     const on=c.cast.includes(ch.id);
     const mismatch=c.location&&here&&locPart(here)!==locPart(c.location);

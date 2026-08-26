@@ -23,7 +23,7 @@ function portAlderCheck(){
     'goals','connections','relationship_defaults','boundaries','private_profile','relationship_chapters',
     'quest_hooks','conversation_topics','text_style','quests','conversations','text_messages','outcomes','asset_refs','entry_event'];
   const ids=new Set();
-  P.characters.forEach(c=>{
+  npcs().forEach(c=>{
     const sheet=gameReady(c),name=c.name||c.id||'Unnamed character';
     required.filter(k=>sheet[k]===undefined).forEach(k=>add('err','Missing required .character field "'+k+'".',name));
     if(ids.has(c.id))add('err','Two character sheets use "'+c.id+'". Port Alder requires unique package ids.',name);
@@ -50,7 +50,7 @@ function portAlderCheck(){
     });
     walk(c.nodes||[],'scene');
   });
-  if(P.characters.length!==15)add('info','The current Port Alder vertical slice expects 15 character packages; this project has '+P.characters.length+'.', 'Character sheets');
+  if(npcs().length!==15)add('info','The current Port Alder vertical slice expects 15 NPC character packages; this project has '+npcs().length+'. The runtime Player is counted separately.', 'Character sheets');
   return out;
 }
 function branchTests(){

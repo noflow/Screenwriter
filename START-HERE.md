@@ -24,18 +24,19 @@ If that errors, start Ollama from the Start menu.
 Then quit Ollama from the system tray (right-click the llama, Quit) and start it
 again. `setx` only affects new processes, so the restart matters.
 
-**3. Serve the folder.** Open Command Prompt in this directory:
+**3. Start Scenewright.** Double-click `Start Scenewright.bat`. It finds Python,
+reuses its own local server when one is already running, avoids ports occupied by
+other programs, and opens the correct page automatically.
 
-    python -m http.server 8000
+To run it manually instead, open Command Prompt in this directory:
+
+    python -m http.server 8765
 
 Leave that window open — closing it stops the server.
 
-Or simply double-click `Start Scenewright.bat`. It starts the server if needed and
-opens the app for you.
-
 **4. Open it:**
 
-    http://localhost:8000/scenewright.html
+    http://127.0.0.1:8765/scenewright.html
 
 Not by double-clicking the file. A page opened from `file://` can't reach Ollama.
 
@@ -78,8 +79,9 @@ editor's scene structure automatically, so the model does not need to write JSON
    their identity, pronouns, presentation, traits, likes, dislikes, fears, strengths,
    and starting values for those custom stats. Use **Download game locations** after
    creating places, then put that file in the game's `content/world` folder.
-3. **Inspect → Missing characters → Add all as stubs** creates the referenced
-   people who have no sheet yet, including the player.
+3. **Inspect → Missing characters → Add all as stubs** creates referenced NPCs
+   who have no sheet yet. The Player is built in: every new game creates them from
+   that user's character-creator choices, so there is never a `player.character` file.
 4. **Inspect → Port Alder** before exporting. It checks the game package fields,
    automatic stat branches, and any gate the current game runtime cannot play.
 5. **Inspect → Validate** to see what needs attention inside the story itself.
@@ -106,9 +108,25 @@ work won't be there. **Content → Save file** writes a copy you can keep.
 
 Use **Quest builder** to turn a story idea into an arc before you draft its scenes.
 Give it a title, a quest giver, a summary, objectives, optional prerequisite quest,
-completion rewards, and a follow-up calendar event. Each objective becomes a quest
-stage where you write the relevant dialogue or task. Rewards use the same simple
-effect syntax as scenes, such as `emma_rowan.trust +3` or `unlocked_calendar`.
+completion rewards, and a follow-up calendar event. **Help & examples** shows a
+short walkthrough inside the builder. Add every NPC involved in the quest, then
+build rewards from the **Who**, **What changes**, and **Amount** menus. Add as many
+rows as needed—for example, Emma Trust +3, Emma Love +1, and Player Confidence +2.
+The advanced effects field remains available for flags and unlocks such as
+`unlocked_calendar`. Each objective becomes a quest stage where you write the
+relevant dialogue or task.
+
+Choose **Chat workshop** when you would rather talk the quest through. Pick the
+Story Guide for normal planning, or choose the quest giver or another NPC to hear
+an in-character reply. The chat accepts ordinary roleplay text and includes quick
+prompts for hooks, complications, objectives, and stat-based outcomes. When the
+direction feels right, choose **Build quest plan from chat**. Scenewright asks the
+model for a plain-text worksheet, parses it locally, and fills the normal editable
+quest fields; it never asks the model to author the game's JSON. Existing stage
+dialogue and imported automatic branch stages are preserved.
+
+The workshop also keeps **Branch ideas** as planning notes. Use the scene planner's
+conditional outcome controls when you write the scene where that stat split occurs.
 
 For a follow-up event, use an in-game date like `Y1-08-23`, choose a time block and
 location, then export the character sheet. Completing the quest adds that event to

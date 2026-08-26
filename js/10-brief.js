@@ -54,7 +54,11 @@ function canonBrief(){
   return relevant.length?'\n\n# Story memory\n'+relevant.slice(-18).map(n=>'- '+n.text).join('\n'):'';
 }
 
-const present=()=>{const c=cur();return (c?.cast||[]).map(chr).filter(Boolean);};
+const present=()=>{
+  const c=cur();
+  const ids=c?.type==='quest'?[c.character,...(c.questPlan?.participants||[])]:c?.cast||[];
+  return [...new Set(ids.filter(Boolean))].map(chr).filter(Boolean);
+};
 /** Only NPCs can be given generated dialogue. */
 const presentNPCs=()=>present().filter(c=>!isPlayer(c));
 /** Who may be given a spoken line, given the current drafting setting. */

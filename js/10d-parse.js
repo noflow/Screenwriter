@@ -144,7 +144,7 @@ function closeJSON(t){
     wrapped — {"lines":[...]}, {"nodes":[...]}, or occasionally a single bare item.
     Dig the array out rather than handing a non-array to the caller. */
 /** Resolves whatever the model called a speaker to a real id, or rejects the line.
-    A line attributed to the player is dropped — the player never speaks in dialogue. */
+    Player aliases always resolve to the runtime id; drafting decides whether to keep them. */
 function resolveSpeaker(raw,c){
   let sp=String(raw||'').trim();
   if(sp==='__narrator__')return sp;
@@ -159,7 +159,7 @@ function resolveSpeaker(raw,c){
     (pc&&sp.toLowerCase()===pc.name.toLowerCase());
   if(meansPlayer)
     // Kept when the writer wants drafted player dialogue; otherwise it belongs in a choice.
-    return $('writePlayer')?.checked ? (pc?pc.id:'player') : null;
+    return $('writePlayer')?.checked ? 'player' : null;
 
   if(hit)return hit.id;                       // a real character, even if not in cast yet
   const cast=(c.cast||[]).filter(id=>!isPlayer(chr(id)));

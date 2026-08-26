@@ -333,18 +333,29 @@
 </dialog>
 
 <dialog id="questBuilder">
-  <div class="sheet-head"><h3>Quest &amp; event builder</h3><span class="sp"></span><button class="btn" id="closeQuestBuilder">Close</button></div>
+  <div class="sheet-head"><h3>Quest &amp; event builder</h3><span class="sp"></span><button class="btn quest-workshop-launch" id="qbWorkshopButton">Chat workshop</button><button class="btn quiet" id="qbHelpButton">Help &amp; examples</button><button class="btn" id="closeQuestBuilder">Close</button></div>
   <div class="sheet-body edbody">
     <p class="hint">Build the arc first, then write each objective as a quest stage. This keeps story progression, rewards, and follow-up events visible in one place.</p>
+    <div class="builder-help" id="qbHelp" hidden>
+      <div><span class="help-step">1</span><b>Define the arc</b><p>Example: Emma asks the player to help prepare for her first day at a new job.</p></div>
+      <div><span class="help-step">2</span><b>Add objectives</b><p>Talk to Emma → buy interview clothes → meet her at the café.</p></div>
+      <div><span class="help-step">3</span><b>Add rewards</b><p>Emma Trust +3, Emma Love +1, and Player Confidence +2 can all be separate reward rows.</p></div>
+      <div><span class="help-step">4</span><b>Schedule a follow-up</b><p>Use a game date such as <code>Y1-08-23</code>, then choose a time and location.</p></div>
+      <p class="help-tip"><b>Tip:</b> choose how each objective finishes inside its quest stage—for example, after a conversation, when an item is obtained, or when a stat reaches a value.</p>
+    </div>
     <div class="edgrid" style="padding-top:12px">
       <div class="field edfull"><label for="qbTitle">Quest title</label><input id="qbTitle" placeholder="A Favor at the Marina"></div>
       <div class="field"><label for="qbCategory">Story type</label><select id="qbCategory"><option value="character_story">Character story</option><option value="relationship">Relationship</option><option value="work">Work</option><option value="school">School</option><option value="community">Community</option><option value="personal">Personal</option></select></div>
       <div class="field"><label for="qbGiver">Quest giver</label><select id="qbGiver"></select></div>
+      <div class="field edfull"><label>Other characters in this quest</label><div class="quest-cast-row"><select id="qbCastAdd" aria-label="Add quest character"></select><button class="btn" id="qbAddCast">+ Add character</button></div><div class="quest-cast-chips" id="qbCastChips"></div><p class="hint">The Player and these characters become available in the reward menus.</p></div>
       <div class="field edfull"><label for="qbSummary">What is this arc about?</label><textarea id="qbSummary" rows="3" placeholder="Help a friend prepare for an important first day."></textarea></div>
+      <div class="field"><label for="qbLocation">Primary location</label><select id="qbLocation"></select></div>
+      <div class="field"><label for="qbDeadline">Story deadline <span class="hint">shown to you</span></label><input id="qbDeadline" placeholder="Before Friday night"></div>
       <div class="field"><label for="qbAfter">Starts after quest <span class="hint">optional</span></label><select id="qbAfter"></select></div>
       <div class="field"><label for="qbEarliest">Earliest follow-up block</label><select id="qbEarliest"><option value="">Immediately</option><option>early_morning</option><option>morning</option><option>lunch</option><option>afternoon</option><option>evening</option><option>late_evening</option><option>night</option></select></div>
-      <div class="field edfull"><label for="qbRewards">Completion rewards / consequences</label><input id="qbRewards" placeholder="emma_rowan.trust +3; marina_favor_done; unlocked_calendar"><p class="hint">Use normal effects, separated by semicolons. They apply when every objective is complete.</p></div>
-      <div class="field"><label for="qbDeadline">Story deadline <span class="hint">shown to you</span></label><input id="qbDeadline" placeholder="Before Friday night"></div>
+      <div class="field edfull"><label for="qbBranchIdeas">Branch ideas <span class="hint">planning notes</span></label><textarea id="qbBranchIdeas" rows="3" placeholder="If Emma's Trust is 50 or higher, she shares the secret. Otherwise, she asks for more proof."></textarea><p class="hint">Keep possible outcomes here while planning. Turn them into a stat branch when you write the scene where the choice happens.</p></div>
+      <div class="field edfull"><label>Completion rewards / consequences</label><div class="reward-builder" id="qbRewardRows"></div><button class="btn reward-add" id="qbAddReward">+ Add another reward</button><p class="hint">Choose who changes, what changes, and an amount from −5 to +5. Add as many rewards as the quest needs.</p></div>
+      <div class="field edfull"><label for="qbRewards">Other effects <span class="hint">advanced, optional</span></label><input id="qbRewards" placeholder="marina_favor_done; unlocked_calendar"><p class="hint">Use this only for flags, unlocks, memories, or effects not covered by the reward menus.</p></div>
       <div class="field edfull"><p class="rubric">Completion event <span class="hint">optional</span></p></div>
       <div class="field"><label for="qbEventTitle">Event title</label><input id="qbEventTitle" placeholder="Meet at the marina"></div>
       <div class="field"><label for="qbEventDate">Game date</label><input id="qbEventDate" placeholder="Y1-08-23"></div>
@@ -353,6 +364,57 @@
     </div>
     <div id="qbObjectives"></div>
     <div class="row dialog-actions" style="margin-top:14px"><button class="btn" id="qbAddObjective">+ objective</button><span class="sp"></span><button class="btn gold" id="saveQuestBuilder">Save quest plan</button></div>
+  </div>
+</dialog>
+
+<dialog id="questWorkshop" aria-labelledby="qwTitle">
+  <div class="sheet-head quest-workshop-head">
+    <div><span class="quest-workshop-kicker">Conversational quest planning</span><h3 id="qwTitle">Quest workshop</h3></div>
+    <span class="sp"></span>
+    <button class="btn quiet" id="qwClear">Clear chat</button>
+    <button class="btn" id="qwClose">Back to quest</button>
+  </div>
+  <div class="sheet-body quest-workshop-body">
+    <div class="quest-workshop-layout">
+      <aside class="quest-workshop-sidebar">
+        <div class="qw-card">
+          <span class="qw-label">Building</span>
+          <strong id="qwQuestName">New quest</strong>
+          <p id="qwCastSummary">Choose a giver and cast in the quest builder.</p>
+        </div>
+        <div class="qw-card">
+          <label class="qw-label" for="qwSpeaker">Next reply from</label>
+          <select id="qwSpeaker"></select>
+          <p>Choose the Story Guide for planning, or an NPC to talk through the request in character.</p>
+        </div>
+        <div class="qw-card qw-prompts">
+          <span class="qw-label">Conversation starters</span>
+          <button type="button" data-qw-prompt="Pitch three grounded quest hooks for these characters. Make each hook personal, playable, and different from the others.">Pitch three hooks</button>
+          <button type="button" data-qw-prompt="Add a complication that reveals character and changes what the player must do.">Add a complication</button>
+          <button type="button" data-qw-prompt="Suggest two different outcomes based on a relationship or player stat, including a useful threshold.">Design a stat split</button>
+          <button type="button" data-qw-prompt="Turn the direction we have chosen into a short sequence of concrete, playable objectives.">Shape the objectives</button>
+        </div>
+        <p class="qw-privacy" id="qwPrivacy">Uses the AI engine selected in the main window.</p>
+      </aside>
+      <section class="quest-workshop-conversation">
+        <div class="qw-messages" id="qwMessages" role="log" aria-live="polite"></div>
+        <div class="qw-composer">
+          <label for="qwInput">Talk through the quest in ordinary language</label>
+          <textarea id="qwInput" rows="3" placeholder="I want Emma to ask the player for help, but she should be hiding the real reason..."></textarea>
+          <div class="qw-compose-actions">
+            <span class="qw-status" id="qwStatus">Enter sends · Shift+Enter adds a line</span>
+            <button class="btn quiet" id="qwStop" disabled>Stop</button>
+            <button class="btn gold" id="qwSend">Send</button>
+          </div>
+        </div>
+        <div class="qw-finish">
+          <button class="btn" id="qwRegenerate">Regenerate last reply</button>
+          <span class="sp"></span>
+          <span class="hint">Creates editable fields, never AI-authored JSON.</span>
+          <button class="btn gold" id="qwBuild">Build quest plan from chat</button>
+        </div>
+      </section>
+    </div>
   </div>
 </dialog>
 
@@ -398,6 +460,7 @@
 <script src="js/08f-activity.js"></script>
 <script src="js/08g-quest.js"></script>
 <script src="js/08h-quest-builder.js"></script>
+<script src="js/08i-quest-workshop.js"></script>
 <script src="js/09-modes.js"></script>
 <script src="js/10-brief.js"></script>
 <script src="js/10b-speakers.js"></script>

@@ -66,24 +66,23 @@ function wkChoose(i){
   wkPending=null;wkStep();
 }
 function applyFlag(raw,S){
-  // Effects arrive as "a.b +1; flag_name; c.d -2" — semicolons first, then the value.
-  String(raw||'').split(';').forEach(piece=>{
-    const clean=piece.trim();
-    const memory=clean.match(/^memory:([^:]+):(.+)$/i);
-    if(memory){S.memories=S.memories||{};const list=S.memories[memory[1]]||(S.memories[memory[1]]=[]);if(!list.includes(memory[2]))list.push(memory[2]);return;}
-    const chapter=clean.match(/^chapter:([^:]+):(\d+)$/i);
-    if(chapter){S.chapters[chapter[1]]=Math.max(+S.chapters[chapter[1]]||1,+chapter[2]);return;}
-    const custom=clean.match(/^stat:([^:]+):([^\s:]+)\s+([+-]?\d+)$/i);
-    if(custom){const k=custom[1]+'.'+custom[2];S.stats[k]=(+S.stats[k]||0)+(+custom[3]);return;}
-    const p=clean.split(/\s+/).filter(Boolean);
-    if(!p.length)return;
-    if(p.length===1){
-      if(p[0].includes('='))S.flags[p[0].split('=')[0]]=p[0].split('=')[1];
-      else S.flags[p[0]]=true;
-      return;
+  compileEffects(raw).forEach(e=>{
+    if(e.operation==='create_memory'){
+      S.memories=S.memories||{};const list=S.memories[e.character]||(S.memories[e.character]=[]);
+      if(!list.includes(e.value))list.push(e.value);return;
     }
-    const k=p[0],d=parseInt(p[1],10)||0;
-    if(k.includes('.'))S.stats[k]=(+S.stats[k]||0)+d; else S.flags[k]=(+S.flags[k]||0)+d;
+    if(e.operation==='unlock_relationship_chapter'){
+      S.chapters[e.character]=Math.max(+S.chapters[e.character]||1,+e.level);return;
+    }
+    if(e.operation==='add_meter'||e.operation==='add_character_stat'){
+      const key=e.character+'.'+(e.meter||e.key);S.stats[key]=(+S.stats[key]||0)+(+e.value||0);return;
+    }
+    if(e.operation==='add_player_value'){
+      S.player=S.player||{};S.player[e.section]=S.player[e.section]||{};
+      S.player[e.section][e.key]=(+S.player[e.section][e.key]||0)+(+e.value||0);return;
+    }
+    if(e.operation==='set_value'||e.operation==='set_flag'){S.flags[e.key]=e.value;return;}
+    if(e.operation==='add_value')S.flags[e.key]=(+S.flags[e.key]||0)+(+e.value||0);
   });
 }
 

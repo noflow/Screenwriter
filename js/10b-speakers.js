@@ -1,7 +1,6 @@
 function speakableIds(c){
   const ids=(c?.cast||[]).filter(id=>!isPlayer(chr(id)));
-  const pc=playerChar();
-  if($('writePlayer')?.checked&&pc)ids.unshift(pc.id);
+  if($('writePlayer')?.checked)ids.unshift('player');
   return ids;
 }
 
@@ -12,11 +11,9 @@ function lastSpoken(){
 }
 
 function speakerPool(){
-  const ids=[];
-  const pc=playerChar();
-  if(pc)ids.push(pc.id);
-  (cur()?.cast||[]).forEach(id=>{if(id&&!ids.includes(id))ids.push(id);});
-  P.characters.forEach(ch=>{if(!ids.includes(ch.id))ids.push(ch.id);});
+  const ids=['player'];
+  (cur()?.cast||[]).forEach(id=>{if(id&&!isPlayer(chr(id))&&!ids.includes(id))ids.push(id);});
+  npcs().forEach(ch=>{if(!ids.includes(ch.id))ids.push(ch.id);});
   ids.push('__narrator__');
   return ids;
 }
@@ -64,7 +61,8 @@ function takeFreshLines(rows,c){
     if(seen.some(s=>similarLine(s,t))){droppedEcho++;return;}
     const sp=resolveSpeaker(l.speaker,c);
     if(!sp){droppedSpeaker.n++;return;}
-    if(sp!=='__narrator__'&&!(c.cast||[]).includes(sp))c.cast=(c.cast||[]).concat(sp);
+    if(sp!=='__narrator__'&&!isPlayer(chr(sp))&&!(c.cast||[]).includes(sp))
+      c.cast=(c.cast||[]).concat(sp);
     out.push({type:'line',speaker:sp,text:t,
       emotion:sp==='__narrator__'?'':String(l.emotion||'').toLowerCase().slice(0,18)});
     seen.push(t);

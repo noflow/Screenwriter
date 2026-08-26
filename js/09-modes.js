@@ -23,9 +23,7 @@ function paintModes(){
       ' unfinished branch'+(dangling===1?'':'es')+'</button>':'')+
     (c.type!=='repeatable'?'<span class="as">as <select id="playAs">'+
       // The player comes first — Play-a-part means playing the player by default.
-      (playerChar()
-        ? '<option value="'+esc(playerChar().id)+'">'+esc(playerChar().name)+' (player)</option>'
-        : '<option value="__player__">Player</option>')+
+      '<option value="player">Player</option>'+
       (c.cast||[]).filter(id=>!isPlayer(chr(id))).map(id=>
         '<option value="'+esc(id)+'">'+esc(chr(id)?.name||id)+'</option>').join('')+
       '</select></span>':'');

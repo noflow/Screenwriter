@@ -12,7 +12,8 @@ function toJSON(){
   const acts=activityBlocks();
   const place=ref=>({location:locPart(ref),room:roomPart(ref)});
   return JSON.stringify({format:'scenewright.v3',
-    characters:P.characters.map(c=>{
+    player:{id:'player',runtime:true,source:'new_game'},
+    characters:npcs().map(c=>{
       const g=gameReady(c);
       return {id:c.id,name:c.name,color:c.color,
         age:g.profile?.age??null,
@@ -65,8 +66,8 @@ function toScript(){
   }).join('\n\n\n');
 }
 function toSheets(){
-  if(!P.characters.length)return '// No characters imported.';
-  return P.characters.map(c=>'// ---- '+c.id+'.character ----\n'+
+  if(!npcs().length)return '// No NPC characters imported. The runtime Player needs no sheet.';
+  return npcs().map(c=>'// ---- '+c.id+'.character ----\n'+
     JSON.stringify(sheetOut(c),null,2)).join('\n\n');
 }
 const build=()=>fmt==='sheets'?toSheets():fmt==='json'?toJSON():toScript();
@@ -85,7 +86,7 @@ $('copyOut').onclick=()=>{navigator.clipboard.writeText($('dump').value);
   $('copyOut').textContent='Copied';setTimeout(()=>$('copyOut').textContent='Copy',1200)};
 $('dlOut').onclick=()=>{
   if(fmt==='sheets'){
-    P.characters.forEach((c,i)=>setTimeout(()=>{
+    npcs().forEach((c,i)=>setTimeout(()=>{
       const url=URL.createObjectURL(new Blob([JSON.stringify(sheetOut(c),null,2)],
         {type:'application/json'}));
       Object.assign(document.createElement('a'),{href:url,download:c.id+'.character'}).click();
@@ -104,10 +105,10 @@ document.querySelectorAll('[data-new]').forEach(b=>b.onclick=()=>{
     chapter:1,cast:[],premise:''};
   if(t==='conversation')base.nodes=[];
   if(t==='quest'){base.stages=[{id:'stage_1',title:'Opening',location:base.location,nodes:[],flag:''}];
-    base.character=P.characters[0]?.id||'';base.hook='';}
-  if(t==='repeatable'){base.lines=[];base.character=P.characters[0]?.id||'';}
+    base.character=npcs()[0]?.id||'';base.hook='';}
+  if(t==='repeatable'){base.lines=[];base.character=npcs()[0]?.id||'';}
   if(t==='activity'){
-    base.character=P.characters[0]?.id||'';
+    base.character=npcs()[0]?.id||'';
     base.cast=[base.character].filter(Boolean);
     base.stages=[{id:'base',title:'Every time',at:0,nodes:[],flag:'',requires:[],once:false}];
   }
@@ -224,8 +225,8 @@ $('saveProj').onclick=()=>{
 $('loadProj').onclick=pickFiles;
 
 $('exportSheets').onclick=()=>{
-  if(!P.characters.length)return raise('No characters to export.');
-  P.characters.forEach((c,i)=>setTimeout(()=>{
+  if(!npcs().length)return raise('No NPC character sheets to export. The runtime Player needs no sheet.');
+  npcs().forEach((c,i)=>setTimeout(()=>{
     const url=URL.createObjectURL(new Blob([JSON.stringify(sheetOut(c),null,2)],{type:'application/json'}));
     Object.assign(document.createElement('a'),{href:url,download:c.id+'.character'}).click();
     URL.revokeObjectURL(url);

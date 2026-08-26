@@ -12,27 +12,58 @@ function walkAll(cb){
 /** Every flag in the project: where it's written, where it's read. */
 function flagRegistry(){
   const reg={};
-  const touch=(k,kind,where)=>{
+  const touch=(k,access,where,meta)=>{
     if(!k)return;
-    reg[k]=reg[k]||{sets:[],reads:[]};
-    if(!reg[k][kind].includes(where))reg[k][kind].push(where);
+    const row=reg[k]=reg[k]||{sets:[],reads:[],kinds:[],character_refs:[],values:[]};
+    if(!row[access].includes(where))row[access].push(where);
+    if(!meta)return;
+    if(meta.kind&&!row.kinds.includes(meta.kind))row.kinds.push(meta.kind);
+    if(meta.state_key)row.state_key=meta.state_key;
+    if(Object.prototype.hasOwnProperty.call(meta,'value')&&
+       !row.values.some(v=>JSON.stringify(v)===JSON.stringify(meta.value)))row.values.push(meta.value);
+    if(meta.character){
+      const ref={character:meta.character,key:meta.key||'',kind:meta.kind||'meter'};
+      if(!row.character_refs.some(x=>x.character===ref.character&&x.key===ref.key&&x.kind===ref.kind))
+        row.character_refs.push(ref);
+    }
   };
   const readReqs=(reqs,where)=>(reqs||[]).forEach(r=>{
-    if(r.type==='flag')touch(r.key,'reads',where);
-    if(r.type==='stat')touch(r.character+'.'+r.key,'reads',where);
-    if(r.type==='met')touch('met_'+r.character,'reads',where);
+    if(r.type==='flag'){
+      const value=stateAssignment(r.key);
+      touch(r.key,'reads',where,value
+        ?{kind:'value',state_key:value.key,value:value.value}
+        :{kind:'flag',state_key:r.key});
+    }
+    if(r.type==='stat'||r.type==='custom_stat')touch(r.character+'.'+r.key,'reads',where,
+      {kind:r.type==='custom_stat'?'character_stat':'meter',character:r.character,key:r.key});
+    if(r.type==='met')touch('met_'+r.character,'reads',where,{kind:'flag',state_key:'met_'+r.character});
+  });
+  const writeEffects=(raw,where)=>compileEffects(raw).forEach(e=>{
+    if(e.operation==='add_meter')
+      touch(e.character+'.'+e.meter,'sets',where,{kind:'meter',character:e.character,key:e.meter});
+    else if(e.operation==='add_character_stat')
+      touch(e.character+'.'+e.key,'sets',where,{kind:'character_stat',character:e.character,key:e.key});
+    else if(e.operation==='add_player_value')
+      touch('player.'+e.section+'.'+e.key,'sets',where,{kind:'player_value',state_key:'player.'+e.section+'.'+e.key});
+    else if(e.operation==='set_value')
+      touch(e.key+'='+stateValueText(e.value),'sets',where,{kind:'value',state_key:e.key,value:e.value});
+    else if(e.operation==='add_value')
+      touch(e.key,'sets',where,{kind:'counter',state_key:e.key,value:+e.value||0});
+    else if(e.operation==='set_flag')
+      touch(e.key,'sets',where,{kind:'flag',state_key:e.key,value:e.value!==false});
   });
 
   P.content.forEach(c=>{
     const w=c.title||c.id;
     readReqs(c.requires,w);
+    writeEffects(c.flag,w);
     (c.stages||[]).forEach(s=>{readReqs(s.requires,w);
-      String(s.flag||'').split(';').forEach(f=>{const k=f.trim().split(/\s+/)[0];if(k)touch(k,'sets',w);});});
+      writeEffects(s.flag,w);});
   });
   walkAll((n,c,p,isOpt)=>{
     const w=c.title||c.id;
     if(isOpt){
-      String(n.flag||'').split(';').forEach(f=>{const k=f.trim().split(/\s+/)[0];if(k)touch(k,'sets',w);});
+      writeEffects(n.flag,w);
       readReqs(n.requires,w);}
   });
   return reg;
@@ -52,7 +83,7 @@ function emotionRegistry(){
 function coverage(){
   const per={};
   const bump=(id,k,n)=>{per[id]=per[id]||{conv:0,quest:0,rep:0,routes:0};per[id][k]+=n;};
-  P.characters.forEach(c=>bump(c.id,'conv',0));
+  npcs().forEach(c=>bump(c.id,'conv',0));
   walkAll((n,c)=>{if(n.type==='line')bump(n.speaker,c.type==='quest'?'quest':'conv',1);});
   P.content.forEach(c=>{
     if(c.type==='repeatable'&&c.character)bump(c.character,'rep',(c.lines||[]).length);
@@ -67,7 +98,7 @@ const REL_INVERSE={spouse:'spouse',daughter:'parent',son:'parent',mother:'child'
 
 /** Character ids referenced by an imported sheet but never imported themselves. */
 function missingRefs(){
-  const known=new Set(P.characters.map(c=>c.id)),out={};
+  const known=new Set(['player','__player__',...P.characters.map(c=>c.id)]),out={};
   const note=(id,from,relation,household)=>{
     if(!id||known.has(id))return;
     out[id]=out[id]||{id,from:[],relation:'',district:'',residence:''};
@@ -84,15 +115,6 @@ function missingRefs(){
 
 function stubSheet(ref){
   const stats={};STAT_KEYS.forEach(k=>stats[k]=0);
-  if(ref.id==='player'||/^player/.test(ref.id))return {
-    format_version:1,id:'player',display_name:'Player',
-    profile:{is_player:true,age:null,role:'player_character',romance_eligible:false},
-    home:{district:ref.district||'',residence:ref.residence||'',household:[]},
-    personality:{archetype:'',traits:[],values:[],social_style:''},
-    schedule:{days_off:[],fixed_commitments:[],preferred_social_blocks:[]},
-    goals:[],connections:[],relationship_defaults:{},
-    boundaries:{hard_limits:[]},relationship_chapters:[],
-    quest_hooks:[],conversation_topics:[],text_style:{},_stub:true};
   return {format_version:1,id:ref.id,
     display_name:ref.id.split('_').map(w=>w[0].toUpperCase()+w.slice(1)).join(' '),
     profile:{age:null,gender_identity:'',role:ref.relation||'',occupation:'',romance_eligible:false},

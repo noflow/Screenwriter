@@ -59,7 +59,7 @@
   .field{margin-bottom:10px}
   .field label{display:block;font-family:var(--util);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
     color:var(--ash);margin-bottom:4px}
-  .field input[type=text],.field textarea,.field select{width:100%;background:var(--curtain);
+  .field input[type=text],.field input:not([type]),.field textarea,.field select{width:100%;background:var(--curtain);
     border:1px solid var(--edge);border-radius:3px;padding:6px 8px;font-size:13px;line-height:1.5;resize:vertical}
   .field textarea{min-height:56px}
   .hint{font-family:var(--util);font-size:9px;color:var(--ash);margin-top:3px;line-height:1.5}
@@ -71,6 +71,8 @@
   .chip:hover{background:var(--velvet-2)}
   .chip.on{border-left-color:var(--brass);background:var(--velvet-2)}
   .chip.pc .tag{color:var(--brass);letter-spacing:.14em}
+  .chip.legacy-player{opacity:.62;border-left-color:var(--rose)}
+  .chip.legacy-player .tag{color:var(--rose);font-size:7.5px}
   .pres.pc{border-style:solid;border-color:rgba(201,162,39,.55)}
   .pres.pc .dot{background:var(--brass)}
   .chip .tag{font-family:var(--util);font-size:9px;color:var(--ash);margin-left:auto;white-space:nowrap}
@@ -593,8 +595,107 @@
   .compose #sayAs{min-width:105px}
   .notes{margin-top:7px;opacity:.88}
 
+  /* Quest-builder guidance and structured rewards. */
+  .builder-help[hidden]{display:none!important}
+  .builder-help{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:13px 0 2px;padding:12px;
+    border:1px solid rgba(141,185,218,.24);border-radius:9px;background:rgba(8,18,27,.38)}
+  .builder-help>div{position:relative;min-height:76px;padding:10px 11px 9px 45px;border:1px solid rgba(220,231,241,.09);
+    border-radius:7px;background:rgba(141,185,218,.045)}
+  .builder-help b{font-family:var(--util);font-size:10px;letter-spacing:.055em;color:var(--paper)}
+  .builder-help p{margin:5px 0 0;font-family:var(--util);font-size:9px;line-height:1.55;color:#aebdca}
+  .builder-help code{color:#c9dceb;background:rgba(141,185,218,.08);padding:1px 4px;border-radius:3px}
+  .help-step{position:absolute;left:11px;top:10px;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;
+    font-family:var(--util);font-size:10px;font-weight:700;color:#17212d;background:var(--sky)}
+  .builder-help .help-tip{grid-column:1/-1;margin:1px 2px 0;padding:8px 10px;border-left:2px solid var(--brass);
+    background:rgba(215,180,111,.055);color:#b9c6d1}
+
+  .quest-cast-row{display:flex;gap:7px;align-items:stretch}
+  .quest-cast-row select{flex:1;min-width:0}
+  .quest-cast-chips{display:flex;flex-wrap:wrap;align-items:center;gap:6px;min-height:29px;margin-top:7px}
+  .quest-cast-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 7px 5px 9px;border:1px solid rgba(141,185,218,.2);
+    border-radius:999px;font-family:var(--util);font-size:9px;color:#d6e0e8;background:rgba(141,185,218,.07)}
+  .quest-cast-chip .x{width:18px;height:18px;padding:0;border:0;border-radius:50%;color:#aebdca;background:rgba(220,231,241,.07);cursor:pointer}
+  .quest-cast-chip .x:hover{color:#fff;background:rgba(203,139,152,.24)}
+
+  .reward-builder{display:grid;gap:7px}
+  .reward-row{display:grid;grid-template-columns:minmax(130px,.95fr) minmax(170px,1.25fr) 88px 30px;gap:8px;align-items:end;
+    padding:9px;border:1px solid rgba(220,231,241,.11);border-radius:8px;background:rgba(7,14,21,.24)}
+  .reward-field{min-width:0}
+  .reward-field label{display:block;margin-bottom:4px;font-family:var(--util);font-size:8px;letter-spacing:.075em;text-transform:uppercase;color:#94a6b6}
+  .reward-field select{width:100%;min-height:34px}
+  .reward-field.amount select{text-align:center;font-weight:700;color:#dbe8f2}
+  .reward-remove{align-self:end;width:30px;height:34px;padding:0;border:1px solid rgba(203,139,152,.18);border-radius:6px;
+    color:#b9c6d1;background:rgba(203,139,152,.055);cursor:pointer;font-size:15px}
+  .reward-remove:hover{color:#fff;border-color:rgba(203,139,152,.52);background:rgba(203,139,152,.17)}
+  .reward-empty{display:flex;flex-direction:column;gap:3px;padding:12px 13px;border:1px dashed rgba(220,231,241,.16);border-radius:8px;
+    font-family:var(--util);font-size:9px;color:#9fb0be;background:rgba(7,14,21,.12)}
+  .reward-empty b{color:#cdd8e1;font-size:9.5px}
+  .reward-add{margin-top:7px}
+
+  /* Conversational quest workshop. */
+  .quest-workshop-launch{color:#f0dbac;border-color:rgba(215,180,111,.34);background:rgba(215,180,111,.09)}
+  .quest-workshop-launch:hover:not(:disabled){border-color:rgba(215,180,111,.72);background:rgba(215,180,111,.16)}
+  #questWorkshop{width:min(1080px,calc(100vw - 32px));max-width:1080px}
+  #questWorkshop[open]{height:min(86vh,860px)}
+  .quest-workshop-head{min-height:70px;padding:12px 18px}
+  .quest-workshop-head>div:first-child{display:flex;flex-direction:column;gap:2px}
+  .quest-workshop-head h3{line-height:1.05}
+  .quest-workshop-kicker{font-family:var(--util);font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--brass)}
+  #questWorkshop .quest-workshop-body{flex:1;padding:0;overflow:hidden}
+  .quest-workshop-layout{display:grid;grid-template-columns:250px minmax(0,1fr);height:100%;min-height:0}
+  .quest-workshop-sidebar{min-height:0;overflow-y:auto;padding:14px;border-right:1px solid rgba(220,231,241,.11);
+    background:linear-gradient(180deg,rgba(10,19,28,.34),rgba(10,19,28,.16))}
+  .qw-card{margin-bottom:10px;padding:12px;border:1px solid rgba(220,231,241,.11);border-radius:9px;background:rgba(7,14,21,.24)}
+  .qw-card strong{display:block;margin:3px 0 5px;font-family:var(--display);font-size:16px;line-height:1.3;color:#eef3f7}
+  .qw-card p,.qw-privacy{margin:5px 0 0;font-family:var(--util);font-size:9px;line-height:1.55;color:#9fb0be}
+  .qw-label{display:block;margin-bottom:5px;font-family:var(--util);font-size:8px;letter-spacing:.14em;text-transform:uppercase;color:var(--brass)}
+  .qw-card select{width:100%;min-height:36px;padding:7px;border:1px solid rgba(220,231,241,.14);border-radius:6px;background:rgba(8,14,21,.58)}
+  .qw-prompts{display:grid;gap:6px}
+  .qw-prompts .qw-label{margin-bottom:1px}
+  .qw-prompts button{width:100%;padding:8px 9px;border:1px solid rgba(141,185,218,.14);border-radius:6px;text-align:left;
+    font-family:var(--util);font-size:9px;line-height:1.35;color:#c8d5df;background:rgba(141,185,218,.045);cursor:pointer}
+  .qw-prompts button:hover{color:#fff;border-color:rgba(141,185,218,.42);background:rgba(141,185,218,.12)}
+  .qw-privacy{padding:2px 3px 10px;color:#899cab}
+
+  .quest-workshop-conversation{display:flex;flex-direction:column;min-width:0;min-height:0;background:rgba(7,13,20,.1)}
+  .qw-messages{flex:1;min-height:0;overflow-y:auto;padding:22px 24px 14px;scrollbar-gutter:stable}
+  .qw-empty{display:grid;place-items:center;align-content:center;min-height:100%;max-width:480px;margin:auto;text-align:center;color:#9eafbd}
+  .qw-empty span{display:grid;place-items:center;width:45px;height:45px;margin-bottom:13px;border:1px solid rgba(215,180,111,.28);
+    border-radius:50%;font-size:20px;color:var(--brass);background:rgba(215,180,111,.06)}
+  .qw-empty h4{margin:0 0 7px;font-family:var(--display);font-size:20px;font-weight:600;color:#e4ecf2}
+  .qw-empty p{margin:0;font-family:var(--util);font-size:10.5px;line-height:1.7}
+  .qw-message{display:flex;align-items:flex-start;gap:10px;max-width:86%;margin-bottom:16px}
+  .qw-message.user{margin-left:auto;flex-direction:row-reverse}
+  .qw-avatar{display:grid;place-items:center;flex:none;width:34px;height:34px;border:1px solid color-mix(in srgb,var(--qw-speaker) 52%,transparent);
+    border-radius:50%;font-family:var(--util);font-size:8px;font-weight:700;letter-spacing:.03em;color:var(--qw-speaker);
+    background:color-mix(in srgb,var(--qw-speaker) 10%,rgba(8,14,21,.8))}
+  .qw-bubble{min-width:0;padding:10px 12px 11px;border:1px solid rgba(220,231,241,.12);border-radius:5px 13px 13px 13px;
+    background:linear-gradient(145deg,rgba(37,55,74,.94),rgba(25,39,54,.96));box-shadow:0 7px 18px rgba(2,8,14,.12)}
+  .qw-message.user .qw-bubble{border-color:rgba(141,185,218,.21);border-radius:13px 5px 13px 13px;background:rgba(68,99,125,.28)}
+  .qw-message-meta{display:flex;align-items:center;gap:10px;margin-bottom:5px;font-family:var(--util)}
+  .qw-message-meta strong{font-size:9px;letter-spacing:.08em;color:var(--qw-speaker)}
+  .qw-message-meta button{margin-left:auto;padding:0;border:0;background:none;font-family:var(--util);font-size:8px;color:#8093a3;cursor:pointer}
+  .qw-message-meta button:hover{color:#dca0aa}
+  .qw-message-text{font-size:13px;line-height:1.65;color:#e0e8ee;overflow-wrap:anywhere}
+  .qw-composer{flex:none;padding:12px 16px 10px;border-top:1px solid rgba(220,231,241,.11);background:rgba(15,25,35,.93)}
+  .qw-composer>label{display:block;margin-bottom:6px;font-family:var(--util);font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:#9fb0be}
+  .qw-composer textarea{width:100%;min-height:74px;max-height:180px;padding:10px 11px;border:1px solid rgba(220,231,241,.15);border-radius:8px;
+    resize:vertical;font-size:13px;line-height:1.55;color:#eef3f7;background:rgba(7,14,21,.66)}
+  .qw-compose-actions{display:flex;align-items:center;gap:7px;margin-top:8px}
+  .qw-status{margin-right:auto;font-family:var(--util);font-size:8.5px;color:#8fa1b0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .qw-finish{display:flex;align-items:center;gap:8px;flex:none;padding:10px 16px;border-top:1px solid rgba(220,231,241,.1);
+    background:linear-gradient(180deg,rgba(25,39,54,.97),rgba(15,25,35,.99))}
+  .qw-finish .hint{margin:0;text-align:right}
+
   @media (max-width:1180px){.masthead{flex-wrap:wrap}.mast-right{width:100%;margin-left:0}.mast-engine{min-width:220px}.wordmark{margin-right:auto}}
-  @media (max-width:760px){.mast-group{border-right:0;padding-right:0;flex-wrap:wrap}.mast-engine{width:100%;margin-left:0}.blank-actions{flex-direction:column}.blank-actions .btn{width:100%}.blank.welcome{padding:30px 24px}}
+  @media (max-width:760px){.mast-group{border-right:0;padding-right:0;flex-wrap:wrap}.mast-engine{width:100%;margin-left:0}.blank-actions{flex-direction:column}.blank-actions .btn{width:100%}.blank.welcome{padding:30px 24px}.reward-row{grid-template-columns:1fr 1fr 78px 30px}
+    #questWorkshop{width:96vw}#questWorkshop[open]{height:92vh}.quest-workshop-layout{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr)}
+    .quest-workshop-sidebar{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:220px;border-right:0;border-bottom:1px solid rgba(220,231,241,.11)}
+    .qw-card{margin:0}.qw-prompts{grid-column:1/-1;grid-template-columns:1fr 1fr}.qw-prompts .qw-label{grid-column:1/-1}.qw-privacy{display:none}
+    .qw-messages{padding:16px}.qw-message{max-width:94%}.qw-finish .hint{display:none}}
+  @media (max-width:620px){.builder-help{grid-template-columns:1fr}.builder-help .help-tip{grid-column:1}.quest-cast-row{align-items:stretch;flex-direction:column}.reward-row{grid-template-columns:1fr 82px 30px}.reward-field:first-child{grid-column:1/-1}
+    .quest-workshop-head{align-items:flex-start}.quest-workshop-head .sp{display:none}.quest-workshop-sidebar{display:block;max-height:180px}.quest-workshop-sidebar .qw-card{margin-bottom:8px}.qw-prompts{display:none}
+    .qw-avatar{width:29px;height:29px}.qw-message-text{font-size:12px}.qw-finish{flex-wrap:wrap}.qw-finish .sp{display:none}.qw-finish #qwBuild{margin-left:auto}}
 </style>
 
 <header class="masthead">
@@ -923,18 +1024,29 @@
 </dialog>
 
 <dialog id="questBuilder">
-  <div class="sheet-head"><h3>Quest &amp; event builder</h3><span class="sp"></span><button class="btn" id="closeQuestBuilder">Close</button></div>
+  <div class="sheet-head"><h3>Quest &amp; event builder</h3><span class="sp"></span><button class="btn quest-workshop-launch" id="qbWorkshopButton">Chat workshop</button><button class="btn quiet" id="qbHelpButton">Help &amp; examples</button><button class="btn" id="closeQuestBuilder">Close</button></div>
   <div class="sheet-body edbody">
     <p class="hint">Build the arc first, then write each objective as a quest stage. This keeps story progression, rewards, and follow-up events visible in one place.</p>
+    <div class="builder-help" id="qbHelp" hidden>
+      <div><span class="help-step">1</span><b>Define the arc</b><p>Example: Emma asks the player to help prepare for her first day at a new job.</p></div>
+      <div><span class="help-step">2</span><b>Add objectives</b><p>Talk to Emma → buy interview clothes → meet her at the café.</p></div>
+      <div><span class="help-step">3</span><b>Add rewards</b><p>Emma Trust +3, Emma Love +1, and Player Confidence +2 can all be separate reward rows.</p></div>
+      <div><span class="help-step">4</span><b>Schedule a follow-up</b><p>Use a game date such as <code>Y1-08-23</code>, then choose a time and location.</p></div>
+      <p class="help-tip"><b>Tip:</b> choose how each objective finishes inside its quest stage—for example, after a conversation, when an item is obtained, or when a stat reaches a value.</p>
+    </div>
     <div class="edgrid" style="padding-top:12px">
       <div class="field edfull"><label for="qbTitle">Quest title</label><input id="qbTitle" placeholder="A Favor at the Marina"></div>
       <div class="field"><label for="qbCategory">Story type</label><select id="qbCategory"><option value="character_story">Character story</option><option value="relationship">Relationship</option><option value="work">Work</option><option value="school">School</option><option value="community">Community</option><option value="personal">Personal</option></select></div>
       <div class="field"><label for="qbGiver">Quest giver</label><select id="qbGiver"></select></div>
+      <div class="field edfull"><label>Other characters in this quest</label><div class="quest-cast-row"><select id="qbCastAdd" aria-label="Add quest character"></select><button class="btn" id="qbAddCast">+ Add character</button></div><div class="quest-cast-chips" id="qbCastChips"></div><p class="hint">The Player and these characters become available in the reward menus.</p></div>
       <div class="field edfull"><label for="qbSummary">What is this arc about?</label><textarea id="qbSummary" rows="3" placeholder="Help a friend prepare for an important first day."></textarea></div>
+      <div class="field"><label for="qbLocation">Primary location</label><select id="qbLocation"></select></div>
+      <div class="field"><label for="qbDeadline">Story deadline <span class="hint">shown to you</span></label><input id="qbDeadline" placeholder="Before Friday night"></div>
       <div class="field"><label for="qbAfter">Starts after quest <span class="hint">optional</span></label><select id="qbAfter"></select></div>
       <div class="field"><label for="qbEarliest">Earliest follow-up block</label><select id="qbEarliest"><option value="">Immediately</option><option>early_morning</option><option>morning</option><option>lunch</option><option>afternoon</option><option>evening</option><option>late_evening</option><option>night</option></select></div>
-      <div class="field edfull"><label for="qbRewards">Completion rewards / consequences</label><input id="qbRewards" placeholder="emma_rowan.trust +3; marina_favor_done; unlocked_calendar"><p class="hint">Use normal effects, separated by semicolons. They apply when every objective is complete.</p></div>
-      <div class="field"><label for="qbDeadline">Story deadline <span class="hint">shown to you</span></label><input id="qbDeadline" placeholder="Before Friday night"></div>
+      <div class="field edfull"><label for="qbBranchIdeas">Branch ideas <span class="hint">planning notes</span></label><textarea id="qbBranchIdeas" rows="3" placeholder="If Emma's Trust is 50 or higher, she shares the secret. Otherwise, she asks for more proof."></textarea><p class="hint">Keep possible outcomes here while planning. Turn them into a stat branch when you write the scene where the choice happens.</p></div>
+      <div class="field edfull"><label>Completion rewards / consequences</label><div class="reward-builder" id="qbRewardRows"></div><button class="btn reward-add" id="qbAddReward">+ Add another reward</button><p class="hint">Choose who changes, what changes, and an amount from −5 to +5. Add as many rewards as the quest needs.</p></div>
+      <div class="field edfull"><label for="qbRewards">Other effects <span class="hint">advanced, optional</span></label><input id="qbRewards" placeholder="marina_favor_done; unlocked_calendar"><p class="hint">Use this only for flags, unlocks, memories, or effects not covered by the reward menus.</p></div>
       <div class="field edfull"><p class="rubric">Completion event <span class="hint">optional</span></p></div>
       <div class="field"><label for="qbEventTitle">Event title</label><input id="qbEventTitle" placeholder="Meet at the marina"></div>
       <div class="field"><label for="qbEventDate">Game date</label><input id="qbEventDate" placeholder="Y1-08-23"></div>
@@ -943,6 +1055,57 @@
     </div>
     <div id="qbObjectives"></div>
     <div class="row dialog-actions" style="margin-top:14px"><button class="btn" id="qbAddObjective">+ objective</button><span class="sp"></span><button class="btn gold" id="saveQuestBuilder">Save quest plan</button></div>
+  </div>
+</dialog>
+
+<dialog id="questWorkshop" aria-labelledby="qwTitle">
+  <div class="sheet-head quest-workshop-head">
+    <div><span class="quest-workshop-kicker">Conversational quest planning</span><h3 id="qwTitle">Quest workshop</h3></div>
+    <span class="sp"></span>
+    <button class="btn quiet" id="qwClear">Clear chat</button>
+    <button class="btn" id="qwClose">Back to quest</button>
+  </div>
+  <div class="sheet-body quest-workshop-body">
+    <div class="quest-workshop-layout">
+      <aside class="quest-workshop-sidebar">
+        <div class="qw-card">
+          <span class="qw-label">Building</span>
+          <strong id="qwQuestName">New quest</strong>
+          <p id="qwCastSummary">Choose a giver and cast in the quest builder.</p>
+        </div>
+        <div class="qw-card">
+          <label class="qw-label" for="qwSpeaker">Next reply from</label>
+          <select id="qwSpeaker"></select>
+          <p>Choose the Story Guide for planning, or an NPC to talk through the request in character.</p>
+        </div>
+        <div class="qw-card qw-prompts">
+          <span class="qw-label">Conversation starters</span>
+          <button type="button" data-qw-prompt="Pitch three grounded quest hooks for these characters. Make each hook personal, playable, and different from the others.">Pitch three hooks</button>
+          <button type="button" data-qw-prompt="Add a complication that reveals character and changes what the player must do.">Add a complication</button>
+          <button type="button" data-qw-prompt="Suggest two different outcomes based on a relationship or player stat, including a useful threshold.">Design a stat split</button>
+          <button type="button" data-qw-prompt="Turn the direction we have chosen into a short sequence of concrete, playable objectives.">Shape the objectives</button>
+        </div>
+        <p class="qw-privacy" id="qwPrivacy">Uses the AI engine selected in the main window.</p>
+      </aside>
+      <section class="quest-workshop-conversation">
+        <div class="qw-messages" id="qwMessages" role="log" aria-live="polite"></div>
+        <div class="qw-composer">
+          <label for="qwInput">Talk through the quest in ordinary language</label>
+          <textarea id="qwInput" rows="3" placeholder="I want Emma to ask the player for help, but she should be hiding the real reason..."></textarea>
+          <div class="qw-compose-actions">
+            <span class="qw-status" id="qwStatus">Enter sends · Shift+Enter adds a line</span>
+            <button class="btn quiet" id="qwStop" disabled>Stop</button>
+            <button class="btn gold" id="qwSend">Send</button>
+          </div>
+        </div>
+        <div class="qw-finish">
+          <button class="btn" id="qwRegenerate">Regenerate last reply</button>
+          <span class="sp"></span>
+          <span class="hint">Creates editable fields, never AI-authored JSON.</span>
+          <button class="btn gold" id="qwBuild">Build quest plan from chat</button>
+        </div>
+      </section>
+    </div>
   </div>
 </dialog>
 
@@ -987,12 +1150,43 @@ const dress=s=>esc(s).replace(/\*([^*\n]+)\*/g,'<em class="dir">$1</em>');
 const pretty=s=>String(s??'').replace(/_/g,' ');
 const cur=()=>P.content.find(c=>c.uid===sel);
 const NARRATOR={id:'__narrator__',name:'Narration',color:'#938599'};
-/** The player character is whoever is flagged, else a sheet literally called "player". */
-function isPlayer(c){return !!c&&(c.profile?.is_player===true||c.id==='player');}
-function playerChar(){return P.characters.find(isPlayer)||null;}
+/** Port Alder creates this person from the user's choices for every new save.
+    It is an authoring reference, never a .character package. */
+const RUNTIME_PLAYER=Object.freeze({
+  id:'player',name:'Player',display_name:'Player',color:'#D7B46F',_runtime_player:true,
+  profile:Object.freeze({is_player:true,role:'runtime_player',romance_eligible:false}),
+  personality:Object.freeze({traits:[],values:[],social_style:''}),
+  boundaries:Object.freeze({hard_limits:[]}),relationship_defaults:Object.freeze({})
+});
+const isRuntimePlayerId=id=>id==='player'||id==='__player__';
+/** Legacy fixed-player sheets remain recognisable so they can be ignored on export. */
+function isPlayer(c){return !!c&&(c._runtime_player===true||isRuntimePlayerId(c.id)||c.profile?.is_player===true);}
+function playerChar(){return RUNTIME_PLAYER;}
 const npcs=()=>P.characters.filter(c=>!isPlayer(c));
-const chr=id=>id==='__narrator__'?NARRATOR:P.characters.find(c=>c.id===id);
+const authoredChr=id=>P.characters.find(c=>c.id===id)||null;
+const chr=id=>id==='__narrator__'?NARRATOR:isRuntimePlayerId(id)?RUNTIME_PLAYER:authoredChr(id);
 const loc=id=>P.locations.find(l=>l.id===id);
+
+/** State-value shorthand used by imported Port Alder content: player.life_path=college. */
+function stateScalar(raw){
+  const value=String(raw??'').trim();
+  if(value==='true')return true;
+  if(value==='false')return false;
+  if(value==='null')return null;
+  if(/^-?(?:\d+|\d*\.\d+)$/.test(value))return Number(value);
+  return value.replace(/^(["'])([\s\S]*)\1$/,'$2');
+}
+function stateAssignment(raw){
+  const text=String(raw??'').trim(),at=text.indexOf('=');
+  if(at<1)return null;
+  const key=text.slice(0,at).trim();
+  return key?{key,value:stateScalar(text.slice(at+1))}:null;
+}
+function stateValueText(value){
+  if(value===null)return 'null';
+  if(typeof value==='boolean'||typeof value==='number')return String(value);
+  return String(value??'');
+}
 
 let disk={get:()=>null,set:()=>{}};
 try{localStorage.setItem('__t','1');localStorage.removeItem('__t');
@@ -1597,13 +1791,17 @@ document.querySelectorAll('.railtabs button').forEach(b=>b.onclick=()=>{
 });
 
 function paintCast(){
-  $('castList').innerHTML=P.characters.length?P.characters.map((c,i)=>
-    '<div class="chip'+(selChar===i?' on':'')+(isPlayer(c)?' pc':'')+'" data-c="'+i+'">'+
+  const runtime='<div class="chip pc" style="cursor:default" title="Created from this user’s new-game choices">'+
+    '<span class="swatch" style="background:'+RUNTIME_PLAYER.color+'"></span>Player'+
+    '<span class="tag">RUNTIME</span></div>';
+  const sheets=P.characters.map((c,i)=>({c,i}));
+  $('castList').innerHTML=runtime+(sheets.length?sheets.map(({c,i})=>
+    '<div class="chip'+(selChar===i?' on':'')+(isPlayer(c)?' legacy-player':'')+'" data-c="'+i+'">'+
     '<span class="swatch" style="background:'+c.color+'"></span>'+
-    esc(c.name)+'<span class="tag">'+(isPlayer(c)?'PLAYER'
+    esc(c.name)+'<span class="tag">'+(isPlayer(c)?'OLD PLAYER · IGNORED'
       :esc(c.profile?.role?pretty(c.profile.role):c.id))+'</span>'+
     '<button class="x" data-cx="'+i+'">×</button></div>').join('')
-    :'<p class="empty">No characters. Press Import sheets, or drop .character files onto the window.</p>';
+    :'<p class="empty">No NPC sheets yet. Import them or drop .character files onto the window.</p>');
   $('castList').querySelectorAll('.chip').forEach(el=>el.onclick=e=>{
     if(e.target.dataset.cx!==undefined)return;
     selChar=selChar===+el.dataset.c?null:+el.dataset.c;paintCast();paintSheet();});
@@ -1768,9 +1966,8 @@ function paintSetup(){
 function paintPresence(){
   const c=cur(),box=$('presence');if(!c||!box)return;
   c.cast=c.cast||[];
-  box.innerHTML=P.characters.map(ch=>{
-    if(isPlayer(ch))return '<span class="pres in pc" title="The player is always in the scene">'+
-      '<span class="dot"></span>'+esc(ch.name)+'</span>';
+  box.innerHTML='<span class="pres in pc" title="Created from this user’s choices when a new game starts">'+
+    '<span class="dot"></span>Player <small>runtime</small></span>'+npcs().map(ch=>{
     const a=availability(ch,c.day,c.block),here=whereIs(ch,c.day,c.block);
     const on=c.cast.includes(ch.id);
     const mismatch=c.location&&here&&locPart(here)!==locPart(c.location);
@@ -1892,7 +2089,8 @@ function wireTree(){
   inner.querySelectorAll('[data-act="speaker"]').forEach(el=>el.onclick=()=>{
     const n=nodeAt(el.closest('.node').dataset.p.split('.').map(Number));
     // Narration sits at the end of the cycle so one more click always reaches it.
-    let pool=(cur().cast?.length?cur().cast:P.characters.map(c=>c.id));
+    let pool=(cur().cast?.length?cur().cast:npcs().map(c=>c.id))
+      .filter(id=>!isPlayer(chr(id)));
     const pc=playerChar();
     if($('writePlayer')?.checked&&pc&&!pool.includes(pc.id))pool=[pc.id].concat(pool);
     if(!$('writePlayer')?.checked)pool=pool.filter(id=>!isPlayer(chr(id)));
@@ -2290,63 +2488,725 @@ function paintQuest(c){
 
 /* ---- 08h-quest-builder.js ---- */
 /* ============ quest and event builder ============ */
-let qbQuest=null;
+let qbQuest=null,qbRewardRows=[],qbParticipants=[];
+
+const QB_RELATIONSHIP_REWARDS=[
+  ['friendship','Friendship'],['trust','Trust'],['love','Love'],['respect','Respect'],
+  ['comfort','Comfort'],['attraction','Attraction'],['commitment','Commitment'],
+  ['compatibility','Compatibility'],['satisfaction','Satisfaction'],
+  ['resentment','Resentment'],['jealousy','Jealousy'],['lust','Lust']
+];
+const QB_PLAYER_REWARDS=[
+  ['attributes:confidence','Confidence'],['attributes:self_esteem','Self-esteem'],
+  ['attributes:motivation','Motivation'],['attributes:creativity','Creativity'],
+  ['attributes:charisma','Charisma'],['attributes:empathy','Empathy'],
+  ['attributes:reliability','Reliability'],['needs:mood','Mood'],
+  ['needs:energy','Energy'],['needs:stress','Stress'],
+  ['needs:loneliness','Loneliness'],['needs:fatigue','Fatigue']
+];
+const QB_REWARD_VALUES=[5,4,3,2,1,-1,-2,-3,-4,-5];
 
 function newQuestForBuilder(){
   const uid='u'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  const giver=P.characters.find(c=>!isPlayer(c))?.id||'';
   const c={uid,type:'quest',id:'quest_'+(P.content.filter(x=>x.type==='quest').length+1),title:'New quest',
-    character:P.characters.find(c=>!isPlayer(c))?.id||'',hook:'',location:P.locations[0]?.id||'',
+    character:giver,hook:'',location:P.locations[0]?.id||'',
     day:'monday',block:'evening',cast:[],premise:'',requires:[],
     stages:[{id:'objective_1',title:'First objective',location:P.locations[0]?.id||'',nodes:[],flag:'',requires:[]}],
-    questPlan:{category:'character_story',rewards:'',deadline:'',event:null}};
+    questPlan:{category:'character_story',rewards:'',
+      rewardRows:[{character:giver||'player',reward:defaultQuestReward(giver||'player'),value:1}],
+      advancedRewards:'',participants:[],deadline:'',branchIdeas:'',event:null,eventDraft:null}};
   P.content.push(c);sel=uid;focusPath=[];stageIx=0;return c;
+}
+
+function questObjectiveEntries(c=qbQuest){
+  return (c?.stages||[]).map((stage,index)=>({stage,index})).filter(x=>x.stage.id!=='branch');
+}
+
+function normalizeQuestObjectiveIds(c){
+  let number=0;
+  (c?.stages||[]).forEach(stage=>{
+    if(stage.id==='branch')return;
+    number++;
+    if(!stage.id||/^objective_\d+$/.test(stage.id))stage.id='objective_'+number;
+    stage.title=String(stage.title||'').trim()||'Objective '+number;
+  });
 }
 
 function paintQuestObjectives(){
   const c=qbQuest;if(!c)return;
-  $('qbObjectives').innerHTML='<p class="rubric later">Objectives</p>'+c.stages.map((s,i)=>
-    '<div class="row" style="margin:5px 0"><span class="tag">'+(i+1)+'</span><input data-qbo="'+i+'" value="'+
-      esc(s.title||'')+'" placeholder="What must the player do?"><button class="x" data-qbx="'+i+'">×</button></div>').join('');
+  const entries=questObjectiveEntries(c);
+  $('qbObjectives').innerHTML='<p class="rubric later">Objectives</p>'+entries.map((entry,i)=>
+    '<div class="row" style="margin:5px 0"><span class="tag">'+(i+1)+'</span><input data-qbo="'+entry.index+'" value="'+
+      esc(entry.stage.title||'')+'" placeholder="What must the player do?"><button class="x" data-qbx="'+entry.index+'" aria-label="Remove objective">×</button></div>').join('');
   $('qbObjectives').querySelectorAll('[data-qbo]').forEach(el=>el.oninput=()=>{qbQuest.stages[+el.dataset.qbo].title=el.value;save();});
   $('qbObjectives').querySelectorAll('[data-qbx]').forEach(b=>b.onclick=()=>{
-    if(qbQuest.stages.length<2)return;
-    qbQuest.stages.splice(+b.dataset.qbx,1);qbQuest.stages.forEach((s,i)=>s.id='objective_'+(i+1));save();paintQuestObjectives();
+    if(questObjectiveEntries(qbQuest).length<2)return;
+    qbQuest.stages.splice(+b.dataset.qbx,1);normalizeQuestObjectiveIds(qbQuest);save();paintQuestObjectives();
   });
 }
 
+function questRewardCharacters(){
+  const giver=$('qbGiver')?.value||qbQuest?.character||'';
+  const ids=['player',giver,...qbParticipants].filter(Boolean);
+  return [...new Set(ids)].map(id=>({id,name:id==='player'?(playerChar()?.name||'Player'):(chr(id)?.name||pretty(id))}));
+}
+
+function defaultQuestReward(character){
+  return character==='player'?'attributes:confidence':'relationship:trust';
+}
+
+function rewardOptionsFor(character,current){
+  if(character==='player'){
+    const attributes=QB_PLAYER_REWARDS.filter(x=>x[0].startsWith('attributes:'));
+    const needs=QB_PLAYER_REWARDS.filter(x=>x[0].startsWith('needs:'));
+    const options=rows=>rows.map(([value,label])=>'<option value="'+value+'"'+(value===current?' selected':'')+'>'+esc(label)+'</option>').join('');
+    return '<optgroup label="Player attributes">'+options(attributes)+'</optgroup><optgroup label="Player needs">'+options(needs)+'</optgroup>';
+  }
+  const relationships=QB_RELATIONSHIP_REWARDS.map(([key,label])=>{
+    const value='relationship:'+key;
+    return '<option value="'+value+'"'+(value===current?' selected':'')+'>'+esc(label)+'</option>';
+  }).join('');
+  const custom=customStatDefs().map(s=>{
+    const value='custom:'+s.id;
+    return '<option value="'+esc(value)+'"'+(value===current?' selected':'')+'>'+esc(s.label)+'</option>';
+  }).join('');
+  return '<optgroup label="Relationship">'+relationships+'</optgroup>'+
+    (custom?'<optgroup label="Custom character stats">'+custom+'</optgroup>':'');
+}
+
+function validRewardFor(character,reward){
+  if(character==='player')return QB_PLAYER_REWARDS.some(x=>x[0]===reward);
+  if(String(reward).startsWith('relationship:'))return QB_RELATIONSHIP_REWARDS.some(x=>'relationship:'+x[0]===reward);
+  if(String(reward).startsWith('custom:'))return customStatDefs().some(x=>'custom:'+x.id===reward);
+  return false;
+}
+
+function paintQuestRewards(){
+  const box=$('qbRewardRows');if(!box)return;
+  const characters=questRewardCharacters(),validCharacters=characters.map(x=>x.id);
+  qbRewardRows=qbRewardRows.map(row=>{
+    const character=validCharacters.includes(row.character)?row.character:(validCharacters[0]||'player');
+    const reward=validRewardFor(character,row.reward)?row.reward:defaultQuestReward(character);
+    const amount=QB_REWARD_VALUES.includes(+row.value)?+row.value:1;
+    return {character,reward,value:amount};
+  });
+  box.innerHTML=qbRewardRows.length?qbRewardRows.map((row,i)=>
+    '<div class="reward-row">'+
+      '<div class="reward-field"><label>Who</label><select aria-label="Reward '+(i+1)+' character" data-qbr-character="'+i+'">'+characters.map(c=>
+        '<option value="'+esc(c.id)+'"'+(c.id===row.character?' selected':'')+'>'+esc(c.id==='player'&&c.name==='Player'?'Player':c.name+(c.id==='player'?' (Player)':''))+'</option>').join('')+'</select></div>'+
+      '<div class="reward-field"><label>What changes</label><select aria-label="Reward '+(i+1)+' change" data-qbr-reward="'+i+'">'+rewardOptionsFor(row.character,row.reward)+'</select></div>'+
+      '<div class="reward-field amount"><label>Amount</label><select aria-label="Reward '+(i+1)+' amount" data-qbr-value="'+i+'">'+QB_REWARD_VALUES.map(value=>
+        '<option value="'+value+'"'+(value===row.value?' selected':'')+'>'+(value>0?'+':'')+value+'</option>').join('')+'</select></div>'+
+      '<button class="x reward-remove" data-qbr-x="'+i+'" aria-label="Remove reward">×</button></div>').join(''):
+    '<div class="reward-empty"><b>No rewards added.</b><span>Use “Add another reward” to add Trust, Love, a player stat, or another change.</span></div>';
+  box.querySelectorAll('[data-qbr-character]').forEach(el=>el.onchange=()=>{
+    const row=qbRewardRows[+el.dataset.qbrCharacter];row.character=el.value;row.reward=defaultQuestReward(el.value);paintQuestRewards();
+  });
+  box.querySelectorAll('[data-qbr-reward]').forEach(el=>el.onchange=()=>{qbRewardRows[+el.dataset.qbrReward].reward=el.value;});
+  box.querySelectorAll('[data-qbr-value]').forEach(el=>el.onchange=()=>{qbRewardRows[+el.dataset.qbrValue].value=+el.value;});
+  box.querySelectorAll('[data-qbr-x]').forEach(el=>el.onclick=()=>{qbRewardRows.splice(+el.dataset.qbrX,1);paintQuestRewards();});
+}
+
+function paintQuestCast(){
+  const giver=$('qbGiver')?.value||'';
+  const rewarded=qbRewardRows.map(row=>row.character).filter(id=>id&&id!=='player'&&id!==giver&&chr(id));
+  qbParticipants=[...new Set([...qbParticipants,...rewarded].filter(id=>id&&id!=='player'&&id!==giver))];
+  const available=P.characters.filter(c=>!isPlayer(c)&&c.id!==giver&&!qbParticipants.includes(c.id));
+  $('qbCastAdd').innerHTML=available.length?available.map(c=>'<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>').join(''):
+    '<option value="">All quest characters added</option>';
+  $('qbCastAdd').disabled=!available.length;$('qbAddCast').disabled=!available.length;
+  $('qbCastChips').innerHTML=qbParticipants.length?qbParticipants.map(id=>
+    '<span class="quest-cast-chip">'+esc(chr(id)?.name||pretty(id))+'<button class="x" data-qbc-x="'+esc(id)+'" aria-label="Remove character">×</button></span>').join(''):
+    '<span class="hint">No additional NPCs yet.</span>';
+  $('qbCastChips').querySelectorAll('[data-qbc-x]').forEach(b=>b.onclick=()=>{
+    const removed=b.dataset.qbcX;
+    qbParticipants=qbParticipants.filter(id=>id!==removed);qbRewardRows=qbRewardRows.filter(row=>row.character!==removed);
+    paintQuestCast();paintQuestRewards();
+  });
+}
+
+function parseQuestRewards(text){
+  const rows=[],advanced=[];
+  String(text||'').split(';').map(x=>x.trim()).filter(Boolean).forEach(piece=>{
+    let match=piece.match(/^playerstat:(attributes|needs):([^\s:]+)\s+([+-]?[1-5])$/i);
+    if(match&&QB_PLAYER_REWARDS.some(x=>x[0]===match[1].toLowerCase()+':'+match[2].toLowerCase())){
+      rows.push({character:'player',reward:match[1].toLowerCase()+':'+match[2].toLowerCase(),value:+match[3]});return;
+    }
+    match=piece.match(/^stat:([^:]+):([^\s:]+)\s+([+-]?[1-5])$/i);
+    if(match&&chr(match[1].trim())&&customStatDefs().some(x=>x.id===match[2].toLowerCase())){
+      rows.push({character:match[1].trim(),reward:'custom:'+match[2].toLowerCase(),value:+match[3]});return;
+    }
+    match=piece.match(/^([^.\s:]+)\.([^\s:]+)\s+([+-]?[1-5])$/i);
+    if(match&&chr(match[1].trim())&&QB_RELATIONSHIP_REWARDS.some(x=>x[0]===match[2].toLowerCase())){
+      rows.push({character:match[1].trim(),reward:'relationship:'+match[2].toLowerCase(),value:+match[3]});return;
+    }
+    advanced.push(piece);
+  });
+  return {rows,advanced:advanced.join('; ')};
+}
+
+function questRewardRowsToEffects(rows){
+  return (rows||[]).map(row=>{
+    const amount=(+row.value>0?'+':'')+(+row.value);
+    if(row.character==='player'){
+      const [section,key]=row.reward.split(':');return 'playerstat:'+section+':'+key+' '+amount;
+    }
+    const [kind,key]=row.reward.split(':');
+    return kind==='custom'?'stat:'+row.character+':'+key+' '+amount:row.character+'.'+key+' '+amount;
+  }).join('; ');
+}
+
+function questRewardEffects(){return questRewardRowsToEffects(qbRewardRows);}
+
 function openQuestBuilder(){
   qbQuest=cur()?.type==='quest'?cur():newQuestForBuilder();
-  const c=qbQuest,p=c.questPlan||{};
+  const c=qbQuest,p=c.questPlan||{},parsed=parseQuestRewards(p.rewards||'');
+  const eventDraft=p.eventDraft||p.event||{};
   $('qbGiver').innerHTML='<option value="">— no specific giver —</option>'+P.characters.filter(x=>!isPlayer(x)).map(x=>
     '<option value="'+esc(x.id)+'">'+esc(x.name)+'</option>').join('');
   $('qbAfter').innerHTML='<option value="">— available immediately —</option>'+P.content.filter(x=>x.type==='quest'&&x!==c).map(x=>
     '<option value="'+esc(x.id)+'">'+esc(x.title||x.id)+'</option>').join('');
-  $('qbEventLocation').innerHTML=placeOptions(p.event?.location||'');
+  $('qbLocation').innerHTML=placeOptions(c.location||'');
+  $('qbEventLocation').innerHTML=placeOptions(eventDraft.location||c.location||'');
   $('qbTitle').value=c.title||'';$('qbCategory').value=p.category||c._authored?.category||'character_story';
   $('qbGiver').value=c.character||'';$('qbSummary').value=p.summary||c.hook||c.premise||'';
-  $('qbAfter').value=c.after||'';$('qbEarliest').value=p.earliestBlock||'';$('qbRewards').value=p.rewards||'';
-  $('qbDeadline').value=p.deadline||'';$('qbEventTitle').value=p.event?.title||'';$('qbEventDate').value=p.event?.date||'';
-  $('qbEventBlock').value=p.event?.block||'';paintQuestObjectives();$('questBuilder').showModal();$('qbTitle').focus();
+  $('qbLocation').value=c.location||'';
+  $('qbAfter').value=c.after||'';$('qbEarliest').value=p.earliestBlock||'';
+  $('qbDeadline').value=p.deadline||'';$('qbBranchIdeas').value=p.branchIdeas||'';
+  $('qbEventTitle').value=eventDraft.title||'';$('qbEventDate').value=eventDraft.date||'';
+  $('qbEventBlock').value=eventDraft.block||'';
+  $('qbEventLocation').value=eventDraft.location||c.location||'';
+  qbRewardRows=(Array.isArray(p.rewardRows)?p.rewardRows:parsed.rows).map(x=>Object.assign({},x));
+  const rewardCharacters=qbRewardRows.map(x=>x.character).filter(id=>id&&id!=='player'&&id!==c.character&&chr(id));
+  qbParticipants=[...new Set([...(Array.isArray(p.participants)?p.participants:(c.cast||[])),...rewardCharacters])];
+  $('qbRewards').value=p.advancedRewards!==undefined?p.advancedRewards:parsed.advanced;
+  $('qbHelp').hidden=true;$('qbHelpButton').setAttribute('aria-expanded','false');
+  paintQuestCast();paintQuestRewards();paintQuestObjectives();$('questBuilder').showModal();$('qbTitle').focus();
+}
+
+function updateQuestFromBuilder(){
+  const c=qbQuest;if(!c)return;
+  const giver=$('qbGiver').value,block=$('qbEventBlock').value,date=$('qbEventDate').value.trim();
+  const title=$('qbTitle').value.trim()||'Untitled quest';
+  const participants=[...new Set([giver,...qbParticipants].filter(Boolean))];
+  const eventTitle=$('qbEventTitle').value.trim(),eventLocation=$('qbEventLocation').value;
+  const eventDraft=(eventTitle||date||block)?{title:eventTitle,date,block,location:eventLocation}:null;
+  const event=block&&date?{id:'event_'+c.id,title:eventTitle||title,date,
+    block,location:eventLocation,participants,source:c.id,type:'story_event'}:null;
+  const structured=questRewardEffects(),advanced=$('qbRewards').value.trim();
+  const previousLocation=c.location||'',nextLocation=$('qbLocation').value;
+  c.title=title;c.character=giver;
+  c.hook=$('qbSummary').value.trim();c.premise=c.hook;c.after=$('qbAfter').value;
+  c.location=nextLocation;
+  c.stages.forEach(stage=>{if(stage.id!=='branch'&&(!stage.location||stage.location===previousLocation))stage.location=nextLocation;});
+  c.questPlan=Object.assign({},c.questPlan||{},{category:$('qbCategory').value,summary:c.hook,earliestBlock:$('qbEarliest').value,
+    rewards:[structured,advanced].filter(Boolean).join('; '),rewardRows:qbRewardRows.map(x=>Object.assign({},x)),
+    advancedRewards:advanced,participants:qbParticipants.slice(),deadline:$('qbDeadline').value.trim(),
+    branchIdeas:$('qbBranchIdeas').value.trim(),event,eventDraft});
+  normalizeQuestObjectiveIds(c);
+  return c;
 }
 
 function saveQuestPlan(){
-  const c=qbQuest;if(!c)return;
-  const block=$('qbEventBlock').value,date=$('qbEventDate').value.trim();
-  const event=block&&date?{id:'event_'+c.id,title:$('qbEventTitle').value.trim()||c.title,date,
-    block,location:$('qbEventLocation').value,participants:[c.character].filter(Boolean),source:c.id,type:'story_event'}:null;
-  c.title=$('qbTitle').value.trim()||'Untitled quest';c.character=$('qbGiver').value;
-  c.hook=$('qbSummary').value.trim();c.premise=c.hook;c.after=$('qbAfter').value;
-  c.questPlan={category:$('qbCategory').value,summary:c.hook,earliestBlock:$('qbEarliest').value,
-    rewards:$('qbRewards').value.trim(),deadline:$('qbDeadline').value.trim(),event};
-  c.stages.forEach((s,i)=>{s.id='objective_'+(i+1);s.title=s.title.trim()||'Objective '+(i+1);});
+  const c=updateQuestFromBuilder();if(!c)return;
   save();paintAll();$('questBuilder').close();note('Quest plan saved. Write each objective in its stage, then export the character sheet.');
 }
 
 $('openQuestBuilder').onclick=openQuestBuilder;
 $('closeQuestBuilder').onclick=()=>$('questBuilder').close();
-$('qbAddObjective').onclick=()=>{if(!qbQuest)return;const n=qbQuest.stages.length+1;
-  qbQuest.stages.push({id:'objective_'+n,title:'Objective '+n,location:qbQuest.location||'',nodes:[],flag:'',requires:[]});save();paintQuestObjectives();};
+$('qbHelpButton').onclick=()=>{
+  const help=$('qbHelp'),show=help.hidden;help.hidden=!show;$('qbHelpButton').setAttribute('aria-expanded',String(show));
+};
+$('qbGiver').onchange=()=>{paintQuestCast();paintQuestRewards();};
+$('qbAddCast').onclick=()=>{
+  const id=$('qbCastAdd').value;if(!id)return;qbParticipants.push(id);paintQuestCast();paintQuestRewards();
+};
+$('qbAddReward').onclick=()=>{
+  const character=$('qbGiver').value||qbParticipants[0]||'player';
+  qbRewardRows.push({character,reward:defaultQuestReward(character),value:1});paintQuestRewards();
+};
+$('qbAddObjective').onclick=()=>{if(!qbQuest)return;
+  const objectiveNumber=questObjectiveEntries(qbQuest).length+1;
+  const stage={id:'objective_'+objectiveNumber,title:'Objective '+objectiveNumber,location:qbQuest.location||'',nodes:[],flag:'',requires:[]};
+  const branchAt=qbQuest.stages.findIndex(x=>x.id==='branch');
+  branchAt<0?qbQuest.stages.push(stage):qbQuest.stages.splice(branchAt,0,stage);
+  save();paintQuestObjectives();};
 $('saveQuestBuilder').onclick=saveQuestPlan;
+
+/* ---- 08i-quest-workshop.js ---- */
+/* ============ conversational quest workshop ============ */
+let qwWorking=false,qwAbort=null;
+
+function questWorkshopState(){
+  if(!qbQuest)return {version:1,speaker:'guide',messages:[]};
+  qbQuest.questPlan=qbQuest.questPlan||{};
+  let state=qbQuest.questPlan.workshop;
+  if(!state||typeof state!=='object')state={version:1,speaker:'guide',messages:[]};
+  state.version=1;
+  state.speaker=String(state.speaker||'guide');
+  state.messages=(Array.isArray(state.messages)?state.messages:[]).map(message=>({
+    role:message?.role==='assistant'?'assistant':'user',
+    speaker:String(message?.speaker|| (message?.role==='assistant'?'guide':'writer')),
+    text:String(message?.text??message?.content??'').trim().slice(0,4000)
+  })).filter(message=>message.text).slice(-80);
+  qbQuest.questPlan.workshop=state;
+  return state;
+}
+
+function questWorkshopSpeakers(){
+  const plan=qbQuest?.questPlan||{};
+  const ids=[qbQuest?.character,...(plan.participants||[])].filter(Boolean);
+  const characters=[...new Set(ids)].map(chr).filter(c=>c&&!isPlayer(c));
+  return [{id:'guide',name:'Story Guide',color:'#D7B46F',guide:true},...characters];
+}
+
+function questWorkshopSpeaker(id){
+  return questWorkshopSpeakers().find(s=>s.id===id)||questWorkshopSpeakers()[0];
+}
+
+function questWorkshopCharacterBrief(c){
+  const profile=c.profile||{},personality=c.personality||{},style=c.text_style||{},bits=[];
+  bits.push('## '+c.name+' (id: '+c.id+')');
+  if(profile.age||profile.occupation||profile.role)
+    bits.push('Role: '+[profile.age,pretty(profile.occupation||profile.role||'')].filter(Boolean).join(', '));
+  if(personality.traits?.length)bits.push('Traits: '+personality.traits.map(pretty).join(', '));
+  if(personality.values?.length)bits.push('Values: '+personality.values.map(pretty).join(', '));
+  if(personality.social_style)bits.push('Social style: '+pretty(personality.social_style));
+  if(style.tone)bits.push('Speech: '+pretty(style.tone));
+  if(c.goals?.length)bits.push('Wants: '+c.goals.map(pretty).join('; '));
+  const limits=[...(c.boundaries?.hard_limits||[])];
+  if(c.profile?.romance_eligible===false)bits.push('Hard rule: this character is not a romance option.');
+  if(c.boundaries?.family_only)bits.push('Hard rule: family warmth is never romantic.');
+  if(limits.length)bits.push('Hard limits: '+limits.map(pretty).join(', '));
+  return bits.join('\n');
+}
+
+function questWorkshopContext(){
+  const c=qbQuest,plan=c?.questPlan||{},event=plan.eventDraft||plan.event||{};
+  const giver=chr(c?.character),participants=(plan.participants||[]).map(chr).filter(Boolean);
+  const objectiveText=questObjectiveEntries(c).map((entry,i)=>(i+1)+'. '+(entry.stage.title||'Untitled objective')).join('\n');
+  return [
+    'Title: '+(c?.title||'New quest'),
+    'Category: '+pretty(plan.category||'character_story'),
+    'Quest giver: '+(giver?giver.name+' ('+giver.id+')':'not chosen'),
+    'Other NPCs: '+(participants.length?participants.map(x=>x.name+' ('+x.id+')').join(', '):'none chosen'),
+    'Primary location: '+(c?.location?placeName(c.location)+' ('+c.location+')':'not chosen'),
+    'Summary: '+(plan.summary||c?.hook||c?.premise||'not written yet'),
+    'Objectives:\n'+(objectiveText||'none yet'),
+    'Completion rewards: '+(plan.rewards||'none yet'),
+    'Branch notes: '+(plan.branchIdeas||'none yet'),
+    'Deadline: '+(plan.deadline||'none'),
+    'Follow-up event: '+([event.title,event.date,event.block,event.location].filter(Boolean).join(' | ')||'none')
+  ].join('\n');
+}
+
+function questWorkshopTranscript(messages){
+  return (messages||[]).slice(-18).map(message=>{
+    const who=message.role==='user'?'Writer':questWorkshopSpeaker(message.speaker).name;
+    return '['+who+']\n'+message.text.slice(0,1800);
+  }).join('\n\n');
+}
+
+function questWorkshopReplyPrompt(state,speaker){
+  const roster=questWorkshopSpeakers().filter(x=>!x.guide).map(x=>questWorkshopCharacterBrief(chr(x.id))).join('\n\n');
+  const replyRule=speaker.guide
+    ? 'Reply as the Story Guide: a warm, practical collaborator helping the writer shape a playable quest. Ask no more than one focused question at a time. When useful, offer a few concise choices.'
+    : 'Reply only as '+speaker.name+' in a natural roleplay exchange. Use their voice, first-person dialogue, and brief actions. Reveal what they want, what they are reluctant to say, or what could complicate the request. Never write the Player\'s dialogue, thoughts, identity, or decision.';
+  return 'You are part of a conversational quest workshop for a life-sim roleplaying game.\n'+
+    'The Player is the real person using the game and is created fresh for every save. Never assign the Player a fixed name, age, gender, appearance, personality, thoughts, or choice. Do not ask the writer to define a fixed Player identity as a prerequisite; make the quest work with the identity created at runtime unless the writer explicitly chooses an identity-based condition.\n'+
+    'Keep all suggestions grounded in the supplied characters and locations. Do not invent a new named NPC unless the writer explicitly asks for one. Respect every hard rule.\n'+
+    'Follow the writer\'s latest request directly. If they ask for ideas, alternatives, or a specific number of hooks, provide those before asking any follow-up question.\n'+
+    'Speak in ordinary conversational text. Do not output JSON, schemas, code fences, or technical implementation details. Keep the reply focused and under 350 words.\n\n'+
+    '# Current editable quest\n'+questWorkshopContext()+'\n\n'+
+    '# Available NPC sheets\n'+(roster||'No NPC has been selected yet.')+'\n\n'+
+    '# Workshop conversation\n'+(questWorkshopTranscript(state.messages)||'[No messages yet]')+'\n\n'+
+    '# Next reply\n'+replyRule;
+}
+
+function questWorkshopMessageHtml(message,index){
+  const speaker=message.role==='user'?{name:'Writer',color:'#8DB9DA'}:questWorkshopSpeaker(message.speaker);
+  const initials=message.role==='user'?'YOU':speaker.guide?'✦':speaker.name.split(/\s+/).slice(0,2).map(x=>x[0]).join('').toUpperCase();
+  const color=/^#[0-9a-f]{3,8}$/i.test(speaker.color||'')?speaker.color:'#98BDA8';
+  return '<article class="qw-message '+(message.role==='user'?'user':'assistant')+'" style="--qw-speaker:'+color+'">'+
+    '<div class="qw-avatar">'+esc(initials)+'</div><div class="qw-bubble">'+
+    '<div class="qw-message-meta"><strong>'+esc(speaker.name)+'</strong><button type="button" data-qw-remove="'+index+'" aria-label="Remove message">remove</button></div>'+
+    '<div class="qw-message-text">'+esc(message.text).replace(/\n/g,'<br>')+'</div></div></article>';
+}
+
+function paintQuestWorkshop(){
+  const state=questWorkshopState(),speakers=questWorkshopSpeakers();
+  if(!speakers.some(x=>x.id===state.speaker))state.speaker='guide';
+  $('qwQuestName').textContent=qbQuest?.title||'New quest';
+  const npcNames=speakers.filter(x=>!x.guide).map(x=>x.name);
+  $('qwCastSummary').textContent=npcNames.length?'Talking with '+npcNames.join(', ')+'.':'Choose a giver or participant to add an in-character voice.';
+  $('qwSpeaker').innerHTML=speakers.map(s=>'<option value="'+esc(s.id)+'"'+(s.id===state.speaker?' selected':'')+'>'+esc(s.name)+(s.guide?' — planning':' — in character')+'</option>').join('');
+  const box=$('qwMessages');
+  box.innerHTML=state.messages.length?state.messages.map(questWorkshopMessageHtml).join(''):
+    '<div class="qw-empty"><span>✦</span><h4>Build the quest by talking it out</h4><p>Describe a rough idea, ask for hooks, or select a quest giver and speak with them in character. Nothing here needs special formatting.</p></div>';
+  box.querySelectorAll('[data-qw-remove]').forEach(button=>button.onclick=()=>{
+    state.messages.splice(+button.dataset.qwRemove,1);save();paintQuestWorkshop();
+  });
+  $('qwRegenerate').disabled=qwWorking||!state.messages.some(x=>x.role==='user');
+  $('qwBuild').disabled=qwWorking||!state.messages.length;
+  $('qwClear').disabled=qwWorking||!state.messages.length;
+  requestAnimationFrame(()=>{box.scrollTop=box.scrollHeight;});
+}
+
+function setQuestWorkshopBusy(on,status){
+  qwWorking=on;
+  ['qwSend','qwRegenerate','qwBuild','qwSpeaker','qwClear'].forEach(id=>$(id).disabled=on);
+  $('qwStop').disabled=!on;
+  $('qwSend').textContent=on?'Thinking…':'Send';
+  $('qwStatus').textContent=status||(on?'Writing a reply…':'Enter sends · Shift+Enter adds a line');
+}
+
+function openQuestWorkshop(){
+  if(!qbQuest)return;
+  updateQuestFromBuilder();save();
+  $('questBuilder').close();
+  const local=typeof isLocalEngine==='function'&&isLocalEngine();
+  $('qwPrivacy').textContent=local?'Using the selected local AI engine; the conversation stays on this computer.':
+    'Using the selected remote AI engine; workshop text and the selected NPC details are sent to that provider.';
+  setQuestWorkshopBusy(false);
+  paintQuestWorkshop();
+  $('questWorkshop').showModal();
+  $('qwInput').focus();
+}
+
+function returnFromQuestWorkshop(){
+  if(qwAbort)qwAbort.abort();
+  if($('questWorkshop').open)$('questWorkshop').close();
+  if(qbQuest)openQuestBuilder();
+}
+
+async function generateQuestWorkshopReply(speakerId){
+  const state=questWorkshopState(),speaker=questWorkshopSpeaker(speakerId||state.speaker);
+  state.speaker=speaker.id;save();paintQuestWorkshop();
+  qwAbort=new AbortController();setQuestWorkshopBusy(true,speaker.guide?'Story Guide is thinking…':speaker.name+' is replying…');
+  let finalStatus='Enter sends · Shift+Enter adds a line';
+  try{
+    const reply=String(await askModel(questWorkshopReplyPrompt(state,speaker),qwAbort.signal,false)||'').trim();
+    if(!reply)throw new Error('The AI returned an empty reply.');
+    state.messages.push({role:'assistant',speaker:speaker.id,text:reply.slice(0,4000)});
+    state.messages=state.messages.slice(-80);save();paintQuestWorkshop();
+  }catch(error){
+    if(error.name==='AbortError')finalStatus='Reply stopped. You can edit your message and try again.';
+    else finalStatus='Could not get a reply: '+error.message;
+  }finally{
+    qwAbort=null;setQuestWorkshopBusy(false,finalStatus);paintQuestWorkshop();
+  }
+}
+
+async function sendQuestWorkshopMessage(){
+  if(qwWorking)return;
+  const text=$('qwInput').value.trim();if(!text)return;
+  const state=questWorkshopState();
+  state.speaker=$('qwSpeaker').value||'guide';
+  state.messages.push({role:'user',speaker:'writer',text:text.slice(0,4000)});
+  state.messages=state.messages.slice(-80);$('qwInput').value='';save();paintQuestWorkshop();
+  await generateQuestWorkshopReply(state.speaker);
+}
+
+function regenerateQuestWorkshopReply(){
+  if(qwWorking)return;
+  const state=questWorkshopState();
+  let index=-1;
+  for(let i=state.messages.length-1;i>=0;i--)if(state.messages[i].role==='assistant'){index=i;break;}
+  const removed=index>=0?state.messages.splice(index,1)[0]:null;
+  if(!state.messages.some(x=>x.role==='user'))return paintQuestWorkshop();
+  if(removed?.speaker)state.speaker=removed.speaker;
+  save();paintQuestWorkshop();generateQuestWorkshopReply(state.speaker);
+}
+
+function questWorkshopHeaderKey(label){
+  const key=slug(String(label||'').replace(/\*/g,''));
+  const aliases={
+    title:'title',quest_title:'title',summary:'summary',hook:'summary',premise:'summary',
+    category:'category',story_type:'category',giver:'giver',quest_giver:'giver',
+    cast:'cast',participants:'cast',characters:'cast',setting:'setting',primary_location:'setting',
+    objectives:'objectives',objective:'objectives',stages:'objectives',steps:'objectives',
+    rewards:'rewards',completion_rewards:'rewards',consequences:'rewards',
+    branches:'branches',branch_ideas:'branches',stat_branches:'branches',outcomes:'branches',
+    deadline:'deadline',story_deadline:'deadline',follow_up:'followup',follow_up_event:'followup',completion_event:'followup',
+    event_title:'event_title',game_date:'date',date:'date',time:'block',time_block:'block',block:'block',location:'location'
+  };
+  return aliases[key]||'';
+}
+
+function questWorkshopCleanItem(text){
+  return String(text||'').trim().replace(/^[-*•]\s*/,'').replace(/^\d+[.)]\s*/, '').trim();
+}
+
+/** Tolerant plain-text worksheet parser. It never expects or accepts AI-authored JSON. */
+function parseQuestWorkshopDraft(raw){
+  const out={title:'',summary:'',category:'',giver:'',cast:[],location:'',deadline:'',
+    objectives:[],rewards:[],branches:[],event:{title:'',date:'',block:'',location:'',clear:false},seen:{},raw:String(raw||'')};
+  const summary=[],lines=String(raw||'').replace(/```[^\n]*\n?/g,'').replace(/```/g,'').split(/\r?\n/);
+  let section='',inFollowup=false,recognized=0;
+  const setHeader=(key,value)=>{
+    recognized++;out.seen[key]=true;value=questWorkshopCleanItem(value);
+    if(key==='followup'){
+      section='followup';inFollowup=true;
+      if(/^(?:none|no event|n\/a)$/i.test(value))out.event.clear=true;
+      else if(value)out.event.title=value;
+      return;
+    }
+    if(key==='title'){
+      if(inFollowup){out.event.title=value;out.seen.event_title=true;}
+      else out.title=value;
+      section='';return;
+    }
+    if(key==='summary'){section='summary';if(value)summary.push(value);return;}
+    if(key==='objectives'||key==='rewards'||key==='branches'){
+      section=key;if(value)out[key].push(value);return;
+    }
+    if(key==='category'||key==='giver'||key==='deadline')out[key]=value;
+    else if(key==='cast')out.cast=value?value.split(/\s*(?:,|;|\band\b)\s*/i).filter(Boolean):[];
+    else if(key==='setting')out.location=value;
+    else if(key==='event_title')out.event.title=value;
+    else if(key==='date')out.event.date=value;
+    else if(key==='block')out.event.block=value;
+    else if(key==='location'){
+      if(inFollowup)out.event.location=value;else out.location=value;
+    }
+    if(!['event_title','date','block','location'].includes(key))section='';
+  };
+  lines.forEach(rawLine=>{
+    const line=String(rawLine).trim().replace(/^#{1,6}\s*/,'').replace(/\*\*/g,'');
+    if(!line)return;
+    const divided=line.match(/^([^:|]{2,42})\s*[:|]\s*(.*)$/)||line.match(/^([A-Za-z][A-Za-z /_-]{1,40})\s+-\s+(.+)$/);
+    const exact=questWorkshopHeaderKey(line);
+    const key=divided?questWorkshopHeaderKey(divided[1]):exact;
+    if(key){setHeader(key,divided?divided[2]:'');return;}
+    const item=questWorkshopCleanItem(line);if(!item)return;
+    if(section==='summary')summary.push(item);
+    else if(section==='objectives'||section==='rewards'||section==='branches')out[section].push(item);
+  });
+  out.summary=summary.join(' ').trim();
+  out.objectives=[...new Set(out.objectives.filter(Boolean))];
+  out.rewards=[...new Set(out.rewards.filter(Boolean))];
+  out.branches=[...new Set(out.branches.filter(Boolean))];
+  if(!recognized){
+    const bullets=lines.map(questWorkshopCleanItem).filter((line,i)=>/^\s*(?:[-*•]|\d+[.)])\s+/.test(lines[i])&&line);
+    if(bullets.length)out.objectives=[...new Set(bullets)];
+    out.summary=lines.map(x=>x.trim()).filter(Boolean).join(' ').slice(0,900);
+  }
+  return out;
+}
+
+function questWorkshopCharacterAliases(){
+  const characters=P.characters.filter(c=>!isPlayer(c)),firstCounts={};
+  characters.forEach(c=>{const first=slug(c.name).split('_')[0];firstCounts[first]=(firstCounts[first]||0)+1;});
+  const aliases=[{id:'player',alias:'player'},{id:'player',alias:'user'}];
+  characters.forEach(c=>{
+    const values=[c.id,c.name,slug(c.name)],first=slug(c.name).split('_')[0];
+    if(firstCounts[first]===1)values.push(first);
+    [...new Set(values.map(slug))].forEach(alias=>aliases.push({id:c.id,alias}));
+  });
+  return aliases.sort((a,b)=>b.alias.length-a.alias.length);
+}
+
+function resolveQuestWorkshopCharacter(value,allowPlayer=false){
+  const normalized=slug(String(value||'').replace(/\([^)]*\)/g,''));
+  if(!normalized||['none','no_specific_giver','not_chosen','n_a'].includes(normalized))return '';
+  const matches=[...new Set(questWorkshopCharacterAliases().filter(x=>x.alias===normalized).map(x=>x.id))];
+  if(matches.length!==1||(!allowPlayer&&matches[0]==='player'))return null;
+  return matches[0];
+}
+
+function resolveQuestWorkshopLocation(value){
+  const normalized=slug(String(value||'').replace(/\([^)]*\)/g,''));
+  if(!normalized||['none','not_chosen','n_a'].includes(normalized))return '';
+  const candidates=[];
+  P.locations.forEach(place=>{
+    [place.id,place.name].forEach(alias=>candidates.push({ref:place.id,alias:slug(alias)}));
+    (place.rooms||[]).forEach(room=>{
+      const ref=place.id+'.'+room.id;
+      [ref,room.id,room.name,place.name+' '+room.name].forEach(alias=>candidates.push({ref,alias:slug(alias)}));
+    });
+  });
+  const matches=[...new Set(candidates.filter(x=>x.alias===normalized).map(x=>x.ref))];
+  return matches.length===1?matches[0]:null;
+}
+
+function parseQuestWorkshopReward(text){
+  const source=questWorkshopCleanItem(text).replace(/^(?:reward|consequence)\s*[:|-]\s*/i,'');
+  const amountMatch=source.match(/([+-]?\d+)\s*$/);if(!amountMatch)return null;
+  const amount=+amountMatch[1];if(!amount||Math.abs(amount)>5)return null;
+  const subject=slug(source.slice(0,amountMatch.index));
+  const alias=questWorkshopCharacterAliases().find(x=>subject===x.alias||subject.startsWith(x.alias+'_'));
+  if(!alias)return null;
+  let metric=subject.slice(alias.alias.length).replace(/^_+|_+$/g,'')
+    .replace(/^(?:gains?|loses?|gets?|relationship|meter|stat|custom|attribute|attributes|need|needs)_+/,'');
+  metric=metric.replace(/_(?:gains?|loses?|change)$/,'');
+  if(alias.id==='player'){
+    const found=QB_PLAYER_REWARDS.find(([id,label])=>{
+      const key=id.split(':')[1];return [slug(id),slug(label),slug(key)].includes(metric);
+    });
+    return found?{character:'player',reward:found[0],value:amount}:null;
+  }
+  const relationship=QB_RELATIONSHIP_REWARDS.find(([key,label])=>[slug(key),slug(label)].includes(metric));
+  if(relationship)return {character:alias.id,reward:'relationship:'+relationship[0],value:amount};
+  const custom=customStatDefs().find(stat=>[slug(stat.id),slug(stat.label)].includes(metric));
+  return custom?{character:alias.id,reward:'custom:'+custom.id,value:amount}:null;
+}
+
+function questWorkshopCategory(value){
+  const key=slug(value),allowed=['character_story','relationship','work','school','community','personal'];
+  if(allowed.includes(key))return key;
+  if(key==='character'||key==='character_arc')return 'character_story';
+  return '';
+}
+
+function applyQuestWorkshopDraft(draft){
+  const c=qbQuest,plan=c.questPlan||{},state=questWorkshopState(),changes=[],issues=[];
+  const oldLocation=c.location||'';
+  if(draft.seen.title&&draft.title){c.title=draft.title.slice(0,120);changes.push('title');}
+  if(draft.seen.summary&&draft.summary){c.hook=draft.summary;c.premise=draft.summary;plan.summary=draft.summary;changes.push('summary');}
+  if(draft.seen.category){
+    const category=questWorkshopCategory(draft.category);
+    if(category){plan.category=category;changes.push('story type');}else if(draft.category)issues.push('Unknown story type “'+draft.category+'” was left unchanged.');
+  }
+  if(draft.seen.giver){
+    const giver=resolveQuestWorkshopCharacter(draft.giver,false);
+    if(giver!==null){c.character=giver;changes.push('quest giver');}
+    else issues.push('Quest giver “'+draft.giver+'” does not match an imported NPC.');
+  }
+  if(draft.seen.cast){
+    const participants=[],unknown=[];
+    draft.cast.forEach(name=>{
+      const id=resolveQuestWorkshopCharacter(name,true);
+      if(id&&id!=='player'&&id!==c.character&&!participants.includes(id))participants.push(id);
+      else if(id===null)unknown.push(name);
+    });
+    plan.participants=participants;changes.push('quest cast');
+    if(unknown.length)issues.push('Unknown quest characters were skipped: '+unknown.join(', ')+'.');
+  }
+  if(draft.seen.setting){
+    const location=resolveQuestWorkshopLocation(draft.location);
+    if(location!==null){
+      c.location=location;
+      c.stages.forEach(stage=>{if(stage.id!=='branch'&&(!stage.location||stage.location===oldLocation))stage.location=location;});
+      changes.push('primary location');
+    }else issues.push('Location “'+draft.location+'” does not match an imported place.');
+  }
+  if(draft.seen.deadline){plan.deadline=draft.deadline;changes.push('deadline');}
+  if(draft.seen.objectives&&draft.objectives.length){
+    const existing=questObjectiveEntries(c);
+    draft.objectives.forEach((title,i)=>{
+      if(existing[i])existing[i].stage.title=title.slice(0,180);
+      else{
+        const stage={id:'objective_'+(i+1),title:title.slice(0,180),location:c.location||'',nodes:[],flag:'',requires:[]};
+        const branchAt=c.stages.findIndex(x=>x.id==='branch');
+        branchAt<0?c.stages.push(stage):c.stages.splice(branchAt,0,stage);
+      }
+    });
+    if(existing.length>draft.objectives.length)issues.push('Extra existing objectives were preserved so written stage dialogue was not lost.');
+    normalizeQuestObjectiveIds(c);changes.push(draft.objectives.length+' objectives');
+  }
+  if(draft.seen.rewards){
+    const rows=draft.rewards.map(parseQuestWorkshopReward),mapped=rows.filter(Boolean);
+    const unmapped=draft.rewards.filter((_,i)=>!rows[i]);
+    if(mapped.length){
+      plan.rewardRows=mapped;plan.rewards=[questRewardRowsToEffects(mapped),plan.advancedRewards||''].filter(Boolean).join('; ');
+      changes.push(mapped.length+' rewards');
+    }
+    state.unmappedRewards=unmapped;
+    if(unmapped.length)issues.push('Some reward ideas need review in the guided menus: '+unmapped.join('; ')+'.');
+  }
+  if(draft.seen.branches){plan.branchIdeas=draft.branches.join('\n');changes.push('branch notes');}
+  const eventMentioned=['followup','event_title','date','block','location'].some(key=>draft.seen[key])&&
+    (draft.seen.followup||draft.seen.event_title||draft.seen.date||draft.seen.block);
+  if(eventMentioned){
+    if(draft.event.clear){plan.event=null;plan.eventDraft=null;changes.push('follow-up event');}
+    else{
+      const previous=plan.eventDraft||plan.event||{};
+      const eventDraft=Object.assign({},previous);
+      if(draft.seen.event_title||draft.seen.followup)eventDraft.title=draft.event.title||'';
+      if(draft.seen.date)eventDraft.date=draft.event.date||'';
+      if(draft.seen.block){
+        const block=slug(draft.event.block);
+        if(BLOCKS.includes(block))eventDraft.block=block;else if(draft.event.block)issues.push('Unknown time block “'+draft.event.block+'” was left unchanged.');
+      }
+      if(draft.seen.location&&draft.event.location){
+        const location=resolveQuestWorkshopLocation(draft.event.location);
+        if(location!==null)eventDraft.location=location;else issues.push('Follow-up location “'+draft.event.location+'” was left unchanged.');
+      }
+      eventDraft.location=eventDraft.location||c.location||'';plan.eventDraft=eventDraft;
+      const participants=[c.character,...(plan.participants||[])].filter(Boolean);
+      plan.event=eventDraft.date&&eventDraft.block?{id:'event_'+c.id,title:eventDraft.title||c.title,date:eventDraft.date,
+        block:eventDraft.block,location:eventDraft.location,participants:[...new Set(participants)],source:c.id,type:'story_event'}:null;
+      if(!plan.event)issues.push('The follow-up was kept as a draft until it has both a game date and time block.');
+      changes.push('follow-up event');
+    }
+  }
+  state.lastDraft=draft.raw;plan.workshop=state;c.questPlan=plan;
+  qbRewardRows=(plan.rewardRows||[]).map(row=>Object.assign({},row));
+  qbParticipants=(plan.participants||[]).slice();
+  save();paintAll();
+  return {changes:[...new Set(changes)],issues};
+}
+
+function questWorkshopDraftPrompt(state){
+  const characters=P.characters.filter(c=>!isPlayer(c)).map(c=>c.name+' = '+c.id).join(', ');
+  const places=P.locations.map(place=>place.name+' = '+place.id+(place.rooms?.length?' [rooms: '+place.rooms.map(room=>room.name+' = '+place.id+'.'+room.id).join(', ')+']':'')).join('\n');
+  return 'Turn this quest-design conversation into one editable quest worksheet. Use only what the writer chose or clearly favored; unresolved ideas may stay blank.\n'+
+    'The Player is the changing real user of each new game, so never give the Player a fixed identity.\n'+
+    'Reply in ordinary labeled text only: no JSON, no code block, and no explanation before or after the worksheet.\n'+
+    'Use exact imported IDs for the giver, cast, and locations. Every objective must be one concrete playable action.\n'+
+    'Rewards must be one per line in one of these forms: npc_id.trust +3, npc_id.love +1, player.confidence +2, or player.stress -3. Amounts must be from -5 to +5 and cannot be zero.\n\n'+
+    'Use this forgiving worksheet:\n'+
+    'TITLE: ...\nCATEGORY: character_story | relationship | work | school | community | personal\nGIVER: npc_id\nCAST: npc_id, npc_id\nSETTING: location_id\n'+
+    'SUMMARY: one short paragraph\nDEADLINE: optional note\nOBJECTIVES:\n- ...\nREWARDS:\n- ...\nBRANCH IDEAS:\n- If a stat is at least a useful threshold, ...\n- Otherwise, ...\n'+
+    'FOLLOW-UP EVENT:\nTITLE: optional\nDATE: optional Y1-MM-DD\nTIME: optional time block\nLOCATION: optional location_id\n\n'+
+    '# Imported NPCs\n'+(characters||'none')+'\n\n# Imported locations\n'+(places||'none')+'\n\n'+
+    '# Current quest before changes\n'+questWorkshopContext()+'\n\n# Conversation\n'+questWorkshopTranscript(state.messages);
+}
+
+async function buildQuestFromWorkshop(){
+  if(qwWorking)return;
+  const state=questWorkshopState();if(!state.messages.length)return;
+  qwAbort=new AbortController();setQuestWorkshopBusy(true,'Building an editable quest plan…');
+  let result=null,finalStatus='Enter sends · Shift+Enter adds a line';
+  try{
+    const raw=String(await askModel(questWorkshopDraftPrompt(state),qwAbort.signal,false)||'').trim();
+    if(!raw)throw new Error('The AI returned an empty worksheet.');
+    result=applyQuestWorkshopDraft(parseQuestWorkshopDraft(raw));
+  }catch(error){
+    finalStatus=error.name==='AbortError'?'Quest build stopped.':'Could not build the quest plan: '+error.message;
+  }finally{
+    qwAbort=null;setQuestWorkshopBusy(false,finalStatus);paintQuestWorkshop();
+  }
+  if(!result)return;
+  if($('questWorkshop').open)$('questWorkshop').close();
+  openQuestBuilder();
+  const updated=result.changes.length?result.changes.join(', '):'the existing planning notes';
+  const review=result.issues.length?' Review: '+result.issues.join(' '):'';
+  note('Workshop updated '+esc(updated)+'. Review the fields, then save the quest plan.'+esc(review));
+}
+
+$('qbWorkshopButton').onclick=openQuestWorkshop;
+$('qwClose').onclick=returnFromQuestWorkshop;
+$('qwStop').onclick=()=>qwAbort&&qwAbort.abort();
+$('qwSend').onclick=sendQuestWorkshopMessage;
+$('qwRegenerate').onclick=regenerateQuestWorkshopReply;
+$('qwBuild').onclick=buildQuestFromWorkshop;
+$('qwSpeaker').onchange=()=>{const state=questWorkshopState();state.speaker=$('qwSpeaker').value;save();};
+$('qwClear').onclick=()=>{
+  const state=questWorkshopState();
+  if(state.messages.length&&!window.confirm('Clear this quest workshop conversation? The quest plan itself will stay unchanged.'))return;
+  state.messages=[];state.lastDraft='';state.unmappedRewards=[];save();paintQuestWorkshop();$('qwInput').focus();
+};
+document.querySelectorAll('[data-qw-prompt]').forEach(button=>button.onclick=()=>{
+  $('qwInput').value=button.dataset.qwPrompt;$('qwInput').focus();
+});
+$('qwInput').addEventListener('keydown',event=>{
+  if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendQuestWorkshopMessage();}
+});
+$('questWorkshop').addEventListener('keydown',event=>{
+  if(event.key==='Escape'){event.preventDefault();event.stopPropagation();returnFromQuestWorkshop();}
+});
 
 /* ---- 09-modes.js ---- */
 /* ============ modes ============ */
@@ -2374,9 +3234,7 @@ function paintModes(){
       ' unfinished branch'+(dangling===1?'':'es')+'</button>':'')+
     (c.type!=='repeatable'?'<span class="as">as <select id="playAs">'+
       // The player comes first — Play-a-part means playing the player by default.
-      (playerChar()
-        ? '<option value="'+esc(playerChar().id)+'">'+esc(playerChar().name)+' (player)</option>'
-        : '<option value="__player__">Player</option>')+
+      '<option value="player">Player</option>'+
       (c.cast||[]).filter(id=>!isPlayer(chr(id))).map(id=>
         '<option value="'+esc(id)+'">'+esc(chr(id)?.name||id)+'</option>').join('')+
       '</select></span>':'');
@@ -2458,7 +3316,11 @@ function canonBrief(){
   return relevant.length?'\n\n# Story memory\n'+relevant.slice(-18).map(n=>'- '+n.text).join('\n'):'';
 }
 
-const present=()=>{const c=cur();return (c?.cast||[]).map(chr).filter(Boolean);};
+const present=()=>{
+  const c=cur();
+  const ids=c?.type==='quest'?[c.character,...(c.questPlan?.participants||[])]:c?.cast||[];
+  return [...new Set(ids.filter(Boolean))].map(chr).filter(Boolean);
+};
 /** Only NPCs can be given generated dialogue. */
 const presentNPCs=()=>present().filter(c=>!isPlayer(c));
 /** Who may be given a spoken line, given the current drafting setting. */
@@ -2466,8 +3328,7 @@ const presentNPCs=()=>present().filter(c=>!isPlayer(c));
 /* ---- 10b-speakers.js ---- */
 function speakableIds(c){
   const ids=(c?.cast||[]).filter(id=>!isPlayer(chr(id)));
-  const pc=playerChar();
-  if($('writePlayer')?.checked&&pc)ids.unshift(pc.id);
+  if($('writePlayer')?.checked)ids.unshift('player');
   return ids;
 }
 
@@ -2478,11 +3339,9 @@ function lastSpoken(){
 }
 
 function speakerPool(){
-  const ids=[];
-  const pc=playerChar();
-  if(pc)ids.push(pc.id);
-  (cur()?.cast||[]).forEach(id=>{if(id&&!ids.includes(id))ids.push(id);});
-  P.characters.forEach(ch=>{if(!ids.includes(ch.id))ids.push(ch.id);});
+  const ids=['player'];
+  (cur()?.cast||[]).forEach(id=>{if(id&&!isPlayer(chr(id))&&!ids.includes(id))ids.push(id);});
+  npcs().forEach(ch=>{if(!ids.includes(ch.id))ids.push(ch.id);});
   ids.push('__narrator__');
   return ids;
 }
@@ -2530,7 +3389,8 @@ function takeFreshLines(rows,c){
     if(seen.some(s=>similarLine(s,t))){droppedEcho++;return;}
     const sp=resolveSpeaker(l.speaker,c);
     if(!sp){droppedSpeaker.n++;return;}
-    if(sp!=='__narrator__'&&!(c.cast||[]).includes(sp))c.cast=(c.cast||[]).concat(sp);
+    if(sp!=='__narrator__'&&!isPlayer(chr(sp))&&!(c.cast||[]).includes(sp))
+      c.cast=(c.cast||[]).concat(sp);
     out.push({type:'line',speaker:sp,text:t,
       emotion:sp==='__narrator__'?'':String(l.emotion||'').toLowerCase().slice(0,18)});
     seen.push(t);
@@ -2895,7 +3755,7 @@ function closeJSON(t){
     wrapped — {"lines":[...]}, {"nodes":[...]}, or occasionally a single bare item.
     Dig the array out rather than handing a non-array to the caller. */
 /** Resolves whatever the model called a speaker to a real id, or rejects the line.
-    A line attributed to the player is dropped — the player never speaks in dialogue. */
+    Player aliases always resolve to the runtime id; drafting decides whether to keep them. */
 function resolveSpeaker(raw,c){
   let sp=String(raw||'').trim();
   if(sp==='__narrator__')return sp;
@@ -2910,7 +3770,7 @@ function resolveSpeaker(raw,c){
     (pc&&sp.toLowerCase()===pc.name.toLowerCase());
   if(meansPlayer)
     // Kept when the writer wants drafted player dialogue; otherwise it belongs in a choice.
-    return $('writePlayer')?.checked ? (pc?pc.id:'player') : null;
+    return $('writePlayer')?.checked ? 'player' : null;
 
   if(hit)return hit.id;                       // a real character, even if not in cast yet
   const cast=(c.cast||[]).filter(id=>!isPlayer(chr(id)));
@@ -3073,7 +3933,7 @@ async function run(){
   // Whole-scene mode can start from nothing — it makes the content item itself.
   if(mode==='scene'&&!cur()){
     if(!input)return note('Describe the scene first.',true);
-    if(!P.characters.length)return note('Import a character sheet first.',true);
+    if(!npcs().length)return note('Import an NPC character sheet first.',true);
     const uid='u'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
     P.content.push({uid,type:'conversation',id:'scene_'+(P.content.length+1),title:'New scene',
       location:P.locations[0]?.id||'',day:'monday',block:'evening',chapter:1,
@@ -3093,11 +3953,8 @@ async function run(){
   busy=true;$('go').disabled=true;$('stop').disabled=false;abort=new AbortController();
   const meId=$('sayAs')?.value||$('playAs')?.value;
   if(mode==='play'&&input&&meId){
-    const speaker=meId==='__player__'?(playerChar()?.id||'__player__'):meId;
-    if(speaker==='__player__')
-      note('No sheet is flagged as the player character, so that line has nowhere to go. '+
-        'Flag one in Edit sheet & limits.',true);
-    else listAt(focusPath).push({type:'line',speaker,text:input,emotion:''});
+    const speaker=isRuntimePlayerId(meId)?'player':meId;
+    listAt(focusPath).push({type:'line',speaker,text:input,emotion:''});
   }
   $('line').value='';$('line').style.height='auto';paintBody();
 
@@ -3412,6 +4269,7 @@ function isAdult(c){const a=+(c.profile?.age); return Number.isFinite(a)&&a>=18;
 function openEditor(i){
   edIx=i;const c=P.characters[i];if(!c)return;
   $('edName').textContent=c.name;
+  $('edSheetOut').disabled=isPlayer(c);
   paintEditor();
   $('editor').showModal();
 }
@@ -3453,10 +4311,10 @@ function paintEditor(){
       '<div class="field"><label>Skills / strengths</label>'+tagList('characteristics.strengths',c.characteristics.strengths,'ok')+'</div>'+
       '<div class="field edfull"><label>Identity change history</label>'+tagList('identity.history',c.identity.history,'ok')+
         '<p class="hint">Use short milestones such as <code>comes_out_to_player</code>. A scene can change the live identity with an identity-change effect.</p></div>'+
-      '<div class="field edfull"><label><input type="checkbox" id="edPC" style="width:auto"'+
-        (isPlayer(c)?' checked':'')+'> This is the player character</label>'+
-        '<p class="hint">The person playing. Their words come from choice options, never from '+
-        'generated dialogue, and they are in every scene regardless of schedule.</p></div>'+
+      '<div class="field edfull"><div class="guard">'+(isPlayer(c)
+        ? 'This is an old fixed Player sheet and will not export. Remove it from Cast when you no longer need it. '
+        : 'This is an NPC sheet. ')+'The Player is created from each user’s choices when a new game starts '+
+        'and never needs a character sheet here.</div></div>'+
 
       '<div class="field edfull"><p class="rubric" style="margin-top:6px">Limits</p></div>'+
 
@@ -3564,10 +4422,6 @@ function wireEditor(c,adult,romance){
   $('edGender').oninput=e=>{c.profile.gender_identity=e.target.value.trim();save();paintSheet();};
   $('edPronouns').oninput=e=>{c.identity.pronouns=e.target.value.trim();save();};
   $('edPresentation').oninput=e=>{c.identity.presentation=e.target.value.trim();save();};
-  $('edPC').onchange=e=>{
-    if(e.target.checked)P.characters.forEach(x=>{if(x!==c&&x.profile)x.profile.is_player=false;});
-    c.profile.is_player=e.target.checked;
-    save();paintCast();paintEditor();paintPresence();};
   $('edFam').onchange=e=>{c.boundaries.family_only=e.target.checked;save();paintSheet();};
   $('edAlc').onchange=e=>{c.boundaries.alcohol_consent=e.target.value;save();};
   $('edProt').oninput=e=>{c.boundaries.protection_policy=e.target.value;save();};
@@ -3642,6 +4496,7 @@ function gameReady(c){
 
 $('edSheetOut').onclick=()=>{
   const c=P.characters[edIx];
+  if(!c||isPlayer(c))return raise('The runtime Player is created for each new game and has no character sheet to export.');
   const url=URL.createObjectURL(new Blob([JSON.stringify(sheetOut(c),null,2)],{type:'application/json'}));
   Object.assign(document.createElement('a'),{href:url,download:c.id+'.character'}).click();
   URL.revokeObjectURL(url);
@@ -3660,6 +4515,8 @@ function condLabel(r){
   if(r.type==='custom_stat')return (chr(r.character)?.name||r.character)+' '+(statDefinition(r.key)?.label||r.key)+' '+op+' '+r.value;
   if(r.type==='met')   return 'met '+(chr(r.character)?.name||r.character);
   if(r.type==='memory')return (chr(r.character)?.name||r.character)+' remembers '+r.key+(r.op==='is_false'?' (not yet)':'');
+  const state=stateAssignment(r.key);
+  if(state)return state.key+' = '+stateValueText(state.value)+(r.op==='is_false'?' (not)':'');
   return r.key+' '+op+(r.op==='is_true'||r.op==='is_false'?'':' '+r.value);
 }
 
@@ -3676,7 +4533,14 @@ function condMet(r,S){
     const found=memories.includes(r.key);
     return r.op==='is_false'?!found:found;
   }
-  else                     have=S.flags[r.key];
+  else{
+    const state=stateAssignment(r.key);
+    if(state){
+      const equal=S.flags[state.key]===state.value;
+      return r.op==='is_false'?!equal:equal;
+    }
+    have=S.flags[r.key];
+  }
 
   if(r.op==='is_true')  return have===true||num(have)>0;
   if(r.op==='is_false') return !(have===true||num(have)>0);
@@ -3687,7 +4551,7 @@ const allMet=(reqs,S)=>(reqs||[]).every(r=>condMet(r,S));
 
 function condEditor(reqs,owner){
   return (reqs||[]).map((r,i)=>{
-    const who=P.characters.map(c=>'<option value="'+esc(c.id)+'"'+(c.id===r.character?' selected':'')+'>'+
+    const who=npcs().map(c=>'<option value="'+esc(c.id)+'"'+(c.id===r.character?' selected':'')+'>'+
       esc(c.name)+'</option>').join('');
     let mid='';
     if(r.type==='stat')mid='<select data-cf="'+owner+':'+i+':character">'+who+'</select>'+
@@ -3712,7 +4576,7 @@ function condEditor(reqs,owner){
   '<button class="add" data-cadd="'+owner+':stat">+ stat</button>'+
   (customStatDefs().length?'<button class="add" data-cadd="'+owner+':custom_stat">+ custom stat</button>':'')+
   '<button class="add" data-cadd="'+owner+':chapter">+ chapter</button>'+
-  '<button class="add" data-cadd="'+owner+':flag">+ flag</button>'+
+  '<button class="add" data-cadd="'+owner+':flag">+ flag / value</button>'+
   '<button class="add" data-cadd="'+owner+':met">+ met</button>'+
   '<button class="add" data-cadd="'+owner+':memory">+ memory</button>';
 }
@@ -3730,7 +4594,7 @@ function wireConds(root){
     const [owner,type]=b.dataset.cadd.split(':').slice(0,2).length===2&&b.dataset.cadd.startsWith('opt:')
       ? [b.dataset.cadd.slice(0,b.dataset.cadd.lastIndexOf(':')),b.dataset.cadd.split(':').pop()]
       : [b.dataset.cadd.slice(0,b.dataset.cadd.lastIndexOf(':')),b.dataset.cadd.split(':').pop()];
-    const id=P.characters[0]?.id||'';
+    const id=npcs()[0]?.id||'';
     reqsOf(owner).push(type==='stat'?{type:'stat',character:id,key:'love',op:'gte',value:50}
       :type==='custom_stat'?{type:'custom_stat',character:id,key:customStatDefs()[0]?.id||'',op:'gte',value:0}
       :type==='chapter'?{type:'chapter',character:id,op:'gte',value:2}
@@ -3821,24 +4685,23 @@ function wkChoose(i){
   wkPending=null;wkStep();
 }
 function applyFlag(raw,S){
-  // Effects arrive as "a.b +1; flag_name; c.d -2" — semicolons first, then the value.
-  String(raw||'').split(';').forEach(piece=>{
-    const clean=piece.trim();
-    const memory=clean.match(/^memory:([^:]+):(.+)$/i);
-    if(memory){S.memories=S.memories||{};const list=S.memories[memory[1]]||(S.memories[memory[1]]=[]);if(!list.includes(memory[2]))list.push(memory[2]);return;}
-    const chapter=clean.match(/^chapter:([^:]+):(\d+)$/i);
-    if(chapter){S.chapters[chapter[1]]=Math.max(+S.chapters[chapter[1]]||1,+chapter[2]);return;}
-    const custom=clean.match(/^stat:([^:]+):([^\s:]+)\s+([+-]?\d+)$/i);
-    if(custom){const k=custom[1]+'.'+custom[2];S.stats[k]=(+S.stats[k]||0)+(+custom[3]);return;}
-    const p=clean.split(/\s+/).filter(Boolean);
-    if(!p.length)return;
-    if(p.length===1){
-      if(p[0].includes('='))S.flags[p[0].split('=')[0]]=p[0].split('=')[1];
-      else S.flags[p[0]]=true;
-      return;
+  compileEffects(raw).forEach(e=>{
+    if(e.operation==='create_memory'){
+      S.memories=S.memories||{};const list=S.memories[e.character]||(S.memories[e.character]=[]);
+      if(!list.includes(e.value))list.push(e.value);return;
     }
-    const k=p[0],d=parseInt(p[1],10)||0;
-    if(k.includes('.'))S.stats[k]=(+S.stats[k]||0)+d; else S.flags[k]=(+S.flags[k]||0)+d;
+    if(e.operation==='unlock_relationship_chapter'){
+      S.chapters[e.character]=Math.max(+S.chapters[e.character]||1,+e.level);return;
+    }
+    if(e.operation==='add_meter'||e.operation==='add_character_stat'){
+      const key=e.character+'.'+(e.meter||e.key);S.stats[key]=(+S.stats[key]||0)+(+e.value||0);return;
+    }
+    if(e.operation==='add_player_value'){
+      S.player=S.player||{};S.player[e.section]=S.player[e.section]||{};
+      S.player[e.section][e.key]=(+S.player[e.section][e.key]||0)+(+e.value||0);return;
+    }
+    if(e.operation==='set_value'||e.operation==='set_flag'){S.flags[e.key]=e.value;return;}
+    if(e.operation==='add_value')S.flags[e.key]=(+S.flags[e.key]||0)+(+e.value||0);
   });
 }
 
@@ -4020,27 +4883,58 @@ function walkAll(cb){
 /** Every flag in the project: where it's written, where it's read. */
 function flagRegistry(){
   const reg={};
-  const touch=(k,kind,where)=>{
+  const touch=(k,access,where,meta)=>{
     if(!k)return;
-    reg[k]=reg[k]||{sets:[],reads:[]};
-    if(!reg[k][kind].includes(where))reg[k][kind].push(where);
+    const row=reg[k]=reg[k]||{sets:[],reads:[],kinds:[],character_refs:[],values:[]};
+    if(!row[access].includes(where))row[access].push(where);
+    if(!meta)return;
+    if(meta.kind&&!row.kinds.includes(meta.kind))row.kinds.push(meta.kind);
+    if(meta.state_key)row.state_key=meta.state_key;
+    if(Object.prototype.hasOwnProperty.call(meta,'value')&&
+       !row.values.some(v=>JSON.stringify(v)===JSON.stringify(meta.value)))row.values.push(meta.value);
+    if(meta.character){
+      const ref={character:meta.character,key:meta.key||'',kind:meta.kind||'meter'};
+      if(!row.character_refs.some(x=>x.character===ref.character&&x.key===ref.key&&x.kind===ref.kind))
+        row.character_refs.push(ref);
+    }
   };
   const readReqs=(reqs,where)=>(reqs||[]).forEach(r=>{
-    if(r.type==='flag')touch(r.key,'reads',where);
-    if(r.type==='stat')touch(r.character+'.'+r.key,'reads',where);
-    if(r.type==='met')touch('met_'+r.character,'reads',where);
+    if(r.type==='flag'){
+      const value=stateAssignment(r.key);
+      touch(r.key,'reads',where,value
+        ?{kind:'value',state_key:value.key,value:value.value}
+        :{kind:'flag',state_key:r.key});
+    }
+    if(r.type==='stat'||r.type==='custom_stat')touch(r.character+'.'+r.key,'reads',where,
+      {kind:r.type==='custom_stat'?'character_stat':'meter',character:r.character,key:r.key});
+    if(r.type==='met')touch('met_'+r.character,'reads',where,{kind:'flag',state_key:'met_'+r.character});
+  });
+  const writeEffects=(raw,where)=>compileEffects(raw).forEach(e=>{
+    if(e.operation==='add_meter')
+      touch(e.character+'.'+e.meter,'sets',where,{kind:'meter',character:e.character,key:e.meter});
+    else if(e.operation==='add_character_stat')
+      touch(e.character+'.'+e.key,'sets',where,{kind:'character_stat',character:e.character,key:e.key});
+    else if(e.operation==='add_player_value')
+      touch('player.'+e.section+'.'+e.key,'sets',where,{kind:'player_value',state_key:'player.'+e.section+'.'+e.key});
+    else if(e.operation==='set_value')
+      touch(e.key+'='+stateValueText(e.value),'sets',where,{kind:'value',state_key:e.key,value:e.value});
+    else if(e.operation==='add_value')
+      touch(e.key,'sets',where,{kind:'counter',state_key:e.key,value:+e.value||0});
+    else if(e.operation==='set_flag')
+      touch(e.key,'sets',where,{kind:'flag',state_key:e.key,value:e.value!==false});
   });
 
   P.content.forEach(c=>{
     const w=c.title||c.id;
     readReqs(c.requires,w);
+    writeEffects(c.flag,w);
     (c.stages||[]).forEach(s=>{readReqs(s.requires,w);
-      String(s.flag||'').split(';').forEach(f=>{const k=f.trim().split(/\s+/)[0];if(k)touch(k,'sets',w);});});
+      writeEffects(s.flag,w);});
   });
   walkAll((n,c,p,isOpt)=>{
     const w=c.title||c.id;
     if(isOpt){
-      String(n.flag||'').split(';').forEach(f=>{const k=f.trim().split(/\s+/)[0];if(k)touch(k,'sets',w);});
+      writeEffects(n.flag,w);
       readReqs(n.requires,w);}
   });
   return reg;
@@ -4060,7 +4954,7 @@ function emotionRegistry(){
 function coverage(){
   const per={};
   const bump=(id,k,n)=>{per[id]=per[id]||{conv:0,quest:0,rep:0,routes:0};per[id][k]+=n;};
-  P.characters.forEach(c=>bump(c.id,'conv',0));
+  npcs().forEach(c=>bump(c.id,'conv',0));
   walkAll((n,c)=>{if(n.type==='line')bump(n.speaker,c.type==='quest'?'quest':'conv',1);});
   P.content.forEach(c=>{
     if(c.type==='repeatable'&&c.character)bump(c.character,'rep',(c.lines||[]).length);
@@ -4075,7 +4969,7 @@ const REL_INVERSE={spouse:'spouse',daughter:'parent',son:'parent',mother:'child'
 
 /** Character ids referenced by an imported sheet but never imported themselves. */
 function missingRefs(){
-  const known=new Set(P.characters.map(c=>c.id)),out={};
+  const known=new Set(['player','__player__',...P.characters.map(c=>c.id)]),out={};
   const note=(id,from,relation,household)=>{
     if(!id||known.has(id))return;
     out[id]=out[id]||{id,from:[],relation:'',district:'',residence:''};
@@ -4092,15 +4986,6 @@ function missingRefs(){
 
 function stubSheet(ref){
   const stats={};STAT_KEYS.forEach(k=>stats[k]=0);
-  if(ref.id==='player'||/^player/.test(ref.id))return {
-    format_version:1,id:'player',display_name:'Player',
-    profile:{is_player:true,age:null,role:'player_character',romance_eligible:false},
-    home:{district:ref.district||'',residence:ref.residence||'',household:[]},
-    personality:{archetype:'',traits:[],values:[],social_style:''},
-    schedule:{days_off:[],fixed_commitments:[],preferred_social_blocks:[]},
-    goals:[],connections:[],relationship_defaults:{},
-    boundaries:{hard_limits:[]},relationship_chapters:[],
-    quest_hooks:[],conversation_topics:[],text_style:{},_stub:true};
   return {format_version:1,id:ref.id,
     display_name:ref.id.split('_').map(w=>w[0].toUpperCase()+w.slice(1)).join(' '),
     profile:{age:null,gender_identity:'',role:ref.relation||'',occupation:'',romance_eligible:false},
@@ -4143,12 +5028,10 @@ function validate(){
     if(cids.has(c.id))add('err','Two characters share the id "'+c.id+'".','Cast');
     cids.add(c.id);
   });
-  const pcs=P.characters.filter(isPlayer);
-  if(pcs.length>1)add('err','More than one sheet is flagged as the player character: '+
-    pcs.map(c=>c.name).join(', ')+'.','Cast');
-  if(!pcs.length&&P.characters.length)
-    add('warn','No sheet is marked as the player character, so the model has no idea who the '+
-      'person playing is. Flag one in Edit sheet & limits.','Cast');
+  const fixedPlayers=P.characters.filter(isPlayer);
+  if(fixedPlayers.length)add('warn','Fixed player sheet'+(fixedPlayers.length===1?'':'s')+' ('+
+    fixedPlayers.map(c=>c.name).join(', ')+') will be ignored. Port Alder creates the Player '+
+    'from each user’s choices when a new game starts.','Cast');
 
   P.content.forEach(c=>{
     const w=c.title||c.id;
@@ -4182,14 +5065,21 @@ function validate(){
       else if(!a.free)
         add('warn',ch2.name+' is unavailable then ('+a.why+').',w);
     });
-    if(c.type!=='repeatable'&&!(c.cast||[]).filter(id=>!isPlayer(chr(id))).length)
+    const questPeople=c.type==='quest'?[c.character,...(c.questPlan?.participants||[])]:[];
+    if(c.type!=='repeatable'&&![...(c.cast||[]),...questPeople]
+      .some(id=>id&&authoredChr(id)&&!isPlayer(authoredChr(id))))
       add('warn','No NPC is marked present, so there is nobody for the player to talk to.',w);
 
     const checkReqs=(reqs,label)=>(reqs||[]).forEach(r=>{
-      if((r.type==='stat'||r.type==='chapter'||r.type==='met'||r.type==='memory')&&!chr(r.character))
-        add('err','A '+label+' gate refers to "'+r.character+'", which has no sheet.',w);
+      if(r.type==='stat'||r.type==='custom_stat'||r.type==='chapter'||r.type==='met'||r.type==='memory'){
+        if(isRuntimePlayerId(r.character))
+          add('err','A '+label+' gate uses the Player as an NPC relationship. Use a Player value '+
+            'or state flag instead; the Player has no fixed character sheet.',w);
+        else if(!authoredChr(r.character))
+          add('err','A '+label+' gate refers to "'+r.character+'", which has no sheet.',w);
+      }
       if(r.type==='chapter'){
-        const n=(chr(r.character)?.relationship_chapters||[]).length;
+        const n=(authoredChr(r.character)?.relationship_chapters||[]).length;
         if(n&&+r.value>n)add('err','Gated on chapter '+r.value+' but that character only has '+n+'.',w);
       }
     });
@@ -4235,20 +5125,25 @@ function validate(){
   const reg=flagRegistry(),keys=Object.keys(reg);
   keys.forEach(k=>{
     const r=reg[k];
-    const seeded=k.includes('.')&&chr(k.split('.')[0])?.relationship_defaults?.[k.split('.')[1]]!==undefined;
+    const seeded=(r.character_refs||[]).some(ref=>{
+      const ch=authoredChr(ref.character);
+      return ch&&(ch.relationship_defaults?.[ref.key]!==undefined||ch.custom_stats?.[ref.key]!==undefined);
+    });
     const auto=k.startsWith('met_');
     if(!r.sets.length&&!seeded&&!auto)
       add('warn','"'+k+'" is required somewhere but nothing ever sets it.',r.reads.join(', '));
     if(!r.reads.length)
       add('info','"'+k+'" is set but no condition reads it.',r.sets.join(', '));
-    if(auto&&!chr(k.slice(4))){
+    if(auto&&!authoredChr(k.slice(4))){
       const near=P.characters.find(c=>c.id.startsWith(k.slice(4))||k.slice(4).startsWith(c.id));
       add('err','"'+k+'" checks meeting "'+k.slice(4)+'", who has no sheet.'+
         (near?' Did you mean met_'+near.id+'?':''),r.reads.join(', ')||'Flags');
     }
-    if(k.includes('.')&&!chr(k.split('.')[0]))
-      add('err','"'+k+'" refers to character "'+k.split('.')[0]+'", who has no sheet.',
+    (r.character_refs||[]).forEach(ref=>{
+      if(authoredChr(ref.character))return;
+      add('err','"'+k+'" refers to character "'+ref.character+'", who has no sheet.',
         (r.reads.concat(r.sets)).join(', '));
+    });
   });
   keys.forEach((a,i)=>keys.slice(i+1).forEach(b=>{
     if(a!==b&&lev(a,b)<=2&&Math.min(a.length,b.length)>4)
@@ -4325,12 +5220,11 @@ function validate(){
 function reachable(){
   const gain={},spend={},perRun={};
   // repeat=true means the source can fire again, so it sets no ceiling at all.
-  const take=(flag,repeat)=>String(flag||'').split(';').forEach(p=>{
-    const bits=p.trim().split(/\s+/);
-    if(bits.length<2||!bits[0].includes('.'))return;
-    const n=parseInt(bits[1],10)||0;
-    if(repeat&&n>0){perRun[bits[0]]=(perRun[bits[0]]||0)+n;return;}
-    (n>=0?gain:spend)[bits[0]]=((n>=0?gain:spend)[bits[0]]||0)+Math.abs(n);
+  const take=(flag,repeat)=>compileEffects(flag).forEach(e=>{
+    if(e.operation!=='add_meter'&&e.operation!=='add_character_stat')return;
+    const key=e.character+'.'+(e.meter||e.key),n=+e.value||0;
+    if(repeat&&n>0){perRun[key]=(perRun[key]||0)+n;return;}
+    (n>=0?gain:spend)[key]=((n>=0?gain:spend)[key]||0)+Math.abs(n);
   });
   P.content.forEach(c=>{
     const rep=c.type==='activity';
@@ -4503,7 +5397,7 @@ function portAlderCheck(){
     'goals','connections','relationship_defaults','boundaries','private_profile','relationship_chapters',
     'quest_hooks','conversation_topics','text_style','quests','conversations','text_messages','outcomes','asset_refs','entry_event'];
   const ids=new Set();
-  P.characters.forEach(c=>{
+  npcs().forEach(c=>{
     const sheet=gameReady(c),name=c.name||c.id||'Unnamed character';
     required.filter(k=>sheet[k]===undefined).forEach(k=>add('err','Missing required .character field "'+k+'".',name));
     if(ids.has(c.id))add('err','Two character sheets use "'+c.id+'". Port Alder requires unique package ids.',name);
@@ -4530,7 +5424,7 @@ function portAlderCheck(){
     });
     walk(c.nodes||[],'scene');
   });
-  if(P.characters.length!==15)add('info','The current Port Alder vertical slice expects 15 character packages; this project has '+P.characters.length+'.', 'Character sheets');
+  if(npcs().length!==15)add('info','The current Port Alder vertical slice expects 15 NPC character packages; this project has '+npcs().length+'. The runtime Player is counted separately.', 'Character sheets');
   return out;
 }
 function branchTests(){
@@ -4781,18 +5675,36 @@ function paintInspect(){
    one compiler for effect strings, one declared registry of flags and stats,
    the activity block the export used to omit, and a check for the seam itself. */
 
-/** "trust +1; boat_sold; mara.comfort -2" -> effect objects the runtime applies.
-    A dotted key moves a relationship meter; a bare word with a number counts;
-    a bare word on its own sets a flag true. Same rules the runtime used to
-    infer at play time — decided once, here, and written into the export. */
+function knownMetricName(key){
+  const built=[...(typeof STAT_KEYS==='undefined'?[]:STAT_KEYS),...(typeof STATS==='undefined'?[]:STATS)];
+  const custom=typeof customStatDefs==='function'?customStatDefs().map(s=>s.id):[];
+  return built.includes(key)||custom.includes(key);
+}
+
+/** "emma.trust +1; sandbox.active; player.life_path=college" -> typed effects.
+    A dot alone means nothing: only an explicit numeric NPC-meter change is a meter. */
 function compileEffects(raw){
   return String(raw||'').split(';').map(s=>s.trim()).filter(Boolean).map(piece=>{
+    if(piece.startsWith('!'))return {operation:'set_flag',key:piece.slice(1).trim(),value:false};
+    let match=piece.match(/^memory:([^:]+):(.+)$/i);
+    if(match)return {operation:'create_memory',character:match[1].trim(),value:match[2].trim()};
+    match=piece.match(/^chapter:([^:]+):(\d+)$/i);
+    if(match)return {operation:'unlock_relationship_chapter',character:match[1].trim(),level:+match[2]};
+    match=piece.match(/^stat:([^:]+):([^\s:]+)\s+([+-]?\d+)$/i);
+    if(match)return {operation:'add_character_stat',character:match[1].trim(),key:match[2].trim(),value:+match[3]};
+    match=piece.match(/^playerstat:(attributes|needs):([^\s:]+)\s+([+-]?\d+)$/i);
+    if(match)return {operation:'add_player_value',section:match[1].toLowerCase(),key:match[2].trim(),value:+match[3]};
+    const assignment=stateAssignment(piece);
+    if(assignment)return {operation:'set_value',key:assignment.key,value:assignment.value};
+
     const parts=piece.split(/\s+/);
     const key=parts[0];
     const delta=parts.length>1?parseInt(parts[1],10):NaN;
-    if(key.includes('.')){
+    if(Number.isFinite(delta)&&key.includes('.')){
       const [character,meter]=key.split('.');
-      return {operation:'add_meter',character,meter,value:Number.isFinite(delta)?delta:1};
+      if(authoredChr(character)||knownMetricName(meter))
+        return {operation:'add_meter',character,meter,value:delta};
+      return {operation:'add_value',key,value:delta};
     }
     if(Number.isFinite(delta))return {operation:'add_value',key,value:delta};
     return {operation:'set_flag',key,value:true};
@@ -4817,45 +5729,66 @@ function effectSources(){
 function stateRegistry(){
   const reg=flagRegistry();
   const flags=[],stats=[],counters=[],conflicts=[];
-  const kinds={};
-  effectSources().forEach(({raw,where})=>compileEffects(raw).forEach(e=>{
-    if(e.operation==='set_flag'||e.operation==='add_value'){
-      const k=kinds[e.key]=kinds[e.key]||{bool:[],int:[]};
-      k[e.operation==='set_flag'?'bool':'int'].push(where);
-    }
-  }));
+  const state={};
+  const merge=(a,b)=>[...new Set([...(a||[]),...(b||[])])];
+  const valueType=value=>typeof value==='number'?(Number.isInteger(value)?'int':'number'):
+    typeof value==='boolean'?'bool':typeof value==='string'?'string':'variant';
+  const addState=(key,r)=>{
+    const row=state[key]=state[key]||{key,kinds:[],types:{},sets:[],reads:[]};
+    row.kinds=merge(row.kinds,r.kinds);row.sets=merge(row.sets,r.sets);row.reads=merge(row.reads,r.reads);
+    (r.kinds||[]).forEach(kind=>{
+      if(kind==='flag')row.types.bool=merge(row.types.bool,r.sets.concat(r.reads));
+      if(kind==='counter')row.types.int=merge(row.types.int,r.sets.concat(r.reads));
+    });
+    (r.values||[]).forEach(value=>{
+      const type=valueType(value);row.types[type]=merge(row.types[type],r.sets.concat(r.reads));
+    });
+  };
 
   Object.keys(reg).sort().forEach(k=>{
-    const r=reg[k];
-    if(/^activity\./.test(k)){counters.push({key:k,initial:0,read_by:r.reads});return;}
-    if(k.includes('.')){
-      const [cid,stat]=k.split('.');
-      const ch=chr(cid);
-      if(ch){
-        const cap=ch.stat_caps?.[stat];
-        stats.push({key:k,character:cid,stat,
-          initial:+(ch.relationship_defaults?.[stat]??0),
-          min:0,max:Number.isFinite(+cap)?+cap:null,
-          set_by:r.sets,read_by:r.reads});
-        return;
-      }
+    const r=reg[k],ref=(r.character_refs||[])[0];
+    if(ref){
+      const ch=authoredChr(ref.character),stat=ref.key;
+      const def=typeof statDefinition==='function'?statDefinition(stat):null;
+      const cap=ch?.stat_caps?.[stat];
+      const initial=ch?.relationship_defaults?.[stat]??ch?.custom_stats?.[stat]??def?.default??0;
+      stats.push({key:ref.character+'.'+stat,character:ref.character,stat,initial:+initial||0,
+        min:Number.isFinite(+def?.minimum)?+def.minimum:0,
+        max:Number.isFinite(+cap)?+cap:Number.isFinite(+def?.maximum)?+def.maximum:null,
+        set_by:r.sets,read_by:r.reads,invalid:!ch||undefined});
+      return;
     }
-    const k2=kinds[k]||{bool:[],int:[]};
-    const isInt=k2.int.length>0;
-    if(k2.bool.length&&k2.int.length)
-      conflicts.push({key:k,bool:[...new Set(k2.bool)],int:[...new Set(k2.int)]});
-    flags.push({key:k,type:isInt?'int':'bool',initial:isInt?0:false,
-      auto:/^met_/.test(k)||undefined,set_by:r.sets,read_by:r.reads});
+    if((r.kinds||[]).includes('player_value'))return;
+    addState(r.state_key||k,r);
+  });
+
+  Object.values(state).sort((a,b)=>a.key.localeCompare(b.key)).forEach(row=>{
+    if(/^activity\./.test(row.key)){
+      counters.push({key:row.key,initial:0,set_by:row.sets,read_by:row.reads});return;
+    }
+    let types=Object.keys(row.types);
+    if(types.includes('number')&&types.includes('int'))types=types.filter(t=>t!=='int');
+    if(types.length>1)conflicts.push({key:row.key,types:types.map(type=>({type,where:row.types[type]}))});
+    const type=types.includes('string')?'string':types.includes('number')?'number':
+      types.includes('int')?'int':types.includes('variant')?'variant':'bool';
+    const initial=type==='string'?'':type==='int'||type==='number'?0:type==='variant'?null:false;
+    flags.push({key:row.key,type,initial,auto:/^met_/.test(row.key)||undefined,
+      set_by:row.sets,read_by:row.reads});
   });
 
   // Stats that live on a sheet but no condition reads yet still need seeding.
-  P.characters.forEach(c=>Object.keys(c.relationship_defaults||{}).forEach(stat=>{
-    const key=c.id+'.'+stat;
-    if(stats.some(s=>s.key===key))return;
-    const cap=c.stat_caps?.[stat];
-    stats.push({key,character:c.id,stat,initial:+(c.relationship_defaults[stat]||0),
-      min:0,max:Number.isFinite(+cap)?+cap:null,set_by:[],read_by:[]});
-  }));
+  npcs().forEach(c=>{
+    const seed=(values,custom)=>Object.keys(values||{}).forEach(stat=>{
+      const key=c.id+'.'+stat;if(stats.some(s=>s.key===key))return;
+      const def=custom&&typeof statDefinition==='function'?statDefinition(stat):null;
+      const cap=c.stat_caps?.[stat];
+      stats.push({key,character:c.id,stat,initial:+values[stat]||0,
+        min:Number.isFinite(+def?.minimum)?+def.minimum:0,
+        max:Number.isFinite(+cap)?+cap:Number.isFinite(+def?.maximum)?+def.maximum:null,
+        set_by:[],read_by:[]});
+    });
+    seed(c.relationship_defaults,false);seed(c.custom_stats,true);
+  });
 
   P.content.filter(c=>c.type==='activity').forEach(c=>{
     const key='activity.'+c.id+'.count';
@@ -4904,8 +5837,8 @@ function godotCheck(){
   const out=[],add=(sev,msg,where)=>out.push({sev,msg,where});
   const R=stateRegistry();
 
-  R.conflicts.forEach(c=>add('fatal','"'+c.key+'" is set as a switch in '+c.bool.join(', ')+
-    ' and counted in '+c.int.join(', ')+'. One key cannot be both — rename one or make both counters.',
+  R.conflicts.forEach(c=>add('fatal','"'+c.key+'" is used with incompatible types: '+
+    c.types.map(t=>t.type+' in '+t.where.join(', ')).join('; ')+'. Use one state type for this key.',
     'Flags'));
 
   P.content.filter(c=>c.type==='activity').forEach(c=>{
@@ -5297,6 +6230,7 @@ function effectsToFlag(effects){
       case 'create_memory': return 'memory:'+e.character+':'+v;
       case 'unlock_relationship_chapter': return 'chapter:'+e.character+':'+e.level;
       case 'add_character_stat': return 'stat:'+e.character+':'+e.key+' '+(v>=0?'+':'')+v;
+      case 'add_player_value': return 'playerstat:'+e.section+':'+e.key+' '+(v>=0?'+':'')+v;
       default:            return e.key||e.operation;
     }
   }).filter(Boolean).join('; ');
@@ -5492,7 +6426,7 @@ function convertQuest(q,sheet,report){
     requires:toRequires(act.event==='quest_completed'?act:q.condition,sheet.id),
     stages:stages.length?stages:[{id:'stage_1',title:'Opening',location:'',nodes:[],flag:done,requires:[]}],
     questPlan:{category:q.category||'character_story',summary:q.summary||'',earliestBlock:act.earliest_block||'',
-      rewards:'',deadline:q.deadline_note||'',event:scheduled},
+      rewards:'',participants:Array.isArray(q.participants)?q.participants:[],deadline:q.deadline_note||'',event:scheduled},
     _authored:{category:q.category,failure:q.failure,completion_effects:q.completion_effects,
       objectives:q.objectives,branches:q.branches,activation:act}
   };
@@ -5535,6 +6469,9 @@ function flagToEffects(flag){
     if(chapter)return {operation:'unlock_relationship_chapter',character:chapter[1].trim(),level:+chapter[2]};
     const custom=piece.match(/^stat:([^:]+):([^\s:]+)\s+([+-]?\d+)$/i);
     if(custom)return {operation:'add_character_stat',character:custom[1].trim(),key:custom[2].trim(),value:+custom[3]};
+    const playerValue=piece.match(/^playerstat:(attributes|needs):([^\s:]+)\s+([+-]?\d+)$/i);
+    if(playerValue)return {operation:'add_player_value',section:playerValue[1].toLowerCase(),
+      key:playerValue[2].trim(),value:+playerValue[3]};
     if(piece.includes('=')){
       const [k,v]=piece.split('=');
       const val=v.trim();
@@ -5824,6 +6761,8 @@ function questOut(c){
     if(plan.earliestBlock)out.activation.earliest_block=plan.earliestBlock;
   }
   if(plan.deadline)out.deadline_note=plan.deadline;
+  const participants=[c.character,...(Array.isArray(plan.participants)?plan.participants:[])].filter(Boolean);
+  if(participants.length)out.participants=[...new Set(participants)];
   const cond=requiresToCondition(c.requires);
   if(cond&&!out.activation.event)Object.assign(out.activation,cond);
   return out;
@@ -5909,7 +6848,8 @@ function toJSON(){
   const acts=activityBlocks();
   const place=ref=>({location:locPart(ref),room:roomPart(ref)});
   return JSON.stringify({format:'scenewright.v3',
-    characters:P.characters.map(c=>{
+    player:{id:'player',runtime:true,source:'new_game'},
+    characters:npcs().map(c=>{
       const g=gameReady(c);
       return {id:c.id,name:c.name,color:c.color,
         age:g.profile?.age??null,
@@ -5962,8 +6902,8 @@ function toScript(){
   }).join('\n\n\n');
 }
 function toSheets(){
-  if(!P.characters.length)return '// No characters imported.';
-  return P.characters.map(c=>'// ---- '+c.id+'.character ----\n'+
+  if(!npcs().length)return '// No NPC characters imported. The runtime Player needs no sheet.';
+  return npcs().map(c=>'// ---- '+c.id+'.character ----\n'+
     JSON.stringify(sheetOut(c),null,2)).join('\n\n');
 }
 const build=()=>fmt==='sheets'?toSheets():fmt==='json'?toJSON():toScript();
@@ -5982,7 +6922,7 @@ $('copyOut').onclick=()=>{navigator.clipboard.writeText($('dump').value);
   $('copyOut').textContent='Copied';setTimeout(()=>$('copyOut').textContent='Copy',1200)};
 $('dlOut').onclick=()=>{
   if(fmt==='sheets'){
-    P.characters.forEach((c,i)=>setTimeout(()=>{
+    npcs().forEach((c,i)=>setTimeout(()=>{
       const url=URL.createObjectURL(new Blob([JSON.stringify(sheetOut(c),null,2)],
         {type:'application/json'}));
       Object.assign(document.createElement('a'),{href:url,download:c.id+'.character'}).click();
@@ -6001,10 +6941,10 @@ document.querySelectorAll('[data-new]').forEach(b=>b.onclick=()=>{
     chapter:1,cast:[],premise:''};
   if(t==='conversation')base.nodes=[];
   if(t==='quest'){base.stages=[{id:'stage_1',title:'Opening',location:base.location,nodes:[],flag:''}];
-    base.character=P.characters[0]?.id||'';base.hook='';}
-  if(t==='repeatable'){base.lines=[];base.character=P.characters[0]?.id||'';}
+    base.character=npcs()[0]?.id||'';base.hook='';}
+  if(t==='repeatable'){base.lines=[];base.character=npcs()[0]?.id||'';}
   if(t==='activity'){
-    base.character=P.characters[0]?.id||'';
+    base.character=npcs()[0]?.id||'';
     base.cast=[base.character].filter(Boolean);
     base.stages=[{id:'base',title:'Every time',at:0,nodes:[],flag:'',requires:[],once:false}];
   }
@@ -6121,8 +7061,8 @@ $('saveProj').onclick=()=>{
 $('loadProj').onclick=pickFiles;
 
 $('exportSheets').onclick=()=>{
-  if(!P.characters.length)return raise('No characters to export.');
-  P.characters.forEach((c,i)=>setTimeout(()=>{
+  if(!npcs().length)return raise('No NPC character sheets to export. The runtime Player needs no sheet.');
+  npcs().forEach((c,i)=>setTimeout(()=>{
     const url=URL.createObjectURL(new Blob([JSON.stringify(sheetOut(c),null,2)],{type:'application/json'}));
     Object.assign(document.createElement('a'),{href:url,download:c.id+'.character'}).click();
     URL.revokeObjectURL(url);
