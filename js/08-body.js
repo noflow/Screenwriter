@@ -1,8 +1,13 @@
 function paintBody(){
   const c=cur(),inner=$('treeInner');
-  if(!c){inner.innerHTML='<div class="blank"><h2>Nothing open</h2><p>Import your character sheets, then make a '+
-    'conversation, quest, or repeatable from the Content tab. Locations build themselves from each sheet\'s '+
-    'home and schedule.</p></div>';$('counter').textContent='';paintModes();return;}
+  if(!c){inner.innerHTML='<div class="blank welcome"><span class="blank-kicker">Start a project</span><h2>Your story workspace</h2>'+
+    '<p>Bring in your Port Alder sheets, or create a character and begin shaping the world from here.</p>'+
+    '<div class="blank-actions"><button class="btn gold" data-empty-action="importChars">Import sheets</button>'+
+    '<button class="btn" data-empty-action="openCharacterCreator">Create character</button>'+
+    '<button class="btn quiet" data-empty-action="openQuestBuilder">Plan a quest</button></div>'+
+    '<small>Projects save automatically in this browser.</small></div>';
+    inner.querySelectorAll('[data-empty-action]').forEach(b=>b.onclick=()=>$(b.dataset.emptyAction).click());
+    $('counter').textContent='';paintModes();return;}
 
   if(c.type==='repeatable') return paintPool(c);
   if(c.type==='activity')   return paintActivity(c);

@@ -257,6 +257,7 @@ function conversationOut(group){
 
 function questOut(c){
   const a=c._authored||{};
+  const plan=c.questPlan||{};
   const stages=(c.stages||[]).filter(s=>s.id!=='branch');
   const branchStage=(c.stages||[]).find(s=>s.id==='branch');
 
@@ -285,23 +286,27 @@ function questOut(c){
   const last=(c.stages||[])[(c.stages||[]).length-1];
   const fx=flagToEffects(last&&last.flag)
     .filter(e=>!(e.operation==='set_flag'&&e.key==='quest_'+c.id+'_done'));
+  const plannedEffects=flagToEffects(plan.rewards||'');
+  if(plan.event)plannedEffects.push({operation:'schedule_event',value:plan.event});
 
   const out={
     id:c.id,
-    category:a.category||'character_story',
+    category:plan.category||a.category||'character_story',
     title:c.title,
-    summary:c.hook||c.premise||'',
+    summary:plan.summary||c.hook||c.premise||'',
     activation:mergeActivation(a.activation,c,null),
     objectives,
     branches,
-    completion_effects:fx.length?fx:(a.completion_effects||[])
+    completion_effects:(fx.length?fx:(a.completion_effects||[])).concat(plannedEffects)
   };
   if(a.failure)out.failure=a.failure;
   if(c.after){
     out.activation=Object.assign({},out.activation,
       {event:'quest_completed',quest:c.after});
     delete out.activation.date;
+    if(plan.earliestBlock)out.activation.earliest_block=plan.earliestBlock;
   }
+  if(plan.deadline)out.deadline_note=plan.deadline;
   const cond=requiresToCondition(c.requires);
   if(cond&&!out.activation.event)Object.assign(out.activation,cond);
   return out;

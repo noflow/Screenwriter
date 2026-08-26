@@ -431,6 +431,170 @@
   @media (max-width:940px){.shell{grid-template-columns:1fr}.rail{display:none}
     .rail.open{display:block;position:absolute;inset:54px 0 0;z-index:30}.line-node{grid-template-columns:86px 1fr}}
   #railToggle{display:none}@media (max-width:940px){#railToggle{display:block}}
+
+  /* Product polish — keeps the theatre-inspired palette while giving the editor a
+     calmer, more deliberate application surface. */
+  :root{--panel:#2b1c31;--panel-hi:#382340;--ink:#181019;--radius:8px;
+    --shadow:0 18px 48px rgba(10,5,12,.28)}
+  html,body{background:
+    radial-gradient(900px 560px at 82% -20%,rgba(127,163,196,.11),transparent 68%),
+    radial-gradient(720px 500px at -8% 100%,rgba(196,119,142,.08),transparent 70%),var(--curtain)}
+  ::selection{background:rgba(201,162,39,.36);color:#fff}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:rgba(237,228,211,.17);border:3px solid transparent;border-radius:10px;background-clip:padding-box}
+  ::-webkit-scrollbar-thumb:hover{background-color:rgba(201,162,39,.55)}
+
+  .masthead{align-items:center;min-height:68px;padding:11px 20px;gap:14px;
+    box-shadow:0 1px 0 rgba(255,255,255,.03),0 10px 30px rgba(8,4,10,.18);position:relative;z-index:10}
+  .wordmark{font-size:25px;letter-spacing:.1em;white-space:nowrap}
+  .tagline{max-width:92px;line-height:1.45;color:#b2a4b3}
+  .mast-right{gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .mast-right .btn{padding:7px 9px;font-size:9px;letter-spacing:.075em}
+  .mast-right .btn.gold{box-shadow:0 4px 14px rgba(201,162,39,.2)}
+  .status{padding-left:7px;border-left:1px solid var(--edge)}
+  select.model{border-radius:var(--radius);min-height:32px;background:rgba(20,12,22,.48)}
+
+  .shell{grid-template-columns:316px 1fr}
+  .rail{background:linear-gradient(180deg,rgba(58,35,64,.92),rgba(38,24,43,.98));
+    box-shadow:10px 0 28px rgba(8,4,10,.11);position:relative;z-index:2}
+  .railtabs{background:rgba(47,29,53,.96);backdrop-filter:blur(14px);padding:0 8px}
+  .railtabs button{padding:14px 5px;font-size:9px;letter-spacing:.1em;border-radius:5px 5px 0 0}
+  .railtabs button:hover{color:var(--paper);background:rgba(255,255,255,.035)}
+  .railpane{padding:18px 16px 0}
+  .rubric{margin-bottom:11px;padding-bottom:8px}
+  .chip-list{gap:5px}
+  .chip{min-height:34px;border:1px solid transparent;border-left:3px solid rgba(237,228,211,.12);border-radius:6px;
+    padding:7px 8px;background:rgba(20,12,22,.1)}
+  .chip:hover{border-color:rgba(237,228,211,.12);border-left-color:var(--brass);background:rgba(255,255,255,.045)}
+  .chip.on{border-color:rgba(201,162,39,.3);border-left-color:var(--brass);background:linear-gradient(90deg,rgba(201,162,39,.12),rgba(201,162,39,.035))}
+  .sheetinfo{border-radius:var(--radius);background:rgba(16,10,18,.34);box-shadow:inset 0 1px rgba(255,255,255,.025)}
+
+  .btn{border-radius:6px;background:linear-gradient(180deg,rgba(75,51,85,.92),rgba(54,35,62,.92));
+    box-shadow:inset 0 1px rgba(255,255,255,.04),0 1px 2px rgba(0,0,0,.16)}
+  .btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 5px 15px rgba(0,0,0,.19),inset 0 1px rgba(255,255,255,.05)}
+  .btn:active:not(:disabled){transform:translateY(0);box-shadow:inset 0 1px 3px rgba(0,0,0,.22)}
+  .btn.gold{box-shadow:0 4px 13px rgba(201,162,39,.2)}
+  input,textarea,select{transition:border-color .15s,background .15s,box-shadow .15s}
+  input:hover,textarea:hover,select:hover{border-color:rgba(237,228,211,.25)!important}
+  input:focus,textarea:focus,select:focus{border-color:rgba(201,162,39,.78)!important;box-shadow:0 0 0 3px rgba(201,162,39,.12);outline:none}
+
+  .stage{background:linear-gradient(135deg,rgba(38,24,43,.18),rgba(15,9,18,.1))}
+  .setup{padding:11px 24px;background:rgba(47,29,53,.6);backdrop-filter:blur(10px)}
+  .tree{padding-top:30px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.013),transparent)}
+  .tree-inner{max-width:880px;padding:0 30px}
+  .slug{margin-bottom:24px;padding:11px 13px;border:1px solid rgba(237,228,211,.09);border-radius:var(--radius);
+    background:rgba(18,11,21,.25);box-shadow:inset 0 1px rgba(255,255,255,.02)}
+  .blank{max-width:590px;margin:13vh auto 0;padding:35px 34px;border:1px solid rgba(237,228,211,.1);border-radius:14px;
+    background:linear-gradient(145deg,rgba(67,43,76,.45),rgba(30,18,35,.28));box-shadow:var(--shadow)}
+  .blank h2{font-size:29px}.blank p{font-size:10px;max-width:470px}
+  .said{border-radius:0 var(--radius) var(--radius) 0;padding:6px 11px}
+  .choice-node,.stagecard{border-radius:var(--radius);box-shadow:inset 0 1px rgba(255,255,255,.025),0 8px 20px rgba(8,4,10,.08)}
+  .pit{padding:13px 28px 14px;background:rgba(43,28,49,.94);box-shadow:0 -10px 30px rgba(8,4,10,.12)}
+  .pit-inner{max-width:880px}.compose #sayAs,#line{border-radius:var(--radius);background:rgba(20,12,22,.72)}
+  #line{box-shadow:inset 0 1px rgba(255,255,255,.02)}
+
+  dialog{border-radius:14px;border-color:rgba(237,228,211,.18);background:linear-gradient(145deg,#3a2542,#2a1a30);
+    box-shadow:0 30px 100px rgba(0,0,0,.58);overflow:hidden}
+  dialog::backdrop{backdrop-filter:blur(4px);background:rgba(14,8,17,.76)}
+  .sheet-head{padding:15px 18px;background:rgba(20,12,22,.22)}
+  .sheet-head h3{font-size:20px}.sheet-body{padding:0 18px 18px}
+  dialog .field input,dialog .field textarea,dialog .field select,#pasteBox,#dump{border-radius:6px;background:rgba(18,11,21,.62)}
+  .edgrid{gap:0 22px}.field{margin-bottom:13px}
+
+  @media (max-width:1180px){.masthead{align-items:flex-start}.mast-right{max-width:720px}.status{display:none}}
+  @media (max-width:940px){.shell{grid-template-columns:1fr}.masthead{min-height:unset;padding:10px 13px}.mast-right{margin-left:0}.tagline{display:none}.tree-inner{padding:0 18px}.pit{padding:11px 16px}.blank{margin-top:8vh}.rail.open{inset:64px 0 0}}
+  @media (max-width:620px){.wordmark{font-size:21px}.mast-right .btn{padding:6px 7px;font-size:8px}.mast-right{gap:4px}.setup{padding:9px 12px}.compose{flex-wrap:wrap}.compose #sayAs{min-height:38px}.compose #line{min-width:100%;order:-1}.edgrid,.two{grid-template-columns:1fr}.wkgrid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+
+  /* Softer blue-slate theme: lower saturation and gentler contrast reduce eye strain
+     during long writing sessions while preserving the meaning of each accent color. */
+  :root{--curtain:#101720;--velvet:#182332;--velvet-2:#213145;--lift:#2c4057;
+    --brass:#d7b46f;--paper:#e6edf3;--rose:#cb8b98;--sage:#98bda8;--sky:#8db9da;--ash:#9baab9;
+    --edge:rgba(220,231,241,.14);--panel:#172330;--panel-hi:#213247;--ink:#0c1219;
+    --shadow:0 16px 42px rgba(3,9,15,.25)}
+  select option,select optgroup{background:#182332;color:#e6edf3}
+  select option:checked,select option:hover{background:#2c4057;color:#fff}
+  html,body{background:
+    radial-gradient(960px 620px at 82% -24%,rgba(91,145,190,.13),transparent 70%),
+    radial-gradient(720px 500px at -10% 110%,rgba(105,157,141,.08),transparent 70%),var(--curtain)}
+  .masthead{background:linear-gradient(180deg,#1b2938,#131d28);box-shadow:0 1px 0 rgba(255,255,255,.04),0 8px 26px rgba(3,9,15,.22)}
+  .tagline{color:#aab8c6}.lamp.live{box-shadow:0 0 8px rgba(215,180,111,.65)}
+  select.model{background:rgba(8,14,21,.4)}
+  .rail{background:linear-gradient(180deg,rgba(28,43,59,.96),rgba(19,30,42,.99));box-shadow:9px 0 24px rgba(3,9,15,.14)}
+  .railtabs{background:rgba(22,34,47,.96)}
+  .railtabs button:hover{background:rgba(255,255,255,.045)}
+  .chip{background:rgba(7,13,20,.1)}
+  .chip:hover{background:rgba(255,255,255,.045)}
+  .chip.on{border-color:rgba(215,180,111,.28);background:linear-gradient(90deg,rgba(215,180,111,.13),rgba(215,180,111,.025))}
+  .sheetinfo{background:rgba(7,13,20,.28)}
+  .btn{background:linear-gradient(180deg,rgba(48,69,92,.9),rgba(35,52,72,.94));border-color:rgba(220,231,241,.16)}
+  .btn:hover:not(:disabled){background:linear-gradient(180deg,rgba(58,83,109,.98),rgba(40,59,82,.98));border-color:rgba(215,180,111,.7)}
+  .btn.gold{color:#17212d;background:linear-gradient(180deg,#dfc17f,#cda55d);border-color:#dfc17f}
+  .btn.gold:hover:not(:disabled){background:linear-gradient(180deg,#e7cd92,#d8b56d)}
+  .stage{background:linear-gradient(135deg,rgba(27,43,59,.22),rgba(8,14,21,.07))}
+  .setup{background:rgba(22,34,47,.65)}
+  .slug{background:rgba(9,15,22,.2)}
+  .blank{background:linear-gradient(145deg,rgba(39,59,79,.48),rgba(16,26,37,.31));border-color:rgba(220,231,241,.12);box-shadow:0 16px 42px rgba(3,9,15,.2)}
+  .pit{background:rgba(20,31,43,.96);box-shadow:0 -8px 26px rgba(3,9,15,.16)}
+  .compose #sayAs,#line{background:rgba(8,14,21,.62)}
+  dialog{background:linear-gradient(145deg,#26394e,#172534);border-color:rgba(220,231,241,.2);box-shadow:0 28px 90px rgba(0,0,0,.52)}
+  .sheet-head{background:rgba(8,14,21,.2)}
+  dialog .field input,dialog .field textarea,dialog .field select,#pasteBox,#dump{background:rgba(8,14,21,.55)}
+  .choice-node{background:rgba(152,189,168,.055);border-color:rgba(152,189,168,.32)}
+  .stagecard{background:rgba(141,185,218,.05);border-color:rgba(141,185,218,.28)}
+  .said:hover{background:rgba(230,237,243,.035)}
+  .mode.on{color:#17212d}
+
+  /* Reduce visual clutter in the most frequently used surfaces. */
+  .mast-right{gap:5px}.mast-right .btn{font-size:8.5px;padding:6px 8px}
+  .field label{letter-spacing:.075em}.hint{color:#a6b3c1;line-height:1.6}
+  .railpane{padding-top:16px}.rubric{letter-spacing:.17em}
+  .tree{padding-top:24px}.tree-inner{max-width:900px}
+  .tools button{background:rgba(33,49,69,.92)}
+  .notes{color:#98a8b7}.notes span:not(:last-child)::after{content:'·';margin-left:14px;color:rgba(155,170,185,.45)}
+  .sheet-head h3{letter-spacing:.035em}.edgrid{gap:0 18px}
+
+  /* Third-pass hierarchy: group related tools, keep primary actions visible, and
+     turn the empty editor into a useful starting point. */
+  .mast-right{flex:1;min-width:0}
+  .mast-group{display:flex;align-items:center;gap:4px;padding-right:7px;margin-right:2px;
+    border-right:1px solid rgba(220,231,241,.1)}
+  .mast-tools{border-right:none;padding-right:0}
+  .mast-engine{display:flex;align-items:center;gap:7px;margin-left:auto;min-width:205px}
+  .mast-engine .model{flex:1;min-width:150px}
+  .mast-engine .status{border-left:0;padding-left:0}
+  .btn.quiet{background:rgba(220,231,241,.035);box-shadow:none;border-color:rgba(220,231,241,.11);color:#b7c3ce}
+  .btn.quiet:hover:not(:disabled){background:rgba(220,231,241,.08);color:var(--paper);box-shadow:none}
+  .mast-create .btn:not(.quiet){border-color:rgba(141,185,218,.22)}
+
+  .blank.welcome{max-width:620px;padding:38px 40px}
+  .blank-kicker{display:block;margin-bottom:9px;font-family:var(--util);font-size:9px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--brass)}
+  .blank.welcome h2{margin-bottom:8px}
+  .blank.welcome p{font-size:10.5px;line-height:1.75}
+  .blank-actions{display:flex;align-items:center;justify-content:center;gap:7px;margin:22px 0 16px}
+  .blank-actions .btn{min-width:128px}
+  .blank.welcome small{display:block;font-family:var(--util);font-size:8.5px;color:#8798a8;letter-spacing:.03em}
+
+  dialog:not(#map):not(#sched){max-width:880px}
+  dialog:not(#map):not(#sched)[open]{display:flex;flex-direction:column;max-height:min(88vh,820px)}
+  dialog .sheet-head{flex:none}
+  dialog .sheet-body{min-height:0;overflow-y:auto;scrollbar-gutter:stable}
+  dialog .sheet-body.edbody{max-height:none}
+  .dialog-actions{position:sticky;bottom:-18px;z-index:4;margin:16px -18px -18px!important;padding:12px 18px;
+    border-top:1px solid rgba(220,231,241,.12);background:linear-gradient(180deg,rgba(23,37,52,.96),rgba(16,26,37,.99));
+    box-shadow:0 -12px 26px rgba(3,9,15,.14)}
+  .dialog-actions .btn{min-height:34px}
+  #characterCreator,#questBuilder{max-width:900px}
+
+  .setup>.lbl:first-child{color:#b5c2ce}
+  .pit .modes{padding-bottom:2px}
+  .compose{gap:8px}
+  .compose .btn{min-height:40px}
+  .compose #sayAs{min-width:105px}
+  .notes{margin-top:7px;opacity:.88}
+
+  @media (max-width:1180px){.masthead{flex-wrap:wrap}.mast-right{width:100%;margin-left:0}.mast-engine{min-width:220px}.wordmark{margin-right:auto}}
+  @media (max-width:760px){.mast-group{border-right:0;padding-right:0;flex-wrap:wrap}.mast-engine{width:100%;margin-left:0}.blank-actions{flex-direction:column}.blank-actions .btn{width:100%}.blank.welcome{padding:30px 24px}}
 </style>
 
 <header class="masthead">
@@ -438,16 +602,23 @@
   <span class="tagline">vn authoring · godot</span>
   <div class="mast-right">
     <button class="btn" id="railToggle">Panel</button>
-    <button class="btn" id="importChars">Import sheets</button>
-    <button class="btn" id="openCharacterCreator">New character</button>
-    <button class="btn" id="openWorld">World builder</button>
-    <button class="btn" id="pasteChars">Paste</button>
-    <button class="btn" id="openMap">Map</button>
-    <button class="btn" id="openInspect">Inspect</button>
-    <button class="btn" id="openMemory">Memory</button>
-    <button class="btn" id="openExport">Export</button>
-    <select class="model" id="model" aria-label="Model"></select>
-    <span class="status"><span class="lamp" id="lamp"></span><span id="lampText">checking</span></span>
+    <div class="mast-group mast-create" aria-label="Create and import">
+      <button class="btn" id="importChars" title="Import character and location sheets">Import</button>
+      <button class="btn" id="openCharacterCreator" title="Create a new character">+ Character</button>
+      <button class="btn" id="openWorld" title="Create stats, locations, and rooms">+ World</button>
+      <button class="btn" id="openQuestBuilder" title="Create a quest and follow-up event">+ Quest</button>
+      <button class="btn quiet" id="pasteChars" title="Paste character JSON">Paste</button>
+    </div>
+    <div class="mast-group mast-tools" aria-label="Project tools">
+      <button class="btn quiet" id="openMap">Map</button>
+      <button class="btn quiet" id="openInspect">Inspect</button>
+      <button class="btn quiet" id="openMemory">Memory</button>
+      <button class="btn quiet" id="openExport">Export</button>
+    </div>
+    <div class="mast-engine">
+      <select class="model" id="model" aria-label="Model"></select>
+      <span class="status"><span class="lamp" id="lamp"></span><span id="lampText">checking</span></span>
+    </div>
   </div>
 </header>
 
@@ -602,7 +773,7 @@
     <div class="two"><div class="field"><label for="wlDistrict">District</label><input id="wlDistrict" placeholder="old_town"></div><div class="field"><label for="wlType">Place type</label><input id="wlType" placeholder="apartment"></div></div>
     <div class="field"><label for="wlRooms">Rooms</label><textarea id="wlRooms" rows="3" placeholder="living_room\nbedroom\nkitchen"></textarea></div>
     <div class="field"><label for="wlNotes">Atmosphere / useful details</label><textarea id="wlNotes" rows="3" placeholder="Warm lamplight, thin walls, a view of the marina."></textarea></div>
-    <div class="row" style="justify-content:flex-end"><button class="btn" id="downloadWorldLocations">Download game locations</button><button class="btn gold" id="addWorldLocation">Create location</button></div>
+    <div class="row dialog-actions" style="justify-content:flex-end"><button class="btn" id="downloadWorldLocations">Download game locations</button><button class="btn gold" id="addWorldLocation">Create location</button></div>
     <div id="worldMessage" class="hint"></div>
   </div>
 </dialog>
@@ -641,7 +812,7 @@
     <p class="hint">When the scene ends, this can unlock a relationship chapter, create a durable memory, or update the character's live identity. Later choices can use <code>+ memory</code> as a condition.</p>
     <div class="field"><label for="pOutline">Beat outline</label>
       <textarea id="pOutline" rows="12" spellcheck="true" placeholder="Draft an outline, then edit it here before writing the scene."></textarea></div>
-    <div class="row" style="justify-content:flex-end"><button class="btn" id="draftOutline">Draft outline</button><button class="btn gold" id="writePlanned">Write scene from outline</button></div>
+    <div class="row dialog-actions" style="justify-content:flex-end"><button class="btn" id="draftOutline">Draft outline</button><button class="btn gold" id="writePlanned">Write scene from outline</button></div>
   </div>
 </dialog>
 
@@ -651,7 +822,7 @@
     <p class="hint" style="margin:12px 0">Saved facts are fed into future scene planning and generation. Tag a note with character ids or names, separated by commas, to keep it focused.</p>
     <div class="field"><label for="memoryText">Canon fact</label><textarea id="memoryText" rows="3" placeholder="Elena knows the player lied about the job interview."></textarea></div>
     <div class="field"><label for="memoryTags">Relevant characters</label><input id="memoryTags" placeholder="elena_reyes, player"></div>
-    <div class="row" style="justify-content:flex-end"><button class="btn gold" id="addMemory">Save fact</button></div>
+    <div class="row dialog-actions" style="justify-content:flex-end"><button class="btn gold" id="addMemory">Save fact</button></div>
     <div id="memoryList"></div>
   </div>
 </dialog>
@@ -747,7 +918,31 @@
       <div class="field edfull"><label for="ccGoal">Character goal</label><input id="ccGoal" type="text" placeholder="Build a life in Port Alder"></div>
     </div>
     <p id="ccMessage" class="hint"></p>
-    <div class="row" style="margin-top:14px"><button class="btn gold" id="createCharacter">Create character</button></div>
+    <div class="row dialog-actions" style="margin-top:14px"><button class="btn gold" id="createCharacter">Create character</button></div>
+  </div>
+</dialog>
+
+<dialog id="questBuilder">
+  <div class="sheet-head"><h3>Quest &amp; event builder</h3><span class="sp"></span><button class="btn" id="closeQuestBuilder">Close</button></div>
+  <div class="sheet-body edbody">
+    <p class="hint">Build the arc first, then write each objective as a quest stage. This keeps story progression, rewards, and follow-up events visible in one place.</p>
+    <div class="edgrid" style="padding-top:12px">
+      <div class="field edfull"><label for="qbTitle">Quest title</label><input id="qbTitle" placeholder="A Favor at the Marina"></div>
+      <div class="field"><label for="qbCategory">Story type</label><select id="qbCategory"><option value="character_story">Character story</option><option value="relationship">Relationship</option><option value="work">Work</option><option value="school">School</option><option value="community">Community</option><option value="personal">Personal</option></select></div>
+      <div class="field"><label for="qbGiver">Quest giver</label><select id="qbGiver"></select></div>
+      <div class="field edfull"><label for="qbSummary">What is this arc about?</label><textarea id="qbSummary" rows="3" placeholder="Help a friend prepare for an important first day."></textarea></div>
+      <div class="field"><label for="qbAfter">Starts after quest <span class="hint">optional</span></label><select id="qbAfter"></select></div>
+      <div class="field"><label for="qbEarliest">Earliest follow-up block</label><select id="qbEarliest"><option value="">Immediately</option><option>early_morning</option><option>morning</option><option>lunch</option><option>afternoon</option><option>evening</option><option>late_evening</option><option>night</option></select></div>
+      <div class="field edfull"><label for="qbRewards">Completion rewards / consequences</label><input id="qbRewards" placeholder="emma_rowan.trust +3; marina_favor_done; unlocked_calendar"><p class="hint">Use normal effects, separated by semicolons. They apply when every objective is complete.</p></div>
+      <div class="field"><label for="qbDeadline">Story deadline <span class="hint">shown to you</span></label><input id="qbDeadline" placeholder="Before Friday night"></div>
+      <div class="field edfull"><p class="rubric">Completion event <span class="hint">optional</span></p></div>
+      <div class="field"><label for="qbEventTitle">Event title</label><input id="qbEventTitle" placeholder="Meet at the marina"></div>
+      <div class="field"><label for="qbEventDate">Game date</label><input id="qbEventDate" placeholder="Y1-08-23"></div>
+      <div class="field"><label for="qbEventBlock">Time block</label><select id="qbEventBlock"><option value="">— no event —</option><option>early_morning</option><option>morning</option><option>lunch</option><option>afternoon</option><option>evening</option><option>late_evening</option><option>night</option></select></div>
+      <div class="field"><label for="qbEventLocation">Location</label><select id="qbEventLocation"></select></div>
+    </div>
+    <div id="qbObjectives"></div>
+    <div class="row dialog-actions" style="margin-top:14px"><button class="btn" id="qbAddObjective">+ objective</button><span class="sp"></span><button class="btn gold" id="saveQuestBuilder">Save quest plan</button></div>
   </div>
 </dialog>
 
@@ -1594,9 +1789,14 @@ function paintPresence(){
 /* ---- 08-body.js ---- */
 function paintBody(){
   const c=cur(),inner=$('treeInner');
-  if(!c){inner.innerHTML='<div class="blank"><h2>Nothing open</h2><p>Import your character sheets, then make a '+
-    'conversation, quest, or repeatable from the Content tab. Locations build themselves from each sheet\'s '+
-    'home and schedule.</p></div>';$('counter').textContent='';paintModes();return;}
+  if(!c){inner.innerHTML='<div class="blank welcome"><span class="blank-kicker">Start a project</span><h2>Your story workspace</h2>'+
+    '<p>Bring in your Port Alder sheets, or create a character and begin shaping the world from here.</p>'+
+    '<div class="blank-actions"><button class="btn gold" data-empty-action="importChars">Import sheets</button>'+
+    '<button class="btn" data-empty-action="openCharacterCreator">Create character</button>'+
+    '<button class="btn quiet" data-empty-action="openQuestBuilder">Plan a quest</button></div>'+
+    '<small>Projects save automatically in this browser.</small></div>';
+    inner.querySelectorAll('[data-empty-action]').forEach(b=>b.onclick=()=>$(b.dataset.emptyAction).click());
+    $('counter').textContent='';paintModes();return;}
 
   if(c.type==='repeatable') return paintPool(c);
   if(c.type==='activity')   return paintActivity(c);
@@ -2087,6 +2287,66 @@ function paintQuest(c){
     location:c.location||'',nodes:[],flag:''});stageIx=c.stages.length-1;save();paintBody()};
   $('counter').textContent=c.stages.length+' stages';paintModes();
 }
+
+/* ---- 08h-quest-builder.js ---- */
+/* ============ quest and event builder ============ */
+let qbQuest=null;
+
+function newQuestForBuilder(){
+  const uid='u'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  const c={uid,type:'quest',id:'quest_'+(P.content.filter(x=>x.type==='quest').length+1),title:'New quest',
+    character:P.characters.find(c=>!isPlayer(c))?.id||'',hook:'',location:P.locations[0]?.id||'',
+    day:'monday',block:'evening',cast:[],premise:'',requires:[],
+    stages:[{id:'objective_1',title:'First objective',location:P.locations[0]?.id||'',nodes:[],flag:'',requires:[]}],
+    questPlan:{category:'character_story',rewards:'',deadline:'',event:null}};
+  P.content.push(c);sel=uid;focusPath=[];stageIx=0;return c;
+}
+
+function paintQuestObjectives(){
+  const c=qbQuest;if(!c)return;
+  $('qbObjectives').innerHTML='<p class="rubric later">Objectives</p>'+c.stages.map((s,i)=>
+    '<div class="row" style="margin:5px 0"><span class="tag">'+(i+1)+'</span><input data-qbo="'+i+'" value="'+
+      esc(s.title||'')+'" placeholder="What must the player do?"><button class="x" data-qbx="'+i+'">×</button></div>').join('');
+  $('qbObjectives').querySelectorAll('[data-qbo]').forEach(el=>el.oninput=()=>{qbQuest.stages[+el.dataset.qbo].title=el.value;save();});
+  $('qbObjectives').querySelectorAll('[data-qbx]').forEach(b=>b.onclick=()=>{
+    if(qbQuest.stages.length<2)return;
+    qbQuest.stages.splice(+b.dataset.qbx,1);qbQuest.stages.forEach((s,i)=>s.id='objective_'+(i+1));save();paintQuestObjectives();
+  });
+}
+
+function openQuestBuilder(){
+  qbQuest=cur()?.type==='quest'?cur():newQuestForBuilder();
+  const c=qbQuest,p=c.questPlan||{};
+  $('qbGiver').innerHTML='<option value="">— no specific giver —</option>'+P.characters.filter(x=>!isPlayer(x)).map(x=>
+    '<option value="'+esc(x.id)+'">'+esc(x.name)+'</option>').join('');
+  $('qbAfter').innerHTML='<option value="">— available immediately —</option>'+P.content.filter(x=>x.type==='quest'&&x!==c).map(x=>
+    '<option value="'+esc(x.id)+'">'+esc(x.title||x.id)+'</option>').join('');
+  $('qbEventLocation').innerHTML=placeOptions(p.event?.location||'');
+  $('qbTitle').value=c.title||'';$('qbCategory').value=p.category||c._authored?.category||'character_story';
+  $('qbGiver').value=c.character||'';$('qbSummary').value=p.summary||c.hook||c.premise||'';
+  $('qbAfter').value=c.after||'';$('qbEarliest').value=p.earliestBlock||'';$('qbRewards').value=p.rewards||'';
+  $('qbDeadline').value=p.deadline||'';$('qbEventTitle').value=p.event?.title||'';$('qbEventDate').value=p.event?.date||'';
+  $('qbEventBlock').value=p.event?.block||'';paintQuestObjectives();$('questBuilder').showModal();$('qbTitle').focus();
+}
+
+function saveQuestPlan(){
+  const c=qbQuest;if(!c)return;
+  const block=$('qbEventBlock').value,date=$('qbEventDate').value.trim();
+  const event=block&&date?{id:'event_'+c.id,title:$('qbEventTitle').value.trim()||c.title,date,
+    block,location:$('qbEventLocation').value,participants:[c.character].filter(Boolean),source:c.id,type:'story_event'}:null;
+  c.title=$('qbTitle').value.trim()||'Untitled quest';c.character=$('qbGiver').value;
+  c.hook=$('qbSummary').value.trim();c.premise=c.hook;c.after=$('qbAfter').value;
+  c.questPlan={category:$('qbCategory').value,summary:c.hook,earliestBlock:$('qbEarliest').value,
+    rewards:$('qbRewards').value.trim(),deadline:$('qbDeadline').value.trim(),event};
+  c.stages.forEach((s,i)=>{s.id='objective_'+(i+1);s.title=s.title.trim()||'Objective '+(i+1);});
+  save();paintAll();$('questBuilder').close();note('Quest plan saved. Write each objective in its stage, then export the character sheet.');
+}
+
+$('openQuestBuilder').onclick=openQuestBuilder;
+$('closeQuestBuilder').onclick=()=>$('questBuilder').close();
+$('qbAddObjective').onclick=()=>{if(!qbQuest)return;const n=qbQuest.stages.length+1;
+  qbQuest.stages.push({id:'objective_'+n,title:'Objective '+n,location:qbQuest.location||'',nodes:[],flag:'',requires:[]});save();paintQuestObjectives();};
+$('saveQuestBuilder').onclick=saveQuestPlan;
 
 /* ---- 09-modes.js ---- */
 /* ============ modes ============ */
@@ -5193,6 +5453,7 @@ function convertConversation(conv,sheet,report){
 /** Converts one authored quest. Objectives become stages. */
 function convertQuest(q,sheet,report){
   const act=q.activation||{};
+  const scheduled=(q.completion_effects||[]).find(e=>e?.operation==='schedule_event')?.value||null;
   const stages=(q.objectives||[]).map((o,i)=>({
     id:o.id||'stage_'+(i+1),
     title:o.text||pretty(o.id||'stage '+(i+1)),
@@ -5219,7 +5480,7 @@ function convertQuest(q,sheet,report){
   }
 
   const last=stages[stages.length-1];
-  const done=['quest_'+q.id+'_done',effectsToFlag(q.completion_effects)].filter(Boolean).join('; ');
+  const done=['quest_'+q.id+'_done',effectsToFlag((q.completion_effects||[]).filter(e=>e?.operation!=='schedule_event'))].filter(Boolean).join('; ');
   if(last)last.flag=done; 
 
   const item={
@@ -5230,6 +5491,8 @@ function convertQuest(q,sheet,report){
     chapter:1,cast:[sheet.id],
     requires:toRequires(act.event==='quest_completed'?act:q.condition,sheet.id),
     stages:stages.length?stages:[{id:'stage_1',title:'Opening',location:'',nodes:[],flag:done,requires:[]}],
+    questPlan:{category:q.category||'character_story',summary:q.summary||'',earliestBlock:act.earliest_block||'',
+      rewards:'',deadline:q.deadline_note||'',event:scheduled},
     _authored:{category:q.category,failure:q.failure,completion_effects:q.completion_effects,
       objectives:q.objectives,branches:q.branches,activation:act}
   };
@@ -5511,6 +5774,7 @@ function conversationOut(group){
 
 function questOut(c){
   const a=c._authored||{};
+  const plan=c.questPlan||{};
   const stages=(c.stages||[]).filter(s=>s.id!=='branch');
   const branchStage=(c.stages||[]).find(s=>s.id==='branch');
 
@@ -5539,23 +5803,27 @@ function questOut(c){
   const last=(c.stages||[])[(c.stages||[]).length-1];
   const fx=flagToEffects(last&&last.flag)
     .filter(e=>!(e.operation==='set_flag'&&e.key==='quest_'+c.id+'_done'));
+  const plannedEffects=flagToEffects(plan.rewards||'');
+  if(plan.event)plannedEffects.push({operation:'schedule_event',value:plan.event});
 
   const out={
     id:c.id,
-    category:a.category||'character_story',
+    category:plan.category||a.category||'character_story',
     title:c.title,
-    summary:c.hook||c.premise||'',
+    summary:plan.summary||c.hook||c.premise||'',
     activation:mergeActivation(a.activation,c,null),
     objectives,
     branches,
-    completion_effects:fx.length?fx:(a.completion_effects||[])
+    completion_effects:(fx.length?fx:(a.completion_effects||[])).concat(plannedEffects)
   };
   if(a.failure)out.failure=a.failure;
   if(c.after){
     out.activation=Object.assign({},out.activation,
       {event:'quest_completed',quest:c.after});
     delete out.activation.date;
+    if(plan.earliestBlock)out.activation.earliest_block=plan.earliestBlock;
   }
+  if(plan.deadline)out.deadline_note=plan.deadline;
   const cond=requiresToCondition(c.requires);
   if(cond&&!out.activation.event)Object.assign(out.activation,cond);
   return out;

@@ -12,16 +12,23 @@
   <span class="tagline">vn authoring · godot</span>
   <div class="mast-right">
     <button class="btn" id="railToggle">Panel</button>
-    <button class="btn" id="importChars">Import sheets</button>
-    <button class="btn" id="openCharacterCreator">New character</button>
-    <button class="btn" id="openWorld">World builder</button>
-    <button class="btn" id="pasteChars">Paste</button>
-    <button class="btn" id="openMap">Map</button>
-    <button class="btn" id="openInspect">Inspect</button>
-    <button class="btn" id="openMemory">Memory</button>
-    <button class="btn" id="openExport">Export</button>
-    <select class="model" id="model" aria-label="Model"></select>
-    <span class="status"><span class="lamp" id="lamp"></span><span id="lampText">checking</span></span>
+    <div class="mast-group mast-create" aria-label="Create and import">
+      <button class="btn" id="importChars" title="Import character and location sheets">Import</button>
+      <button class="btn" id="openCharacterCreator" title="Create a new character">+ Character</button>
+      <button class="btn" id="openWorld" title="Create stats, locations, and rooms">+ World</button>
+      <button class="btn" id="openQuestBuilder" title="Create a quest and follow-up event">+ Quest</button>
+      <button class="btn quiet" id="pasteChars" title="Paste character JSON">Paste</button>
+    </div>
+    <div class="mast-group mast-tools" aria-label="Project tools">
+      <button class="btn quiet" id="openMap">Map</button>
+      <button class="btn quiet" id="openInspect">Inspect</button>
+      <button class="btn quiet" id="openMemory">Memory</button>
+      <button class="btn quiet" id="openExport">Export</button>
+    </div>
+    <div class="mast-engine">
+      <select class="model" id="model" aria-label="Model"></select>
+      <span class="status"><span class="lamp" id="lamp"></span><span id="lampText">checking</span></span>
+    </div>
   </div>
 </header>
 
@@ -176,7 +183,7 @@
     <div class="two"><div class="field"><label for="wlDistrict">District</label><input id="wlDistrict" placeholder="old_town"></div><div class="field"><label for="wlType">Place type</label><input id="wlType" placeholder="apartment"></div></div>
     <div class="field"><label for="wlRooms">Rooms</label><textarea id="wlRooms" rows="3" placeholder="living_room\nbedroom\nkitchen"></textarea></div>
     <div class="field"><label for="wlNotes">Atmosphere / useful details</label><textarea id="wlNotes" rows="3" placeholder="Warm lamplight, thin walls, a view of the marina."></textarea></div>
-    <div class="row" style="justify-content:flex-end"><button class="btn" id="downloadWorldLocations">Download game locations</button><button class="btn gold" id="addWorldLocation">Create location</button></div>
+    <div class="row dialog-actions" style="justify-content:flex-end"><button class="btn" id="downloadWorldLocations">Download game locations</button><button class="btn gold" id="addWorldLocation">Create location</button></div>
     <div id="worldMessage" class="hint"></div>
   </div>
 </dialog>
@@ -215,7 +222,7 @@
     <p class="hint">When the scene ends, this can unlock a relationship chapter, create a durable memory, or update the character's live identity. Later choices can use <code>+ memory</code> as a condition.</p>
     <div class="field"><label for="pOutline">Beat outline</label>
       <textarea id="pOutline" rows="12" spellcheck="true" placeholder="Draft an outline, then edit it here before writing the scene."></textarea></div>
-    <div class="row" style="justify-content:flex-end"><button class="btn" id="draftOutline">Draft outline</button><button class="btn gold" id="writePlanned">Write scene from outline</button></div>
+    <div class="row dialog-actions" style="justify-content:flex-end"><button class="btn" id="draftOutline">Draft outline</button><button class="btn gold" id="writePlanned">Write scene from outline</button></div>
   </div>
 </dialog>
 
@@ -225,7 +232,7 @@
     <p class="hint" style="margin:12px 0">Saved facts are fed into future scene planning and generation. Tag a note with character ids or names, separated by commas, to keep it focused.</p>
     <div class="field"><label for="memoryText">Canon fact</label><textarea id="memoryText" rows="3" placeholder="Elena knows the player lied about the job interview."></textarea></div>
     <div class="field"><label for="memoryTags">Relevant characters</label><input id="memoryTags" placeholder="elena_reyes, player"></div>
-    <div class="row" style="justify-content:flex-end"><button class="btn gold" id="addMemory">Save fact</button></div>
+    <div class="row dialog-actions" style="justify-content:flex-end"><button class="btn gold" id="addMemory">Save fact</button></div>
     <div id="memoryList"></div>
   </div>
 </dialog>
@@ -321,7 +328,31 @@
       <div class="field edfull"><label for="ccGoal">Character goal</label><input id="ccGoal" type="text" placeholder="Build a life in Port Alder"></div>
     </div>
     <p id="ccMessage" class="hint"></p>
-    <div class="row" style="margin-top:14px"><button class="btn gold" id="createCharacter">Create character</button></div>
+    <div class="row dialog-actions" style="margin-top:14px"><button class="btn gold" id="createCharacter">Create character</button></div>
+  </div>
+</dialog>
+
+<dialog id="questBuilder">
+  <div class="sheet-head"><h3>Quest &amp; event builder</h3><span class="sp"></span><button class="btn" id="closeQuestBuilder">Close</button></div>
+  <div class="sheet-body edbody">
+    <p class="hint">Build the arc first, then write each objective as a quest stage. This keeps story progression, rewards, and follow-up events visible in one place.</p>
+    <div class="edgrid" style="padding-top:12px">
+      <div class="field edfull"><label for="qbTitle">Quest title</label><input id="qbTitle" placeholder="A Favor at the Marina"></div>
+      <div class="field"><label for="qbCategory">Story type</label><select id="qbCategory"><option value="character_story">Character story</option><option value="relationship">Relationship</option><option value="work">Work</option><option value="school">School</option><option value="community">Community</option><option value="personal">Personal</option></select></div>
+      <div class="field"><label for="qbGiver">Quest giver</label><select id="qbGiver"></select></div>
+      <div class="field edfull"><label for="qbSummary">What is this arc about?</label><textarea id="qbSummary" rows="3" placeholder="Help a friend prepare for an important first day."></textarea></div>
+      <div class="field"><label for="qbAfter">Starts after quest <span class="hint">optional</span></label><select id="qbAfter"></select></div>
+      <div class="field"><label for="qbEarliest">Earliest follow-up block</label><select id="qbEarliest"><option value="">Immediately</option><option>early_morning</option><option>morning</option><option>lunch</option><option>afternoon</option><option>evening</option><option>late_evening</option><option>night</option></select></div>
+      <div class="field edfull"><label for="qbRewards">Completion rewards / consequences</label><input id="qbRewards" placeholder="emma_rowan.trust +3; marina_favor_done; unlocked_calendar"><p class="hint">Use normal effects, separated by semicolons. They apply when every objective is complete.</p></div>
+      <div class="field"><label for="qbDeadline">Story deadline <span class="hint">shown to you</span></label><input id="qbDeadline" placeholder="Before Friday night"></div>
+      <div class="field edfull"><p class="rubric">Completion event <span class="hint">optional</span></p></div>
+      <div class="field"><label for="qbEventTitle">Event title</label><input id="qbEventTitle" placeholder="Meet at the marina"></div>
+      <div class="field"><label for="qbEventDate">Game date</label><input id="qbEventDate" placeholder="Y1-08-23"></div>
+      <div class="field"><label for="qbEventBlock">Time block</label><select id="qbEventBlock"><option value="">— no event —</option><option>early_morning</option><option>morning</option><option>lunch</option><option>afternoon</option><option>evening</option><option>late_evening</option><option>night</option></select></div>
+      <div class="field"><label for="qbEventLocation">Location</label><select id="qbEventLocation"></select></div>
+    </div>
+    <div id="qbObjectives"></div>
+    <div class="row dialog-actions" style="margin-top:14px"><button class="btn" id="qbAddObjective">+ objective</button><span class="sp"></span><button class="btn gold" id="saveQuestBuilder">Save quest plan</button></div>
   </div>
 </dialog>
 
@@ -366,6 +397,7 @@
 <script src="js/08e-completion.js"></script>
 <script src="js/08f-activity.js"></script>
 <script src="js/08g-quest.js"></script>
+<script src="js/08h-quest-builder.js"></script>
 <script src="js/09-modes.js"></script>
 <script src="js/10-brief.js"></script>
 <script src="js/10b-speakers.js"></script>

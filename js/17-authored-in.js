@@ -180,6 +180,7 @@ function convertConversation(conv,sheet,report){
 /** Converts one authored quest. Objectives become stages. */
 function convertQuest(q,sheet,report){
   const act=q.activation||{};
+  const scheduled=(q.completion_effects||[]).find(e=>e?.operation==='schedule_event')?.value||null;
   const stages=(q.objectives||[]).map((o,i)=>({
     id:o.id||'stage_'+(i+1),
     title:o.text||pretty(o.id||'stage '+(i+1)),
@@ -206,7 +207,7 @@ function convertQuest(q,sheet,report){
   }
 
   const last=stages[stages.length-1];
-  const done=['quest_'+q.id+'_done',effectsToFlag(q.completion_effects)].filter(Boolean).join('; ');
+  const done=['quest_'+q.id+'_done',effectsToFlag((q.completion_effects||[]).filter(e=>e?.operation!=='schedule_event'))].filter(Boolean).join('; ');
   if(last)last.flag=done; 
 
   const item={
@@ -217,6 +218,8 @@ function convertQuest(q,sheet,report){
     chapter:1,cast:[sheet.id],
     requires:toRequires(act.event==='quest_completed'?act:q.condition,sheet.id),
     stages:stages.length?stages:[{id:'stage_1',title:'Opening',location:'',nodes:[],flag:done,requires:[]}],
+    questPlan:{category:q.category||'character_story',summary:q.summary||'',earliestBlock:act.earliest_block||'',
+      rewards:'',deadline:q.deadline_note||'',event:scheduled},
     _authored:{category:q.category,failure:q.failure,completion_effects:q.completion_effects,
       objectives:q.objectives,branches:q.branches,activation:act}
   };

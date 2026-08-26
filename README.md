@@ -25,7 +25,7 @@ a copy of, back up, or hand to someone else.
     manifest.json       load order (regenerate by sorting js/ filenames)
     _markup.html        shared markup template with @@CSS@@ / @@JS@@ slots
     css/app.css         all styles
-    js/                 39 modules, loaded in filename order
+    js/                 40 modules, loaded in filename order
 
 ## The modules
 
@@ -48,6 +48,7 @@ Numeric prefixes are load order, not importance.
     08e-completion      objective completion editor
     08f-activity        activities and milestones
     08g-quest           quest stages
+    08h-quest-builder   story arcs, rewards, and follow-up calendar events
     09-modes            mode bar, placeholders
     10-brief            charBrief, boundsBrief — what the model is told
     10b-speakers        who may speak, player rules

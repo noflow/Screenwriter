@@ -102,6 +102,18 @@ medical information.
 Everything autosaves to the browser, keyed to the URL. Same port next time or your
 work won't be there. **Content → Save file** writes a copy you can keep.
 
+## Quest and event builder
+
+Use **Quest builder** to turn a story idea into an arc before you draft its scenes.
+Give it a title, a quest giver, a summary, objectives, optional prerequisite quest,
+completion rewards, and a follow-up calendar event. Each objective becomes a quest
+stage where you write the relevant dialogue or task. Rewards use the same simple
+effect syntax as scenes, such as `emma_rowan.trust +3` or `unlocked_calendar`.
+
+For a follow-up event, use an in-game date like `Y1-08-23`, choose a time block and
+location, then export the character sheet. Completing the quest adds that event to
+the game phone calendar.
+
 ---
 
 ## Planning a stronger first draft
@@ -140,7 +152,7 @@ the value is kept in the save game and respects the range set in World builder.
 
     scenewright.html    the tool — this is the one to open
     index.html          same tool, loading js/ separately, for editing sources
-    js/  css/           the 39 source modules
+    js/  css/           the 40 source modules
     build.py            rebuilds scenewright.html from those sources
     README.md           what each module does
     godot/

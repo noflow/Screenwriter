@@ -423,3 +423,167 @@
   @media (max-width:940px){.shell{grid-template-columns:1fr}.rail{display:none}
     .rail.open{display:block;position:absolute;inset:54px 0 0;z-index:30}.line-node{grid-template-columns:86px 1fr}}
   #railToggle{display:none}@media (max-width:940px){#railToggle{display:block}}
+
+  /* Product polish — keeps the theatre-inspired palette while giving the editor a
+     calmer, more deliberate application surface. */
+  :root{--panel:#2b1c31;--panel-hi:#382340;--ink:#181019;--radius:8px;
+    --shadow:0 18px 48px rgba(10,5,12,.28)}
+  html,body{background:
+    radial-gradient(900px 560px at 82% -20%,rgba(127,163,196,.11),transparent 68%),
+    radial-gradient(720px 500px at -8% 100%,rgba(196,119,142,.08),transparent 70%),var(--curtain)}
+  ::selection{background:rgba(201,162,39,.36);color:#fff}
+  ::-webkit-scrollbar{width:10px;height:10px}
+  ::-webkit-scrollbar-thumb{background:rgba(237,228,211,.17);border:3px solid transparent;border-radius:10px;background-clip:padding-box}
+  ::-webkit-scrollbar-thumb:hover{background-color:rgba(201,162,39,.55)}
+
+  .masthead{align-items:center;min-height:68px;padding:11px 20px;gap:14px;
+    box-shadow:0 1px 0 rgba(255,255,255,.03),0 10px 30px rgba(8,4,10,.18);position:relative;z-index:10}
+  .wordmark{font-size:25px;letter-spacing:.1em;white-space:nowrap}
+  .tagline{max-width:92px;line-height:1.45;color:#b2a4b3}
+  .mast-right{gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .mast-right .btn{padding:7px 9px;font-size:9px;letter-spacing:.075em}
+  .mast-right .btn.gold{box-shadow:0 4px 14px rgba(201,162,39,.2)}
+  .status{padding-left:7px;border-left:1px solid var(--edge)}
+  select.model{border-radius:var(--radius);min-height:32px;background:rgba(20,12,22,.48)}
+
+  .shell{grid-template-columns:316px 1fr}
+  .rail{background:linear-gradient(180deg,rgba(58,35,64,.92),rgba(38,24,43,.98));
+    box-shadow:10px 0 28px rgba(8,4,10,.11);position:relative;z-index:2}
+  .railtabs{background:rgba(47,29,53,.96);backdrop-filter:blur(14px);padding:0 8px}
+  .railtabs button{padding:14px 5px;font-size:9px;letter-spacing:.1em;border-radius:5px 5px 0 0}
+  .railtabs button:hover{color:var(--paper);background:rgba(255,255,255,.035)}
+  .railpane{padding:18px 16px 0}
+  .rubric{margin-bottom:11px;padding-bottom:8px}
+  .chip-list{gap:5px}
+  .chip{min-height:34px;border:1px solid transparent;border-left:3px solid rgba(237,228,211,.12);border-radius:6px;
+    padding:7px 8px;background:rgba(20,12,22,.1)}
+  .chip:hover{border-color:rgba(237,228,211,.12);border-left-color:var(--brass);background:rgba(255,255,255,.045)}
+  .chip.on{border-color:rgba(201,162,39,.3);border-left-color:var(--brass);background:linear-gradient(90deg,rgba(201,162,39,.12),rgba(201,162,39,.035))}
+  .sheetinfo{border-radius:var(--radius);background:rgba(16,10,18,.34);box-shadow:inset 0 1px rgba(255,255,255,.025)}
+
+  .btn{border-radius:6px;background:linear-gradient(180deg,rgba(75,51,85,.92),rgba(54,35,62,.92));
+    box-shadow:inset 0 1px rgba(255,255,255,.04),0 1px 2px rgba(0,0,0,.16)}
+  .btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 5px 15px rgba(0,0,0,.19),inset 0 1px rgba(255,255,255,.05)}
+  .btn:active:not(:disabled){transform:translateY(0);box-shadow:inset 0 1px 3px rgba(0,0,0,.22)}
+  .btn.gold{box-shadow:0 4px 13px rgba(201,162,39,.2)}
+  input,textarea,select{transition:border-color .15s,background .15s,box-shadow .15s}
+  input:hover,textarea:hover,select:hover{border-color:rgba(237,228,211,.25)!important}
+  input:focus,textarea:focus,select:focus{border-color:rgba(201,162,39,.78)!important;box-shadow:0 0 0 3px rgba(201,162,39,.12);outline:none}
+
+  .stage{background:linear-gradient(135deg,rgba(38,24,43,.18),rgba(15,9,18,.1))}
+  .setup{padding:11px 24px;background:rgba(47,29,53,.6);backdrop-filter:blur(10px)}
+  .tree{padding-top:30px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.013),transparent)}
+  .tree-inner{max-width:880px;padding:0 30px}
+  .slug{margin-bottom:24px;padding:11px 13px;border:1px solid rgba(237,228,211,.09);border-radius:var(--radius);
+    background:rgba(18,11,21,.25);box-shadow:inset 0 1px rgba(255,255,255,.02)}
+  .blank{max-width:590px;margin:13vh auto 0;padding:35px 34px;border:1px solid rgba(237,228,211,.1);border-radius:14px;
+    background:linear-gradient(145deg,rgba(67,43,76,.45),rgba(30,18,35,.28));box-shadow:var(--shadow)}
+  .blank h2{font-size:29px}.blank p{font-size:10px;max-width:470px}
+  .said{border-radius:0 var(--radius) var(--radius) 0;padding:6px 11px}
+  .choice-node,.stagecard{border-radius:var(--radius);box-shadow:inset 0 1px rgba(255,255,255,.025),0 8px 20px rgba(8,4,10,.08)}
+  .pit{padding:13px 28px 14px;background:rgba(43,28,49,.94);box-shadow:0 -10px 30px rgba(8,4,10,.12)}
+  .pit-inner{max-width:880px}.compose #sayAs,#line{border-radius:var(--radius);background:rgba(20,12,22,.72)}
+  #line{box-shadow:inset 0 1px rgba(255,255,255,.02)}
+
+  dialog{border-radius:14px;border-color:rgba(237,228,211,.18);background:linear-gradient(145deg,#3a2542,#2a1a30);
+    box-shadow:0 30px 100px rgba(0,0,0,.58);overflow:hidden}
+  dialog::backdrop{backdrop-filter:blur(4px);background:rgba(14,8,17,.76)}
+  .sheet-head{padding:15px 18px;background:rgba(20,12,22,.22)}
+  .sheet-head h3{font-size:20px}.sheet-body{padding:0 18px 18px}
+  dialog .field input,dialog .field textarea,dialog .field select,#pasteBox,#dump{border-radius:6px;background:rgba(18,11,21,.62)}
+  .edgrid{gap:0 22px}.field{margin-bottom:13px}
+
+  @media (max-width:1180px){.masthead{align-items:flex-start}.mast-right{max-width:720px}.status{display:none}}
+  @media (max-width:940px){.shell{grid-template-columns:1fr}.masthead{min-height:unset;padding:10px 13px}.mast-right{margin-left:0}.tagline{display:none}.tree-inner{padding:0 18px}.pit{padding:11px 16px}.blank{margin-top:8vh}.rail.open{inset:64px 0 0}}
+  @media (max-width:620px){.wordmark{font-size:21px}.mast-right .btn{padding:6px 7px;font-size:8px}.mast-right{gap:4px}.setup{padding:9px 12px}.compose{flex-wrap:wrap}.compose #sayAs{min-height:38px}.compose #line{min-width:100%;order:-1}.edgrid,.two{grid-template-columns:1fr}.wkgrid{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}}
+
+  /* Softer blue-slate theme: lower saturation and gentler contrast reduce eye strain
+     during long writing sessions while preserving the meaning of each accent color. */
+  :root{--curtain:#101720;--velvet:#182332;--velvet-2:#213145;--lift:#2c4057;
+    --brass:#d7b46f;--paper:#e6edf3;--rose:#cb8b98;--sage:#98bda8;--sky:#8db9da;--ash:#9baab9;
+    --edge:rgba(220,231,241,.14);--panel:#172330;--panel-hi:#213247;--ink:#0c1219;
+    --shadow:0 16px 42px rgba(3,9,15,.25)}
+  select option,select optgroup{background:#182332;color:#e6edf3}
+  select option:checked,select option:hover{background:#2c4057;color:#fff}
+  html,body{background:
+    radial-gradient(960px 620px at 82% -24%,rgba(91,145,190,.13),transparent 70%),
+    radial-gradient(720px 500px at -10% 110%,rgba(105,157,141,.08),transparent 70%),var(--curtain)}
+  .masthead{background:linear-gradient(180deg,#1b2938,#131d28);box-shadow:0 1px 0 rgba(255,255,255,.04),0 8px 26px rgba(3,9,15,.22)}
+  .tagline{color:#aab8c6}.lamp.live{box-shadow:0 0 8px rgba(215,180,111,.65)}
+  select.model{background:rgba(8,14,21,.4)}
+  .rail{background:linear-gradient(180deg,rgba(28,43,59,.96),rgba(19,30,42,.99));box-shadow:9px 0 24px rgba(3,9,15,.14)}
+  .railtabs{background:rgba(22,34,47,.96)}
+  .railtabs button:hover{background:rgba(255,255,255,.045)}
+  .chip{background:rgba(7,13,20,.1)}
+  .chip:hover{background:rgba(255,255,255,.045)}
+  .chip.on{border-color:rgba(215,180,111,.28);background:linear-gradient(90deg,rgba(215,180,111,.13),rgba(215,180,111,.025))}
+  .sheetinfo{background:rgba(7,13,20,.28)}
+  .btn{background:linear-gradient(180deg,rgba(48,69,92,.9),rgba(35,52,72,.94));border-color:rgba(220,231,241,.16)}
+  .btn:hover:not(:disabled){background:linear-gradient(180deg,rgba(58,83,109,.98),rgba(40,59,82,.98));border-color:rgba(215,180,111,.7)}
+  .btn.gold{color:#17212d;background:linear-gradient(180deg,#dfc17f,#cda55d);border-color:#dfc17f}
+  .btn.gold:hover:not(:disabled){background:linear-gradient(180deg,#e7cd92,#d8b56d)}
+  .stage{background:linear-gradient(135deg,rgba(27,43,59,.22),rgba(8,14,21,.07))}
+  .setup{background:rgba(22,34,47,.65)}
+  .slug{background:rgba(9,15,22,.2)}
+  .blank{background:linear-gradient(145deg,rgba(39,59,79,.48),rgba(16,26,37,.31));border-color:rgba(220,231,241,.12);box-shadow:0 16px 42px rgba(3,9,15,.2)}
+  .pit{background:rgba(20,31,43,.96);box-shadow:0 -8px 26px rgba(3,9,15,.16)}
+  .compose #sayAs,#line{background:rgba(8,14,21,.62)}
+  dialog{background:linear-gradient(145deg,#26394e,#172534);border-color:rgba(220,231,241,.2);box-shadow:0 28px 90px rgba(0,0,0,.52)}
+  .sheet-head{background:rgba(8,14,21,.2)}
+  dialog .field input,dialog .field textarea,dialog .field select,#pasteBox,#dump{background:rgba(8,14,21,.55)}
+  .choice-node{background:rgba(152,189,168,.055);border-color:rgba(152,189,168,.32)}
+  .stagecard{background:rgba(141,185,218,.05);border-color:rgba(141,185,218,.28)}
+  .said:hover{background:rgba(230,237,243,.035)}
+  .mode.on{color:#17212d}
+
+  /* Reduce visual clutter in the most frequently used surfaces. */
+  .mast-right{gap:5px}.mast-right .btn{font-size:8.5px;padding:6px 8px}
+  .field label{letter-spacing:.075em}.hint{color:#a6b3c1;line-height:1.6}
+  .railpane{padding-top:16px}.rubric{letter-spacing:.17em}
+  .tree{padding-top:24px}.tree-inner{max-width:900px}
+  .tools button{background:rgba(33,49,69,.92)}
+  .notes{color:#98a8b7}.notes span:not(:last-child)::after{content:'·';margin-left:14px;color:rgba(155,170,185,.45)}
+  .sheet-head h3{letter-spacing:.035em}.edgrid{gap:0 18px}
+
+  /* Third-pass hierarchy: group related tools, keep primary actions visible, and
+     turn the empty editor into a useful starting point. */
+  .mast-right{flex:1;min-width:0}
+  .mast-group{display:flex;align-items:center;gap:4px;padding-right:7px;margin-right:2px;
+    border-right:1px solid rgba(220,231,241,.1)}
+  .mast-tools{border-right:none;padding-right:0}
+  .mast-engine{display:flex;align-items:center;gap:7px;margin-left:auto;min-width:205px}
+  .mast-engine .model{flex:1;min-width:150px}
+  .mast-engine .status{border-left:0;padding-left:0}
+  .btn.quiet{background:rgba(220,231,241,.035);box-shadow:none;border-color:rgba(220,231,241,.11);color:#b7c3ce}
+  .btn.quiet:hover:not(:disabled){background:rgba(220,231,241,.08);color:var(--paper);box-shadow:none}
+  .mast-create .btn:not(.quiet){border-color:rgba(141,185,218,.22)}
+
+  .blank.welcome{max-width:620px;padding:38px 40px}
+  .blank-kicker{display:block;margin-bottom:9px;font-family:var(--util);font-size:9px;letter-spacing:.2em;
+    text-transform:uppercase;color:var(--brass)}
+  .blank.welcome h2{margin-bottom:8px}
+  .blank.welcome p{font-size:10.5px;line-height:1.75}
+  .blank-actions{display:flex;align-items:center;justify-content:center;gap:7px;margin:22px 0 16px}
+  .blank-actions .btn{min-width:128px}
+  .blank.welcome small{display:block;font-family:var(--util);font-size:8.5px;color:#8798a8;letter-spacing:.03em}
+
+  dialog:not(#map):not(#sched){max-width:880px}
+  dialog:not(#map):not(#sched)[open]{display:flex;flex-direction:column;max-height:min(88vh,820px)}
+  dialog .sheet-head{flex:none}
+  dialog .sheet-body{min-height:0;overflow-y:auto;scrollbar-gutter:stable}
+  dialog .sheet-body.edbody{max-height:none}
+  .dialog-actions{position:sticky;bottom:-18px;z-index:4;margin:16px -18px -18px!important;padding:12px 18px;
+    border-top:1px solid rgba(220,231,241,.12);background:linear-gradient(180deg,rgba(23,37,52,.96),rgba(16,26,37,.99));
+    box-shadow:0 -12px 26px rgba(3,9,15,.14)}
+  .dialog-actions .btn{min-height:34px}
+  #characterCreator,#questBuilder{max-width:900px}
+
+  .setup>.lbl:first-child{color:#b5c2ce}
+  .pit .modes{padding-bottom:2px}
+  .compose{gap:8px}
+  .compose .btn{min-height:40px}
+  .compose #sayAs{min-width:105px}
+  .notes{margin-top:7px;opacity:.88}
+
+  @media (max-width:1180px){.masthead{flex-wrap:wrap}.mast-right{width:100%;margin-left:0}.mast-engine{min-width:220px}.wordmark{margin-right:auto}}
+  @media (max-width:760px){.mast-group{border-right:0;padding-right:0;flex-wrap:wrap}.mast-engine{width:100%;margin-left:0}.blank-actions{flex-direction:column}.blank-actions .btn{width:100%}.blank.welcome{padding:30px 24px}}
