@@ -69,7 +69,7 @@ function validate(){
       add('warn','No NPC is marked present, so there is nobody for the player to talk to.',w);
 
     const checkReqs=(reqs,label)=>(reqs||[]).forEach(r=>{
-      if((r.type==='stat'||r.type==='chapter'||r.type==='met')&&!chr(r.character))
+      if((r.type==='stat'||r.type==='chapter'||r.type==='met'||r.type==='memory')&&!chr(r.character))
         add('err','A '+label+' gate refers to "'+r.character+'", which has no sheet.',w);
       if(r.type==='chapter'){
         const n=(chr(r.character)?.relationship_chapters||[]).length;

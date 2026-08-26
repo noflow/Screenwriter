@@ -1,10 +1,12 @@
 /* ---- playthrough simulator ---- */
 /** Runs the project forward, taking the most rewarding choice at each fork. */
 function simulate(maxDays){
-  const S={stats:{},flags:{},chapters:{}};
+  const S={stats:{},flags:{},chapters:{},memories:{}};
   P.characters.forEach(c=>{
     S.chapters[c.id]=1;
+    S.memories[c.id]=[];
     Object.entries(c.relationship_defaults||{}).forEach(([k,v])=>S.stats[c.id+'.'+k]=+v||0);
+    Object.entries(c.custom_stats||{}).forEach(([k,v])=>S.stats[c.id+'.'+k]=+v||0);
   });
   const played=new Set(),log=[],counts={};
   const worth=flag=>String(flag||'').split(';').reduce((n,p)=>{
@@ -58,6 +60,9 @@ function simulate(maxDays){
           log.push({day,block,what:c.title,kind:'quest'});
         }else{
           run(c.nodes,0);
+          const consequence=c.scenePlan?.consequence;
+          if(consequence?.memoryId)applyFlag('memory:'+consequence.character+':'+consequence.memoryId,S);
+          if(+consequence?.chapter>1)applyFlag('chapter:'+consequence.character+':'+consequence.chapter,S);
           log.push({day,block,what:c.title,kind:'conversation'});
         }
       });

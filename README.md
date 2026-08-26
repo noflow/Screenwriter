@@ -25,7 +25,7 @@ a copy of, back up, or hand to someone else.
     manifest.json       load order (regenerate by sorting js/ filenames)
     _markup.html        shared markup template with @@CSS@@ / @@JS@@ slots
     css/app.css         all styles
-    js/                 37 modules, loaded in filename order
+    js/                 39 modules, loaded in filename order
 
 ## The modules
 
@@ -33,7 +33,9 @@ Numeric prefixes are load order, not importance.
 
     00-state            globals, helpers, localStorage
     01-sheets           .character import, location derivation
+    01b-character-creator  guided Port Alder NPC-sheet creator
     02-places           location package, rooms, district grouping
+    02b-world-builder   custom stats plus a location-and-rooms creator
     03-schedule         grid <-> fixed_commitments, availability
     04-ollama           engines (Ollama, Pawan.Krd, any OpenAI-compatible), model list
     05-tree             node tree traversal (listAt, transcriptAt)

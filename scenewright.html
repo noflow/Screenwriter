@@ -439,6 +439,8 @@
   <div class="mast-right">
     <button class="btn" id="railToggle">Panel</button>
     <button class="btn" id="importChars">Import sheets</button>
+    <button class="btn" id="openCharacterCreator">New character</button>
+    <button class="btn" id="openWorld">World builder</button>
     <button class="btn" id="pasteChars">Paste</button>
     <button class="btn" id="openMap">Map</button>
     <button class="btn" id="openInspect">Inspect</button>
@@ -587,6 +589,24 @@
   </div>
 </dialog>
 
+<dialog id="worldBuilder">
+  <div class="sheet-head"><h3>World builder</h3><span class="sp"></span><button class="btn" id="closeWorld">Done</button></div>
+  <div class="sheet-body">
+    <p class="rubric">Custom character stat</p>
+    <p class="hint">Add a stat once, then give each character a starting value. It can gate dialogue and change during scenes without replacing Port Alder's relationship meters.</p>
+    <div class="row"><input id="wsLabel" placeholder="Confidence" aria-label="Stat name"><input id="wsMin" type="number" value="0" aria-label="Minimum" style="width:62px"><input id="wsMax" type="number" value="100" aria-label="Maximum" style="width:62px"><input id="wsDefault" type="number" value="0" aria-label="Starting value" style="width:70px"><button class="btn gold" id="addWorldStat">Add stat</button></div>
+    <div id="worldStatsList" class="chip-list"></div>
+    <p class="rubric later">Location and rooms</p>
+    <p class="hint">Create a place with its rooms in one step. Rooms can be used in scene locations, schedules, and the story map.</p>
+    <div class="field"><label for="wlName">Location name</label><input id="wlName" placeholder="Harborview Apartment"></div>
+    <div class="two"><div class="field"><label for="wlDistrict">District</label><input id="wlDistrict" placeholder="old_town"></div><div class="field"><label for="wlType">Place type</label><input id="wlType" placeholder="apartment"></div></div>
+    <div class="field"><label for="wlRooms">Rooms</label><textarea id="wlRooms" rows="3" placeholder="living_room\nbedroom\nkitchen"></textarea></div>
+    <div class="field"><label for="wlNotes">Atmosphere / useful details</label><textarea id="wlNotes" rows="3" placeholder="Warm lamplight, thin walls, a view of the marina."></textarea></div>
+    <div class="row" style="justify-content:flex-end"><button class="btn" id="downloadWorldLocations">Download game locations</button><button class="btn gold" id="addWorldLocation">Create location</button></div>
+    <div id="worldMessage" class="hint"></div>
+  </div>
+</dialog>
+
 <dialog id="planner">
   <div class="sheet-head">
     <h3>Plan a scene</h3>
@@ -611,6 +631,14 @@
     <div class="field"><label for="pStatLow">Below the threshold</label><input id="pStatLow" type="text" placeholder="She keeps her distance and ends the conversation"></div>
     <div class="field"><label for="pStatLowEffect">Low-outcome effects</label><input id="pStatLowEffect" type="text" placeholder="elena_reyes.resentment +1"></div>
     <div class="field"><label for="pStatPreview">Preview stat value</label><div class="dial"><input id="pStatPreview" type="number" value="0"><output id="pGatePreview"></output></div></div>
+    <p class="rubric later">Lasting consequence <span class="hint">optional</span></p>
+    <div class="row" style="margin-bottom:8px"><select id="pConsequenceCharacter" aria-label="Character for lasting consequence"></select><select id="pChapterUnlock" aria-label="Chapter to unlock"></select></div>
+    <div class="field"><label for="pMemoryId">Memory id</label><input id="pMemoryId" type="text" placeholder="first_honest_conversation"></div>
+    <p class="rubric later">Identity change <span class="hint">optional, story-driven</span></p>
+    <div class="field"><label for="pIdentityGender">Updated gender identity</label><input id="pIdentityGender" type="text" placeholder="nonbinary"></div>
+    <div class="two"><div class="field"><label for="pIdentityPronouns">Updated pronouns</label><input id="pIdentityPronouns" type="text" placeholder="they/them"></div><div class="field"><label for="pIdentityPresentation">Updated presentation</label><input id="pIdentityPresentation" type="text" placeholder="more openly feminine"></div></div>
+    <div class="field"><label for="pIdentityMilestone">Story milestone</label><input id="pIdentityMilestone" type="text" placeholder="comes_out_to_player"></div>
+    <p class="hint">When the scene ends, this can unlock a relationship chapter, create a durable memory, or update the character's live identity. Later choices can use <code>+ memory</code> as a condition.</p>
     <div class="field"><label for="pOutline">Beat outline</label>
       <textarea id="pOutline" rows="12" spellcheck="true" placeholder="Draft an outline, then edit it here before writing the scene."></textarea></div>
     <div class="row" style="justify-content:flex-end"><button class="btn" id="draftOutline">Draft outline</button><button class="btn gold" id="writePlanned">Write scene from outline</button></div>
@@ -660,6 +688,7 @@
     <button class="mode" data-ins="tests">Branch tests</button>
     <button class="mode" data-ins="stub">Missing characters</button>
     <button class="mode" data-ins="godot">Godot</button>
+    <button class="mode" data-ins="portAlder">Port Alder</button>
     <span class="sp"></span>
     <button class="btn" id="closeInspect">Close</button>
   </div>
@@ -696,6 +725,32 @@
   </div>
 </dialog>
 
+<dialog id="characterCreator">
+  <div class="sheet-head"><h3>New Port Alder character</h3><span class="sp"></span><button class="btn" id="closeCharacterCreator">Close</button></div>
+  <div class="sheet-body edbody">
+    <p class="hint">Creates a complete adult NPC sheet with five relationship chapters, all required meters, and an editable weekday schedule.</p>
+    <div class="edgrid" style="padding-top:14px">
+      <div class="field"><label for="ccName">Display name</label><input id="ccName" type="text" placeholder="Jordan Rivers"></div>
+      <div class="field"><label for="ccRole">Role</label><input id="ccRole" type="text" value="town_resident" placeholder="barista, classmate, neighbor"></div>
+      <div class="field"><label for="ccAge">Age</label><input id="ccAge" type="text" value="22" inputmode="numeric"></div>
+      <div class="field"><label for="ccOccupation">Occupation</label><input id="ccOccupation" type="text" value="Part-time worker"></div>
+      <div class="field"><label for="ccGender">Gender identity</label><input id="ccGender" placeholder="nonbinary, woman, man…" value="female"></div>
+      <div class="field"><label for="ccPronouns">Pronouns</label><input id="ccPronouns" placeholder="she/her"></div>
+      <div class="field"><label for="ccPresentation">Presentation</label><input id="ccPresentation" placeholder="feminine, masc, fluid…"></div>
+      <div class="field"><label for="ccOrientation">Orientation</label><select id="ccOrientation"><option value="bisexual">Bisexual</option><option value="straight">Straight</option><option value="gay">Gay</option><option value="lesbian">Lesbian</option><option value="asexual">Asexual</option></select></div>
+      <div class="field"><label for="ccHome">Home location</label><select id="ccHome"></select></div>
+      <div class="field"><label for="ccTone">Dialogue voice</label><select id="ccTone"><option value="warm_direct">Warm and direct</option><option value="witty_guarded">Witty and guarded</option><option value="quiet_thoughtful">Quiet and thoughtful</option><option value="bold_playful">Bold and playful</option><option value="precise_polite">Precise and polite</option></select></div>
+      <div class="field"><label for="ccTrait1">Primary trait</label><input id="ccTrait1" type="text" value="friendly"></div>
+      <div class="field"><label for="ccTopic1">Conversation topic</label><input id="ccTopic1" type="text" value="city_life"></div>
+      <div class="field"><label for="ccFriendship">Starting friendship (0–100)</label><input id="ccFriendship" type="text" value="0" inputmode="numeric"></div>
+      <div class="field"><label for="ccRomance">Romance eligible</label><select id="ccRomance"><option value="yes">Yes</option><option value="no">No</option></select></div>
+      <div class="field edfull"><label for="ccGoal">Character goal</label><input id="ccGoal" type="text" placeholder="Build a life in Port Alder"></div>
+    </div>
+    <p id="ccMessage" class="hint"></p>
+    <div class="row" style="margin-top:14px"><button class="btn gold" id="createCharacter">Create character</button></div>
+  </div>
+</dialog>
+
 <dialog id="editor">
   <div class="sheet-head">
     <h3 id="edName">Character</h3>
@@ -709,7 +764,7 @@
 <dialog id="sheet">
   <div class="sheet-head">
     <h3>Export</h3>
-    <button class="mode on" data-fmt="sheets">Character sheets</button>
+    <button class="mode on" data-fmt="sheets">Port Alder sheets</button>
     <button class="mode" data-fmt="json">Godot JSON</button>
     <button class="mode" data-fmt="script">Plain script</button>
     <span class="sp"></span>
@@ -775,6 +830,95 @@ function derivePlaces(c){
     if(f.activity) add(slug(f.activity),pretty(f.activity).replace(/\b\w/g,m=>m.toUpperCase()),'',['activity']);
   });
 }
+
+/* ---- 01b-character-creator.js ---- */
+/* ============ guided Port Alder character creator ============ */
+const PA_METERS=['friendship','love','attraction','lust','trust','respect','resentment',
+  'jealousy','comfort','commitment','compatibility','satisfaction'];
+
+function creatorLocations(){
+  const select=$('ccHome');
+  const locations=P.locations.filter(l=>l&&l.id);
+  select.innerHTML=locations.length
+    ? locations.map(l=>'<option value="'+esc(l.id)+'">'+esc(l.name||pretty(l.id))+'</option>').join('')
+    : '<option value="">Import locations first</option>';
+  $('createCharacter').disabled=!locations.length;
+  $('ccMessage').textContent=locations.length
+    ? 'The weekday schedule is a safe starting point. Use Edit schedule to place their real work, classes, and free time.'
+    : 'Import Port Alder locations before creating a character so their home is valid in the game.';
+}
+
+function creatorValue(id){return String($(id).value||'').trim();}
+function clampInt(value,min,max,fallback){
+  const n=parseInt(value,10);
+  return Number.isFinite(n)?Math.max(min,Math.min(max,n)):fallback;
+}
+
+function newPortAlderCharacter(){
+  const displayName=creatorValue('ccName');
+  const id=slug(displayName);
+  if(!displayName)throw new Error('Give the character a display name first.');
+  if(P.characters.some(c=>c.id===id))throw new Error('A character named "'+id+'" already exists.');
+  const homeId=creatorValue('ccHome'),home=loc(homeId);
+  if(!home)throw new Error('Choose a home from the imported Port Alder locations.');
+
+  const age=clampInt(creatorValue('ccAge'),18,120,22);
+  const friendship=clampInt(creatorValue('ccFriendship'),0,100,0);
+  const romance=creatorValue('ccRomance')==='yes';
+  const stats={friendship,love:0,attraction:0,lust:0,trust:friendship,
+    respect:Math.min(friendship,25),resentment:0,jealousy:0,comfort:friendship,
+    commitment:0,compatibility:Math.max(0,Math.min(50,friendship)),satisfaction:50};
+  PA_METERS.forEach(key=>{if(!Number.isFinite(stats[key]))stats[key]=0;});
+  const role=slug(creatorValue('ccRole')||'town_resident');
+  const trait=slug(creatorValue('ccTrait1')||'friendly');
+  const topic=slug(creatorValue('ccTopic1')||'city_life');
+  const goal=slug(creatorValue('ccGoal')||'build_a_life_in_port_alder');
+  const color=PAL[P.characters.length%PAL.length];
+  const chapters=[
+    ['first_meeting','First Meeting'],['getting_to_know_you','Getting to Know You'],
+    ['a_shared_routine','A Shared Routine'],['trust_on_the_line','Trust on the Line'],
+    ['a_place_in_each_others_lives','A Place in Each Other’s Lives']
+  ].map((chapter,index)=>({level:index+1,id:chapter[0],title:chapter[1]}));
+  const hardLimits=romance?['coercion','dishonesty']:['romance_with_player','sexual_content_with_player'];
+  return {
+    format_version:1,id,display_name:displayName,
+    profile:{age,gender_identity:creatorValue('ccGender'),orientation:creatorValue('ccOrientation'),
+      romance_eligible:romance,role,occupation:creatorValue('ccOccupation')||'Unemployed',education:''},
+    home:{location_id:home.id,district:home.district||'',residence:home.name||pretty(home.id),household:['player']},
+    identity:{pronouns:creatorValue('ccPronouns'),presentation:creatorValue('ccPresentation'),history:[]},
+    characteristics:{likes:[],dislikes:[],fears:[],strengths:[]},
+    custom_stats:Object.fromEntries(customStatDefs().map(s=>[s.id,s.default])),
+    personality:{archetype:trait,traits:[trait],values:['community'],social_style:creatorValue('ccTone'),jealousy:0},
+    schedule:{days_off:['saturday','sunday'],fixed_commitments:[{
+      days:['monday','tuesday','wednesday','thursday','friday'],blocks:['morning','lunch','afternoon'],
+      activity:'weekday_commitment',label:'Weekday commitment',location:home.id,unavailable:true
+    }],preferred_social_blocks:['evening','late_evening']},
+    home_routine:{actor_color:color.replace('#',''),default_by_block:{
+      evening:{room:'',spawn:false,activity:'at_home',label:'At home'},
+      late_evening:{room:'',spawn:false,activity:'relaxing',label:'Winding down'},
+      night:{room:'',spawn:false,activity:'sleeping',label:'Asleep'}
+    }},
+    ambient_dialogue:[],skills:{},goals:[goal],connections:[],relationship_defaults:stats,
+    boundaries:{alcohol_consent:'never_when_impaired',hard_limits:hardLimits},
+    private_profile:{knowledge:'hidden_until_relevant'},relationship_chapters:chapters,
+    quest_hooks:[],conversation_topics:[topic],text_style:{tone:creatorValue('ccTone'),emoji_rate:'low',response_delay:'variable'},
+    quests:[],conversations:[],text_messages:[],outcomes:[],asset_refs:{portraits:[],sprites:[],audio:[]},
+    entry_event:''
+  };
+}
+
+function openCharacterCreator(){creatorLocations();$('characterCreator').showModal();$('ccName').focus();}
+$('openCharacterCreator').onclick=openCharacterCreator;
+$('closeCharacterCreator').onclick=()=>$('characterCreator').close();
+$('createCharacter').onclick=()=>{
+  try{
+    const sheet=newPortAlderCharacter();
+    importSheet(sheet);
+    selChar=P.characters.findIndex(c=>c.id===sheet.id);
+    save();paintAll();$('characterCreator').close();openEditor(selChar);
+    note('Created '+esc(sheet.display_name)+'. Fill in their details, then export their Port Alder sheet.');
+  }catch(error){$('ccMessage').textContent=error.message;}
+};
 
 /* ---- 02-places.js ---- */
 /* ============ location package ============ */
@@ -909,6 +1053,84 @@ function placeBrief(ref){
   if(l.notes)bits.push(l.notes);
   return bits.join('. ');
 }
+
+/* ---- 02b-world-builder.js ---- */
+/* ============ world builder: optional stats and authored places ============ */
+function customStatDefs(){
+  return Array.isArray(P.custom_stats)?P.custom_stats:[];
+}
+
+function statDefinition(key){return customStatDefs().find(s=>s.id===key)||null;}
+
+function paintWorldBuilder(){
+  const box=$('worldStatsList');
+  const stats=customStatDefs();
+  box.innerHTML=stats.length?stats.map((s,i)=>
+    '<div class="chip"><span class="swatch" style="background:var(--sage)"></span>'+esc(s.label)+
+    '<span class="tag">'+s.id+' · '+s.minimum+'–'+s.maximum+' · starts '+s.default+'</span>'+
+    '<button class="x" data-wsx="'+i+'">×</button></div>').join(''):
+    '<p class="empty">No custom stats yet. Relationship meters are still available everywhere.</p>';
+  box.querySelectorAll('[data-wsx]').forEach(b=>b.onclick=()=>{
+    const removed=customStatDefs()[+b.dataset.wsx];
+    P.custom_stats.splice(+b.dataset.wsx,1);
+    P.characters.forEach(c=>{if(c.custom_stats)delete c.custom_stats[removed.id];});
+    save();paintWorldBuilder();paintAll();
+  });
+}
+
+function openWorldBuilder(){paintWorldBuilder();$('worldMessage').textContent='';$('worldBuilder').showModal();}
+
+function customLocationsOut(){
+  return {format_version:1,package_id:'scenewright_custom_locations',reference_format:'location_id.room_id',
+    locations:P.locations.filter(l=>l.tags?.includes('custom')).map(l=>({id:l.id,name:l.name,
+      district:l.district,type:l.type||'place',travel_node:l.travel_node!==false,
+      access:l.access||{always_open:true},residents:l.residents||[],services:l.services||[],
+      rooms:(l.rooms||[]).map(r=>({id:r.id,name:r.name,access:r.access||'shared',actions:r.actions||[]})),
+      notes:l.notes||''}))};
+}
+
+function worldNumber(id,fallback){
+  const value=Number($(id).value);
+  return Number.isFinite(value)?value:fallback;
+}
+
+$('openWorld').onclick=openWorldBuilder;
+$('closeWorld').onclick=()=>$('worldBuilder').close();
+$('addWorldStat').onclick=()=>{
+  const label=String($('wsLabel').value||'').trim();
+  const id=slug(label);
+  if(!id){$('worldMessage').textContent='Give the stat a name first.';return;}
+  if(statDefinition(id)){ $('worldMessage').textContent='That stat already exists.';return;}
+  const minimum=worldNumber('wsMin',0),maximum=worldNumber('wsMax',100);
+  if(maximum<minimum){$('worldMessage').textContent='The maximum needs to be at least the minimum.';return;}
+  const def={id,label,minimum,maximum,default:Math.max(minimum,Math.min(maximum,worldNumber('wsDefault',minimum)))};
+  P.custom_stats=P.custom_stats||[];P.custom_stats.push(def);
+  P.characters.forEach(c=>{c.custom_stats=c.custom_stats||{};c.custom_stats[id]=def.default;});
+  $('wsLabel').value='';save();paintWorldBuilder();paintAll();
+};
+$('addWorldLocation').onclick=()=>{
+  const name=String($('wlName').value||'').trim(),id=slug(name);
+  if(!id){$('worldMessage').textContent='Give the location a name first.';return;}
+  if(loc(id)){ $('worldMessage').textContent='A location with that id already exists.';return;}
+	const roomNames=String($('wlRooms').value||'').split(/\r?\n|,/).map(x=>x.trim()).filter(Boolean);
+	const district=slug($('wlDistrict').value||'')||(DISTRICTS[0]?.id||'');
+	if(!district){$('worldMessage').textContent='Import the Port Alder locations first, then choose a district.';return;}
+	P.locations.push({id,name,district,type:slug($('wlType').value||'place'),
+    background:'',rooms:roomNames.map(room=>({id:slug(room),name:room,access:'shared',actions:[]})),
+    residents:[],services:[],tags:['custom'],notes:String($('wlNotes').value||'').trim()});
+  selPlace=P.locations.length-1;
+  ['wlName','wlDistrict','wlType','wlRooms','wlNotes'].forEach(x=>$(x).value='');
+  $('worldMessage').textContent='Created '+name+' with '+roomNames.length+' room'+(roomNames.length===1?'':'s')+'.';
+	save();paintAll();
+};
+$('downloadWorldLocations').onclick=()=>{
+  const locations=customLocationsOut();
+  if(!locations.locations.length){$('worldMessage').textContent='Create at least one custom location first.';return;}
+  const url=URL.createObjectURL(new Blob([JSON.stringify(locations,null,2)],{type:'application/json'}));
+  Object.assign(document.createElement('a'),{href:url,download:'scenewright_custom_locations.json'}).click();
+  URL.revokeObjectURL(url);
+  $('worldMessage').textContent='Downloaded the game package. Put it in the game content/world folder.';
+};
 
 /* ---- 03-schedule.js ---- */
 /* ============ schedule ============ */
@@ -2745,6 +2967,13 @@ function newPlannedScene(){
 function plannerFields(){
   const character=$('pStatCharacter').value,key=$('pStatKey').value;
   const high=$('pStatHigh').value.trim(),middle=$('pStatMiddle').value.trim(),low=$('pStatLow').value.trim();
+  const consequenceCharacter=$('pConsequenceCharacter').value;
+  const chapter=Math.max(0,parseInt($('pChapterUnlock').value,10)||0);
+  const rawMemoryId=$('pMemoryId').value.trim();
+  const memoryId=rawMemoryId?slug(rawMemoryId):'';
+  const identity=Object.fromEntries(Object.entries({gender_identity:$('pIdentityGender').value.trim(),pronouns:$('pIdentityPronouns').value.trim(),
+    presentation:$('pIdentityPresentation').value.trim(),milestone:slug($('pIdentityMilestone').value.trim())}).filter(([,v])=>v));
+  const hasIdentity=Object.values(identity).some(Boolean);
   return {setting:$('pSetting').value.trim(),goal:$('pGoal').value.trim(),
     tension:$('pTension').value.trim(),beat:$('pBeat').value.trim(),
     tone:$('pTone').value.trim(),ending:$('pEnding').value.trim(),
@@ -2752,7 +2981,9 @@ function plannerFields(){
     statGate:character&&key&&high&&low?{character,key,value:Math.max(0,parseInt($('pStatValue').value,10)||0),high,low,
       lowValue:Math.max(0,parseInt($('pStatLowValue').value,10)||0),middle,
       highEffect:$('pStatHighEffect').value.trim(),middleEffect:$('pStatMiddleEffect').value.trim(),
-      lowEffect:$('pStatLowEffect').value.trim()}:null};
+      lowEffect:$('pStatLowEffect').value.trim()}:null,
+    consequence:consequenceCharacter&&(chapter>0||memoryId||hasIdentity)?{character:consequenceCharacter,chapter,memoryId,
+      identity:hasIdentity?identity:null}:null};
 }
 
 function plannerBrief(p){
@@ -2764,7 +2995,11 @@ function plannerBrief(p){
       '; otherwise, '+p.statGate.low,
     p.statGate?.middle&&'Middle outcome between '+p.statGate.lowValue+' and '+(p.statGate.value-1)+': '+p.statGate.middle,
     p.statGate?.highEffect&&'High outcome effects: '+p.statGate.highEffect,
-    p.statGate?.lowEffect&&'Low outcome effects: '+p.statGate.lowEffect].filter(Boolean).join('\n');
+    p.statGate?.lowEffect&&'Low outcome effects: '+p.statGate.lowEffect,
+    p.consequence?.chapter&&'On completion: unlock chapter '+p.consequence.chapter+' for '+(chr(p.consequence.character)?.name||p.consequence.character),
+    p.consequence?.memoryId&&'On completion: create memory '+p.consequence.memoryId+' for '+(chr(p.consequence.character)?.name||p.consequence.character),
+    p.consequence?.identity&&'On completion: update identity for '+(chr(p.consequence.character)?.name||p.consequence.character)+
+      ' ('+Object.entries(p.consequence.identity).map(([k,v])=>k+': '+v).join(', ')+')'].filter(Boolean).join('\n');
 }
 
 function putPlanOnScene(){
@@ -2784,6 +3019,8 @@ function openPlanner(){
   const gate=p.statGate||{};
   $('pStatCharacter').innerHTML='<option value="">— no stat outcome —</option>'+P.characters
     .filter(c=>!isPlayer(c)).map(c=>'<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>').join('');
+  $('pConsequenceCharacter').innerHTML='<option value="">— no lasting consequence —</option>'+P.characters
+    .filter(c=>!isPlayer(c)).map(c=>'<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>').join('');
   $('pStatKey').innerHTML=STAT_KEYS.map(k=>'<option value="'+k+'">'+k+'</option>').join('');
   $('pSetting').value=p.setting||'';$('pGoal').value=p.goal||'';
   $('pTension').value=p.tension||'';$('pBeat').value=p.beat||'';
@@ -2793,6 +3030,17 @@ function openPlanner(){
   $('pStatLowValue').value=gate.lowValue??Math.max(0,(gate.value??50)-26);
   $('pStatMiddle').value=gate.middle||'';$('pStatMiddleEffect').value=gate.middleEffect||'';
   $('pStatHighEffect').value=gate.highEffect||'';$('pStatLowEffect').value=gate.lowEffect||'';
+  const consequence=p.consequence||{};
+  $('pConsequenceCharacter').value=consequence.character||gate.character||'';
+  const chapters=chr($('pConsequenceCharacter').value)?.relationship_chapters||[];
+  $('pChapterUnlock').innerHTML='<option value="0">— do not unlock a chapter —</option>'+chapters
+    .filter(ch=>ch.level>1).map(ch=>'<option value="'+ch.level+'">Chapter '+ch.level+' — '+esc(ch.title)+'</option>').join('');
+  $('pChapterUnlock').value=consequence.chapter||0;
+  $('pMemoryId').value=consequence.memoryId||'';
+  $('pIdentityGender').value=consequence.identity?.gender_identity||'';
+  $('pIdentityPronouns').value=consequence.identity?.pronouns||'';
+  $('pIdentityPresentation').value=consequence.identity?.presentation||'';
+  $('pIdentityMilestone').value=consequence.identity?.milestone||'';
   const initial=chr(gate.character)?.relationship_defaults?.[gate.key]??0;
   $('pStatPreview').value=gate.preview??initial;
   updateGatePreview();
@@ -2816,6 +3064,14 @@ function updateGatePreview(){
       :$('pStatMiddle').value.trim()&&preview>low?name+' '+key+' '+preview+' → middle outcome'
       :name+' '+key+' '+preview+' → low outcome'
     : 'Choose a character to preview';
+}
+
+function updateConsequenceChapters(){
+  const previous=$('pChapterUnlock').value;
+  const chapters=chr($('pConsequenceCharacter').value)?.relationship_chapters||[];
+  $('pChapterUnlock').innerHTML='<option value="0">— do not unlock a chapter —</option>'+chapters
+    .filter(ch=>ch.level>1).map(ch=>'<option value="'+ch.level+'">Chapter '+ch.level+' — '+esc(ch.title)+'</option>').join('');
+  $('pChapterUnlock').value=chapters.some(ch=>String(ch.level)===previous)?previous:'0';
 }
 
 function outlinePrompt(p){
@@ -2861,6 +3117,7 @@ $('pTemplate').onchange=applySceneTemplate;
 ['pStatCharacter','pStatKey','pStatValue','pStatLowValue','pStatMiddle','pStatPreview'].forEach(id=>{
   $(id).oninput=updateGatePreview;$(id).onchange=updateGatePreview;
 });
+$('pConsequenceCharacter').onchange=updateConsequenceChapters;
 
 function paintMemory(){
   const notes=P.storyNotes||[];
@@ -2909,7 +3166,8 @@ function tagList(id,arr,tone){
 
 function paintEditor(){
   const c=P.characters[edIx];if(!c)return;
-  c.profile=c.profile||{};c.boundaries=c.boundaries||{};
+  c.profile=c.profile||{};c.personality=c.personality||{};c.boundaries=c.boundaries||{};
+  c.identity=c.identity||{};c.characteristics=c.characteristics||{};c.custom_stats=c.custom_stats||{};
   c.private_profile=c.private_profile||{};
   c.private_profile.adult_preferences=c.private_profile.adult_preferences||{};
   c.relationship_defaults=c.relationship_defaults||{};
@@ -2925,6 +3183,16 @@ function paintEditor(){
     '<div class="edgrid">'+
       '<div class="field"><label>Age</label><input type="text" id="edAge" value="'+esc(c.profile.age??'')+'"></div>'+
       '<div class="field"><label>Role</label><input type="text" id="edRole" value="'+esc(c.profile.role||'')+'"></div>'+
+      '<div class="field"><label>Gender identity</label><input type="text" id="edGender" value="'+esc(c.profile.gender_identity||'')+'" placeholder="nonbinary, woman, man…"></div>'+
+      '<div class="field"><label>Pronouns</label><input type="text" id="edPronouns" value="'+esc(c.identity.pronouns||'')+'" placeholder="they/them"></div>'+
+      '<div class="field"><label>Presentation</label><input type="text" id="edPresentation" value="'+esc(c.identity.presentation||'')+'" placeholder="feminine, masc, fluid…"></div>'+
+      '<div class="field edfull"><label>Personality traits</label>'+tagList('personality.traits',c.personality?.traits,'ok')+'</div>'+
+      '<div class="field"><label>Likes</label>'+tagList('characteristics.likes',c.characteristics.likes,'ok')+'</div>'+
+      '<div class="field"><label>Dislikes</label>'+tagList('characteristics.dislikes',c.characteristics.dislikes)+'</div>'+
+      '<div class="field"><label>Fears / pressure points</label>'+tagList('characteristics.fears',c.characteristics.fears)+'</div>'+
+      '<div class="field"><label>Skills / strengths</label>'+tagList('characteristics.strengths',c.characteristics.strengths,'ok')+'</div>'+
+      '<div class="field edfull"><label>Identity change history</label>'+tagList('identity.history',c.identity.history,'ok')+
+        '<p class="hint">Use short milestones such as <code>comes_out_to_player</code>. A scene can change the live identity with an identity-change effect.</p></div>'+
       '<div class="field edfull"><label><input type="checkbox" id="edPC" style="width:auto"'+
         (isPlayer(c)?' checked':'')+'> This is the player character</label>'+
         '<p class="hint">The person playing. Their words come from choice options, never from '+
@@ -2971,8 +3239,13 @@ function paintEditor(){
         '<input type="text" data-cap="'+s+'" placeholder="none" value="'+
         (Number.isFinite(+c.stat_caps?.[s])?+c.stat_caps[s]:'')+'"></div>').join('')+
         '</div>'+
-        '<p class="hint">A meter with no ceiling can be pushed past every gate on it. '+
+      '<p class="hint">A meter with no ceiling can be pushed past every gate on it. '+
         'The game clamps to whatever is set here.</p></div>'+
+
+      (customStatDefs().length?'<div class="field edfull"><p class="rubric">Custom character stats</p><div class="stats">'+
+        customStatDefs().map(s=>'<div class="stat"><label>'+esc(s.label)+'</label><input type="text" data-custom-stat="'+s.id+'" value="'+
+          (Number.isFinite(+c.custom_stats[s.id])?+c.custom_stats[s.id]:s.default)+'"></div>').join('')+
+        '</div><p class="hint">Defined in World builder. These can be checked by scene branches and changed by effects.</p></div>':'')+
 
       '<div class="field edfull"><p class="rubric">Chapters</p>'+
         c.relationship_chapters.map((ch,j)=>'<div class="chapline"><span class="lv">'+ch.level+'</span>'+
@@ -3028,6 +3301,9 @@ function wireEditor(c,adult,romance){
     save();paintSheet();};
   $('edAge').onblur=()=>paintEditor();
   $('edRole').oninput=e=>{c.profile.role=slug(e.target.value);save();paintCast();};
+  $('edGender').oninput=e=>{c.profile.gender_identity=e.target.value.trim();save();paintSheet();};
+  $('edPronouns').oninput=e=>{c.identity.pronouns=e.target.value.trim();save();};
+  $('edPresentation').oninput=e=>{c.identity.presentation=e.target.value.trim();save();};
   $('edPC').onchange=e=>{
     if(e.target.checked)P.characters.forEach(x=>{if(x!==c&&x.profile)x.profile.is_player=false;});
     c.profile.is_player=e.target.checked;
@@ -3044,6 +3320,9 @@ function wireEditor(c,adult,romance){
     const n=parseInt(el.value,10);
     if(Number.isFinite(n))c.stat_caps[el.dataset.cap]=n;else delete c.stat_caps[el.dataset.cap];
     save();});
+  B.querySelectorAll('[data-custom-stat]').forEach(el=>el.oninput=()=>{
+    const def=statDefinition(el.dataset.customStat);if(!def)return;
+    c.custom_stats[def.id]=Math.max(def.minimum,Math.min(def.maximum,Number(el.value)||0));save();});
   const setGate=(j)=>{
     const ch=c.relationship_chapters[j];
     const key=B.querySelector('[data-chstat="'+j+'"]')?.value||'';
@@ -3080,6 +3359,12 @@ function gameReady(c){
   out.format_version=out.format_version||1;
   out.display_name=c.name;
   out.profile=out.profile||{};
+  if(Object.keys(out.custom_stats||{}).length){
+    out.custom_stat_definitions=Object.fromEntries(Object.keys(out.custom_stats).map(key=>{
+      const def=statDefinition(key)||{id:key,label:pretty(key),minimum:0,maximum:100,default:0};
+      return [key,{label:def.label,minimum:def.minimum,maximum:def.maximum}];
+    }));
+  }
   const adult=isAdult(c);
   out.profile.romance_eligible=adult&&out.profile.romance_eligible===true;
   out.boundaries=out.boundaries||{};
@@ -3112,7 +3397,9 @@ function condLabel(r){
   const op=(OPS.find(o=>o[0]===r.op)||['','?'])[1];
   if(r.type==='chapter')return (chr(r.character)?.name||r.character)+' ch '+op+' '+r.value;
   if(r.type==='stat')  return (chr(r.character)?.name||r.character)+' '+r.key+' '+op+' '+r.value;
+  if(r.type==='custom_stat')return (chr(r.character)?.name||r.character)+' '+(statDefinition(r.key)?.label||r.key)+' '+op+' '+r.value;
   if(r.type==='met')   return 'met '+(chr(r.character)?.name||r.character);
+  if(r.type==='memory')return (chr(r.character)?.name||r.character)+' remembers '+r.key+(r.op==='is_false'?' (not yet)':'');
   return r.key+' '+op+(r.op==='is_true'||r.op==='is_false'?'':' '+r.value);
 }
 
@@ -3122,7 +3409,13 @@ function condMet(r,S){
   let have;
   if(r.type==='chapter')   have=num(S.chapters[r.character]);
   else if(r.type==='stat') have=num(S.stats[r.character+'.'+r.key]);
+  else if(r.type==='custom_stat')have=num(S.stats[r.character+'.'+r.key]);
   else if(r.type==='met')  return !!S.flags['met_'+r.character];
+  else if(r.type==='memory'){
+    const memories=S.memories?.[r.character]||[];
+    const found=memories.includes(r.key);
+    return r.op==='is_false'?!found:found;
+  }
   else                     have=S.flags[r.key];
 
   if(r.op==='is_true')  return have===true||num(have)>0;
@@ -3139,23 +3432,29 @@ function condEditor(reqs,owner){
     let mid='';
     if(r.type==='stat')mid='<select data-cf="'+owner+':'+i+':character">'+who+'</select>'+
       '<select data-cf="'+owner+':'+i+':key">'+STAT_KEYS.map(k=>'<option'+(k===r.key?' selected':'')+'>'+k+'</option>').join('')+'</select>';
+    else if(r.type==='custom_stat')mid='<select data-cf="'+owner+':'+i+':character">'+who+'</select>'+
+      '<select data-cf="'+owner+':'+i+':key">'+customStatDefs().map(s=>'<option value="'+s.id+'"'+(s.id===r.key?' selected':'')+'>'+esc(s.label)+'</option>').join('')+'</select>';
     else if(r.type==='chapter')mid='<select data-cf="'+owner+':'+i+':character">'+who+'</select>';
     else if(r.type==='met')mid='<select data-cf="'+owner+':'+i+':character">'+who+'</select>';
+    else if(r.type==='memory')mid='<select data-cf="'+owner+':'+i+':character">'+who+'</select>'+
+      '<input style="width:112px;text-align:left" data-cf="'+owner+':'+i+':key" value="'+esc(r.key||'memory_id')+'">';
     else mid='<input style="width:88px;text-align:left" data-cf="'+owner+':'+i+':key" value="'+esc(r.key||'')+'">';
 
     const ops=r.type==='met'?'':'<select data-cf="'+owner+':'+i+':op">'+
-      OPS.filter(o=>r.type==='flag'||!o[0].startsWith('is_')).map(o=>
+      OPS.filter(o=>r.type==='memory'?o[0].startsWith('is_'):r.type==='flag'||!o[0].startsWith('is_')).map(o=>
       '<option value="'+o[0]+'"'+(o[0]===r.op?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>';
-    const val=(r.type==='met'||r.op==='is_true'||r.op==='is_false')?'':
+    const val=(r.type==='met'||r.type==='memory'||r.op==='is_true'||r.op==='is_false')?'':
       '<input data-cf="'+owner+':'+i+':value" value="'+esc(r.value??0)+'">';
 
     return '<span class="cond">'+(r.type==='met'?'met ':'')+mid+ops+val+
       '<button data-cx2="'+owner+':'+i+'">×</button></span>';
   }).join('')+
   '<button class="add" data-cadd="'+owner+':stat">+ stat</button>'+
+  (customStatDefs().length?'<button class="add" data-cadd="'+owner+':custom_stat">+ custom stat</button>':'')+
   '<button class="add" data-cadd="'+owner+':chapter">+ chapter</button>'+
   '<button class="add" data-cadd="'+owner+':flag">+ flag</button>'+
-  '<button class="add" data-cadd="'+owner+':met">+ met</button>';
+  '<button class="add" data-cadd="'+owner+':met">+ met</button>'+
+  '<button class="add" data-cadd="'+owner+':memory">+ memory</button>';
 }
 
 /** owner is "content", "stage:N", or a choice option path "opt:1.0" */
@@ -3173,8 +3472,10 @@ function wireConds(root){
       : [b.dataset.cadd.slice(0,b.dataset.cadd.lastIndexOf(':')),b.dataset.cadd.split(':').pop()];
     const id=P.characters[0]?.id||'';
     reqsOf(owner).push(type==='stat'?{type:'stat',character:id,key:'love',op:'gte',value:50}
+      :type==='custom_stat'?{type:'custom_stat',character:id,key:customStatDefs()[0]?.id||'',op:'gte',value:0}
       :type==='chapter'?{type:'chapter',character:id,op:'gte',value:2}
       :type==='met'?{type:'met',character:id}
+      :type==='memory'?{type:'memory',character:id,key:'memory_id',op:'is_true',value:1}
       :{type:'flag',key:'new_flag',op:'is_true',value:1});
     save();paintSetup();paintBody();
   });
@@ -3213,10 +3514,12 @@ function routes(list,picks){
 }
 
 function simState(){
-  const S={stats:{},flags:{},chapters:{}};
+  const S={stats:{},flags:{},chapters:{},memories:{}};
   P.characters.forEach(c=>{
     S.chapters[c.id]=1;
+    S.memories[c.id]=[];
     Object.entries(c.relationship_defaults||{}).forEach(([k,v])=>S.stats[c.id+'.'+k]=+v||0);
+    Object.entries(c.custom_stats||{}).forEach(([k,v])=>S.stats[c.id+'.'+k]=+v||0);
   });
   return S;
 }
@@ -3260,7 +3563,14 @@ function wkChoose(i){
 function applyFlag(raw,S){
   // Effects arrive as "a.b +1; flag_name; c.d -2" — semicolons first, then the value.
   String(raw||'').split(';').forEach(piece=>{
-    const p=piece.trim().split(/\s+/).filter(Boolean);
+    const clean=piece.trim();
+    const memory=clean.match(/^memory:([^:]+):(.+)$/i);
+    if(memory){S.memories=S.memories||{};const list=S.memories[memory[1]]||(S.memories[memory[1]]=[]);if(!list.includes(memory[2]))list.push(memory[2]);return;}
+    const chapter=clean.match(/^chapter:([^:]+):(\d+)$/i);
+    if(chapter){S.chapters[chapter[1]]=Math.max(+S.chapters[chapter[1]]||1,+chapter[2]);return;}
+    const custom=clean.match(/^stat:([^:]+):([^\s:]+)\s+([+-]?\d+)$/i);
+    if(custom){const k=custom[1]+'.'+custom[2];S.stats[k]=(+S.stats[k]||0)+(+custom[3]);return;}
+    const p=clean.split(/\s+/).filter(Boolean);
     if(!p.length)return;
     if(p.length===1){
       if(p[0].includes('='))S.flags[p[0].split('=')[0]]=p[0].split('=')[1];
@@ -3616,7 +3926,7 @@ function validate(){
       add('warn','No NPC is marked present, so there is nobody for the player to talk to.',w);
 
     const checkReqs=(reqs,label)=>(reqs||[]).forEach(r=>{
-      if((r.type==='stat'||r.type==='chapter'||r.type==='met')&&!chr(r.character))
+      if((r.type==='stat'||r.type==='chapter'||r.type==='met'||r.type==='memory')&&!chr(r.character))
         add('err','A '+label+' gate refers to "'+r.character+'", which has no sheet.',w);
       if(r.type==='chapter'){
         const n=(chr(r.character)?.relationship_chapters||[]).length;
@@ -3817,10 +4127,12 @@ function weekGrid(){
 /* ---- playthrough simulator ---- */
 /** Runs the project forward, taking the most rewarding choice at each fork. */
 function simulate(maxDays){
-  const S={stats:{},flags:{},chapters:{}};
+  const S={stats:{},flags:{},chapters:{},memories:{}};
   P.characters.forEach(c=>{
     S.chapters[c.id]=1;
+    S.memories[c.id]=[];
     Object.entries(c.relationship_defaults||{}).forEach(([k,v])=>S.stats[c.id+'.'+k]=+v||0);
+    Object.entries(c.custom_stats||{}).forEach(([k,v])=>S.stats[c.id+'.'+k]=+v||0);
   });
   const played=new Set(),log=[],counts={};
   const worth=flag=>String(flag||'').split(';').reduce((n,p)=>{
@@ -3874,6 +4186,9 @@ function simulate(maxDays){
           log.push({day,block,what:c.title,kind:'quest'});
         }else{
           run(c.nodes,0);
+          const consequence=c.scenePlan?.consequence;
+          if(consequence?.memoryId)applyFlag('memory:'+consequence.character+':'+consequence.memoryId,S);
+          if(+consequence?.chapter>1)applyFlag('chapter:'+consequence.character+':'+consequence.chapter,S);
           log.push({day,block,what:c.title,kind:'conversation'});
         }
       });
@@ -3918,6 +4233,46 @@ function effectLedger(){
     branch:n.text||'unnamed branch',effect:n.flag,where:p.join('.')});});
   return rows;
 }
+
+/** Checks the editable tree against Port Alder's .character conversation format.
+    This is deliberately separate from the generic Godot contract: Port Alder
+    reads named graph nodes and supports a defined list of branch conditions. */
+function portAlderCheck(){
+  const out=[],add=(sev,msg,where)=>out.push({sev,msg,where});
+  const required=['format_version','id','display_name','profile','home','personality','schedule','skills',
+    'goals','connections','relationship_defaults','boundaries','private_profile','relationship_chapters',
+    'quest_hooks','conversation_topics','text_style','quests','conversations','text_messages','outcomes','asset_refs','entry_event'];
+  const ids=new Set();
+  P.characters.forEach(c=>{
+    const sheet=gameReady(c),name=c.name||c.id||'Unnamed character';
+    required.filter(k=>sheet[k]===undefined).forEach(k=>add('err','Missing required .character field "'+k+'".',name));
+    if(ids.has(c.id))add('err','Two character sheets use "'+c.id+'". Port Alder requires unique package ids.',name);
+    ids.add(c.id);
+  });
+  const seen=new Set();
+  P.content.filter(c=>c.type==='conversation').forEach(c=>{
+    const name=c.title||c.id;
+    const base=c.id.split('__')[0];
+    if(seen.has(base))return;
+    seen.add(base);
+    const walk=(nodes,where)=>nodes.forEach(n=>{
+      if(n.type==='gate'){
+        if(!(n.options||[]).length)add('err','Automatic branch has no outcomes.',name);
+        (n.options||[]).forEach((o,i)=>{
+          if(!(o.requires||[]).length)add('warn','Automatic branch '+(i+1)+' has no condition, so it always wins when reached.',name);
+          walk(o.nodes||[],where+' branch '+(i+1));
+        });
+      }else if(n.type==='choice'){
+        (n.options||[]).forEach(o=>{
+          walk(o.nodes||[],where+' choice');
+        });
+      }
+    });
+    walk(c.nodes||[],'scene');
+  });
+  if(P.characters.length!==15)add('info','The current Port Alder vertical slice expects 15 character packages; this project has '+P.characters.length+'.', 'Character sheets');
+  return out;
+}
 function branchTests(){
   const S=simState(),out=[];
   walkAll((n,c,p)=>{
@@ -3931,6 +4286,14 @@ function branchTests(){
 
 function paintInspect(){
   const B=$('insBody');
+  if(insTab==='portAlder'){
+    const issues=portAlderCheck(),n=s=>issues.filter(i=>i.sev===s).length;
+    B.innerHTML='<p class="hint">Checks the sheets and branching scenes against the Port Alder package and dialogue format before export.</p>'+
+      (issues.length?'<div class="legend"><span style="color:var(--rose)">'+n('err')+' blocking</span><span>'+n('warn')+' warning'+(n('warn')===1?'':'s')+'</span><span>'+n('info')+' note'+(n('info')===1?'':'s')+'</span></div>'+issues.map(i=>
+        '<div class="issue '+i.sev+'"><span class="sev">'+i.sev+'</span><span class="msg">'+esc(i.msg)+'<span class="where">'+esc(i.where)+'</span></span></div>').join(''):
+        '<div class="clean">Ready for Port Alder export.<br>Every editable sheet and branch matches the supported format.</div>');
+    return;
+  }
   if(insTab==='effects'){
     const rows=effectLedger();
     B.innerHTML=rows.length?'<p class="hint">Every stat or flag change caused by a player choice or automatic outcome.</p>'+
@@ -4667,10 +5030,13 @@ function effectsToFlag(effects){
     const v=e.value;
     switch(e.operation){
       case 'add_meter':   return e.character+'.'+e.meter+' '+(v>=0?'+':'')+v;
-      case 'set_flag':    return v===false?'':e.key;
+      case 'set_flag':    return v===false?'!'+e.key:e.key;
       case 'set_value':   return e.key+'='+e.value;
       case 'unlock_phone_app': return 'unlocked_'+v;
       case 'start_quest': return 'quest_'+v+'_started';
+      case 'create_memory': return 'memory:'+e.character+':'+v;
+      case 'unlock_relationship_chapter': return 'chapter:'+e.character+':'+e.level;
+      case 'add_character_stat': return 'stat:'+e.character+':'+e.key+' '+(v>=0?'+':'')+v;
       default:            return e.key||e.operation;
     }
   }).filter(Boolean).join('; ');
@@ -4680,15 +5046,37 @@ function effectsToFlag(effects){
 function toRequires(cond,charId){
   if(!cond)return [];
   const out=[];
-  if(cond.value_equals)out.push({type:'flag',
-    key:String(cond.value_equals[0])+(cond.value_equals[1]===true?'':'='+cond.value_equals[1]),
-    op:'is_true',value:1});
-  if(cond.event==='quest_completed'&&cond.quest)
-    out.push({type:'flag',key:'quest_'+cond.quest+'_done',op:'is_true',value:1});
-  if(cond.event==='conversation_completed'&&cond.conversation)
-    out.push({type:'flag',key:'conv_'+cond.conversation+'_done',op:'is_true',value:1});
-  if(cond.meter_at_least&&charId)
-    out.push({type:'stat',character:charId,key:cond.meter_at_least[0],op:'gte',value:cond.meter_at_least[1]});
+  const list=Array.isArray(cond)?cond:[cond];
+  list.forEach(rule=>{
+    if(!rule||typeof rule!=='object')return;
+    if(rule.value_equals)out.push({type:'flag',
+      key:String(rule.value_equals[0])+(rule.value_equals[1]===true?'':'='+rule.value_equals[1]),
+      op:'is_true',value:1});
+    if(rule.flag)out.push({type:'flag',key:String(rule.flag),op:'is_true',value:1});
+    if(rule.flag_not)out.push({type:'flag',key:String(rule.flag_not),op:'is_false',value:1});
+    if(rule.event==='quest_completed'&&rule.quest)
+      out.push({type:'flag',key:'quest_'+rule.quest+'_done',op:'is_true',value:1});
+    if(rule.event==='conversation_completed'&&rule.conversation)
+      out.push({type:'flag',key:'conv_'+rule.conversation+'_done',op:'is_true',value:1});
+    if(rule.meter_at_least){
+      const m=rule.meter_at_least,full=m.length>=3;
+      out.push({type:'stat',character:full?m[0]:charId,key:full?m[1]:m[0],op:'gte',value:full?m[2]:m[1]});
+    }
+    if(rule.meter_at_most){
+      const m=rule.meter_at_most,full=m.length>=3;
+      out.push({type:'stat',character:full?m[0]:charId,key:full?m[1]:m[0],op:'lte',value:full?m[2]:m[1]});
+    }
+    if(rule.chapter_at_least&&rule.chapter_at_least.length===2)
+      out.push({type:'chapter',character:rule.chapter_at_least[0],op:'gte',value:rule.chapter_at_least[1]});
+    if(rule.memory_exists&&rule.memory_exists.length===2)
+      out.push({type:'memory',character:rule.memory_exists[0],key:rule.memory_exists[1],op:'is_true',value:1});
+    if(rule.memory_missing&&rule.memory_missing.length===2)
+      out.push({type:'memory',character:rule.memory_missing[0],key:rule.memory_missing[1],op:'is_false',value:1});
+    if(rule.character_stat_at_least&&rule.character_stat_at_least.length===3)
+      out.push({type:'custom_stat',character:rule.character_stat_at_least[0],key:rule.character_stat_at_least[1],op:'gte',value:rule.character_stat_at_least[2]});
+    if(rule.character_stat_at_most&&rule.character_stat_at_most.length===3)
+      out.push({type:'custom_stat',character:rule.character_stat_at_most[0],key:rule.character_stat_at_most[1],op:'lte',value:rule.character_stat_at_most[2]});
+  });
   return out;
 }
 
@@ -4755,8 +5143,8 @@ function convertConversation(conv,sheet,report){
             else branch.push(...walk(t,new Set(seen)));
           }
           return {text:c.text||c.id||'…',flag:effectsToFlag(c.effects),
-            requires:toRequires(c.condition,sheet.id),nodes:branch,
-            _oid:c.id,_tone:c.tone};
+            requires:toRequires(c.conditions||c.condition,sheet.id),nodes:branch,
+            _oid:c.id,_tone:c.tone,_orig:c};
         })});
         break;                       // choices terminate the linear run
       }
@@ -4785,7 +5173,8 @@ function convertConversation(conv,sheet,report){
       premise:conv.summary||'',
       requires:toRequires(conv.condition,sheet.id),
       nodes:body,
-      _authored:{type:conv.type,repetition:conv.repetition,activation:act,locRef:act.location}
+      _authored:{type:conv.type,repetition:conv.repetition,activation:act,locRef:act.location,
+        completion_effects:conv.completion_effects}
     });
   };
 
@@ -4876,6 +5265,13 @@ function importAuthored(sheet){
 /** "elena_reyes_hale.respect +1; unlocked_quests" → the game's effects array. */
 function flagToEffects(flag){
   return String(flag||'').split(';').map(s=>s.trim()).filter(Boolean).map(piece=>{
+    if(piece.startsWith('!'))return {operation:'set_flag',key:piece.slice(1).trim(),value:false};
+    const memory=piece.match(/^memory:([^:]+):(.+)$/i);
+    if(memory)return {operation:'create_memory',character:memory[1].trim(),value:memory[2].trim()};
+    const chapter=piece.match(/^chapter:([^:]+):(\d+)$/i);
+    if(chapter)return {operation:'unlock_relationship_chapter',character:chapter[1].trim(),level:+chapter[2]};
+    const custom=piece.match(/^stat:([^:]+):([^\s:]+)\s+([+-]?\d+)$/i);
+    if(custom)return {operation:'add_character_stat',character:custom[1].trim(),key:custom[2].trim(),value:+custom[3]};
     if(piece.includes('=')){
       const [k,v]=piece.split('=');
       const val=v.trim();
@@ -4892,6 +5288,43 @@ function flagToEffects(flag){
     if(/^quest_.+_started$/.test(key))return {operation:'start_quest',value:key.slice(6,-8)};
     return {operation:'set_flag',key,value:true};
   });
+}
+
+function conditionValue(value){
+  const v=String(value).trim();
+  if(v==='true')return true;
+  if(v==='false')return false;
+  if(/^-?(?:\d+|\d*\.\d+)$/.test(v))return Number(v);
+  return v;
+}
+
+/** Scenewright requirement rows → Port Alder dialogue conditions.
+    Dialogue conditions are an array, so multiple requirements stay ANDed instead
+    of being collapsed into one lossy object. */
+function requiresToConditions(reqs){
+  const out=[];
+  (reqs||[]).forEach(r=>{
+    if(r.type==='stat'){
+      const meter=[r.character,r.key,+r.value];
+      if(r.op==='lte')out.push({meter_at_most:meter});
+      else if(r.op==='eq')out.push({meter_at_least:meter},{meter_at_most:meter});
+      else out.push({meter_at_least:meter});
+    }else if(r.type==='custom_stat'){
+      const stat=[r.character,r.key,+r.value];
+      if(r.op==='lte')out.push({character_stat_at_most:stat});
+      else if(r.op==='eq')out.push({character_stat_at_least:stat},{character_stat_at_most:stat});
+      else out.push({character_stat_at_least:stat});
+    }else if(r.type==='chapter')out.push({chapter_at_least:[r.character,+r.value]});
+    else if(r.type==='memory')out.push(r.op==='is_false'
+      ?{memory_missing:[r.character,r.key]}:{memory_exists:[r.character,r.key]});
+    else if(r.type==='met')out.push({flag:'met_'+r.character});
+    else if(String(r.key).includes('=')){
+      const [k,v]=String(r.key).split(/=(.*)/s);
+      out.push({value_equals:[k,conditionValue(v)]});
+    }else if(r.op==='is_false')out.push({flag_not:r.key});
+    else out.push({flag:r.key});
+  });
+  return out;
 }
 
 /** Keeps the source activation intact, updating only fields it already had —
@@ -4914,7 +5347,12 @@ function requiresToCondition(reqs){
   if(!(reqs||[]).length)return undefined;
   const out={};
   reqs.forEach(r=>{
-    if(r.type==='stat')out.meter_at_least=[r.key,+r.value];
+    if(r.type==='stat'){
+      const meter=[r.character,r.key,+r.value];
+      if(r.op==='lte')out.meter_at_most=meter;
+      else if(r.op==='eq')out.meter_equals=meter;
+      else out.meter_at_least=meter;
+    }
     else if(r.type==='chapter')out.chapter_at_least=+r.value;
     else if(r.type==='met')out.event='character_met',out.character=r.character;
     else if(/^quest_.+_done$/.test(r.key))out.event='quest_completed',out.quest=r.key.slice(6,-5);
@@ -5005,16 +5443,36 @@ function buildNodes(group){
         link(id);
         nodes[id].choices=n.options.map((o,i)=>{
           const target=emit(o.nodes,null);
-          const c={id:o._oid||slug(o.text||('opt_'+(i+1))).slice(0,28),text:o.text};
+          const c=Object.assign({},o._orig,{id:o._oid||slug(o.text||('opt_'+(i+1))).slice(0,28),text:o.text});
           if(o._tone)c.tone=o._tone;
           const fx=flagToEffects(o.flag);
           if(fx.length)c.effects=fx;
-          const cond=requiresToCondition(o.requires);
-          if(cond)c.condition=cond;
+          delete c.condition;delete c.conditions;
+          const conditions=requiresToConditions(o.requires);
+          if(conditions.length)c.conditions=conditions;
           if(target)c.next=target;
           return c;
         });
         prev=null;              // choices terminate the chain
+        return first;
+      }
+
+      if(n.type==='gate'){
+        const id=idFor(n,'gate');
+        nodes[id]={branches:[]};
+        link(id);
+        nodes[id].branches=(n.options||[]).map((o,i)=>{
+          const target=emit(o.nodes,null);
+          const branch=Object.assign({},o._orig,{id:o._oid||('branch_'+(i+1)),text:o.text});
+          const fx=flagToEffects(o.flag);
+          if(fx.length)branch.effects=fx;
+          delete branch.condition;delete branch.conditions;
+          const conditions=requiresToConditions(o.requires);
+          if(conditions.length)branch.conditions=conditions;
+          if(target)branch.next=target;
+          return branch;
+        });
+        prev=null;
         return first;
       }
     }
@@ -5039,6 +5497,13 @@ function conversationOut(group){
   };
   if(a.repetition)out.repetition=a.repetition;
   if(group.main.premise)out.summary=group.main.premise;
+  const consequence=group.main.scenePlan?.consequence||{};
+  const planned=[];
+  if(consequence.memoryId)planned.push({operation:'create_memory',character:consequence.character,value:consequence.memoryId});
+  if(+consequence.chapter>1)planned.push({operation:'unlock_relationship_chapter',character:consequence.character,level:+consequence.chapter});
+  if(consequence.identity)planned.push(Object.assign({operation:'change_identity',character:consequence.character},consequence.identity));
+  const completion=(a.completion_effects||[]).concat(planned);
+  if(completion.length)out.completion_effects=completion;
   const cond=requiresToCondition(group.main.requires);
   if(cond)out.condition=cond;
   return out;

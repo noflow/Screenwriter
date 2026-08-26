@@ -1,7 +1,9 @@
 [
  "js/00-state.js",
  "js/01-sheets.js",
+ "js/01b-character-creator.js",
  "js/02-places.js",
+ "js/02b-world-builder.js",
  "js/03-schedule.js",
  "js/04-ollama.js",
  "js/05-tree.js",

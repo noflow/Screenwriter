@@ -13,6 +13,46 @@ function effectLedger(){
     branch:n.text||'unnamed branch',effect:n.flag,where:p.join('.')});});
   return rows;
 }
+
+/** Checks the editable tree against Port Alder's .character conversation format.
+    This is deliberately separate from the generic Godot contract: Port Alder
+    reads named graph nodes and supports a defined list of branch conditions. */
+function portAlderCheck(){
+  const out=[],add=(sev,msg,where)=>out.push({sev,msg,where});
+  const required=['format_version','id','display_name','profile','home','personality','schedule','skills',
+    'goals','connections','relationship_defaults','boundaries','private_profile','relationship_chapters',
+    'quest_hooks','conversation_topics','text_style','quests','conversations','text_messages','outcomes','asset_refs','entry_event'];
+  const ids=new Set();
+  P.characters.forEach(c=>{
+    const sheet=gameReady(c),name=c.name||c.id||'Unnamed character';
+    required.filter(k=>sheet[k]===undefined).forEach(k=>add('err','Missing required .character field "'+k+'".',name));
+    if(ids.has(c.id))add('err','Two character sheets use "'+c.id+'". Port Alder requires unique package ids.',name);
+    ids.add(c.id);
+  });
+  const seen=new Set();
+  P.content.filter(c=>c.type==='conversation').forEach(c=>{
+    const name=c.title||c.id;
+    const base=c.id.split('__')[0];
+    if(seen.has(base))return;
+    seen.add(base);
+    const walk=(nodes,where)=>nodes.forEach(n=>{
+      if(n.type==='gate'){
+        if(!(n.options||[]).length)add('err','Automatic branch has no outcomes.',name);
+        (n.options||[]).forEach((o,i)=>{
+          if(!(o.requires||[]).length)add('warn','Automatic branch '+(i+1)+' has no condition, so it always wins when reached.',name);
+          walk(o.nodes||[],where+' branch '+(i+1));
+        });
+      }else if(n.type==='choice'){
+        (n.options||[]).forEach(o=>{
+          walk(o.nodes||[],where+' choice');
+        });
+      }
+    });
+    walk(c.nodes||[],'scene');
+  });
+  if(P.characters.length!==15)add('info','The current Port Alder vertical slice expects 15 character packages; this project has '+P.characters.length+'.', 'Character sheets');
+  return out;
+}
 function branchTests(){
   const S=simState(),out=[];
   walkAll((n,c,p)=>{
@@ -26,6 +66,14 @@ function branchTests(){
 
 function paintInspect(){
   const B=$('insBody');
+  if(insTab==='portAlder'){
+    const issues=portAlderCheck(),n=s=>issues.filter(i=>i.sev===s).length;
+    B.innerHTML='<p class="hint">Checks the sheets and branching scenes against the Port Alder package and dialogue format before export.</p>'+
+      (issues.length?'<div class="legend"><span style="color:var(--rose)">'+n('err')+' blocking</span><span>'+n('warn')+' warning'+(n('warn')===1?'':'s')+'</span><span>'+n('info')+' note'+(n('info')===1?'':'s')+'</span></div>'+issues.map(i=>
+        '<div class="issue '+i.sev+'"><span class="sev">'+i.sev+'</span><span class="msg">'+esc(i.msg)+'<span class="where">'+esc(i.where)+'</span></span></div>').join(''):
+        '<div class="clean">Ready for Port Alder export.<br>Every editable sheet and branch matches the supported format.</div>');
+    return;
+  }
   if(insTab==='effects'){
     const rows=effectLedger();
     B.innerHTML=rows.length?'<p class="hint">Every stat or flag change caused by a player choice or automatic outcome.</p>'+

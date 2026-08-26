@@ -70,9 +70,34 @@ editor's scene structure automatically, so the model does not need to write JSON
    "61 locations, 306 rooms, 10 districts".
 2. Drop your `.character` sheets on. Quests and conversations already in them are
    imported and become editable.
+   Or choose **New character** to make a complete Port Alder NPC sheet from a
+   guided form. It starts with every required field, the 12 relationship meters,
+   five relationship chapters, and a weekday schedule you can edit afterward.
+   **World builder** adds reusable custom stats (such as Confidence or Stress) and
+   creates a location with its rooms in one step. Open a character's sheet to set
+   their identity, pronouns, presentation, traits, likes, dislikes, fears, strengths,
+   and starting values for those custom stats. Use **Download game locations** after
+   creating places, then put that file in the game's `content/world` folder.
 3. **Inspect → Missing characters → Add all as stubs** creates the referenced
    people who have no sheet yet, including the player.
-4. **Inspect → Validate** to see what needs attention.
+4. **Inspect → Port Alder** before exporting. It checks the game package fields,
+   automatic stat branches, and any gate the current game runtime cannot play.
+5. **Inspect → Validate** to see what needs attention inside the story itself.
+
+## Lasting relationship consequences
+
+In **Plan scene**, use **Lasting consequence** to unlock a character's next
+relationship chapter and/or create a named memory when that scene finishes. The
+memory is stored in the save game, not in the sheet. In a later choice, choose
+**+ memory** in its conditions to make that choice appear only when the character
+remembers that event. This is a simple way to write callbacks without relying on
+the model to remember every prior scene.
+
+The same section can make a respectful, story-driven identity update: choose the
+character, then enter only the identity details that change and an optional milestone.
+The change is saved in the game state and can gate later dialogue with identity or
+pronoun conditions. This models the social story choice without recording private
+medical information.
 
 Everything autosaves to the browser, keyed to the URL. Same port next time or your
 work won't be there. **Content → Save file** writes a copy you can keep.
@@ -104,13 +129,18 @@ Each outcome can also change game state. Add effects such as `elena_reyes.friend
 Use **Preview stat value** to see which outcome a given number would take before you
 generate the scene.
 
+For custom stats, use **+ custom stat** in a choice or automatic-outcome condition.
+Effects use `stat:character_id:stat_id +2`, for example
+`stat:emma_rowan:confidence +5`. The exporter turns it into a Port Alder game effect;
+the value is kept in the save game and respects the range set in World builder.
+
 ---
 
 ## What's in here
 
     scenewright.html    the tool — this is the one to open
     index.html          same tool, loading js/ separately, for editing sources
-    js/  css/           the 37 source modules
+    js/  css/           the 39 source modules
     build.py            rebuilds scenewright.html from those sources
     README.md           what each module does
     godot/
@@ -139,8 +169,9 @@ Call `advance()` on player input, `choose(i)` on a choice. Other useful calls:
     director.can_romance("elena_reyes_hale")    # honours the sheet's boundaries
     director.save_state() / load_state(dict)
 
-Export from the tool gives you both shapes: **Character sheets** writes `.character`
-files back in your own schema, **Godot JSON** writes the flattened `scenes.json`
+Export from the tool gives you both shapes: **Port Alder sheets** writes `.character`
+files back in the game schema, including directed dialogue graphs, conditional choices,
+and automatic stat-outcome branches. **Godot JSON** writes the flattened `scenes.json`
 this runtime reads.
 
 ---

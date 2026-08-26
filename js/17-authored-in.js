@@ -17,10 +17,13 @@ function effectsToFlag(effects){
     const v=e.value;
     switch(e.operation){
       case 'add_meter':   return e.character+'.'+e.meter+' '+(v>=0?'+':'')+v;
-      case 'set_flag':    return v===false?'':e.key;
+      case 'set_flag':    return v===false?'!'+e.key:e.key;
       case 'set_value':   return e.key+'='+e.value;
       case 'unlock_phone_app': return 'unlocked_'+v;
       case 'start_quest': return 'quest_'+v+'_started';
+      case 'create_memory': return 'memory:'+e.character+':'+v;
+      case 'unlock_relationship_chapter': return 'chapter:'+e.character+':'+e.level;
+      case 'add_character_stat': return 'stat:'+e.character+':'+e.key+' '+(v>=0?'+':'')+v;
       default:            return e.key||e.operation;
     }
   }).filter(Boolean).join('; ');
@@ -30,15 +33,37 @@ function effectsToFlag(effects){
 function toRequires(cond,charId){
   if(!cond)return [];
   const out=[];
-  if(cond.value_equals)out.push({type:'flag',
-    key:String(cond.value_equals[0])+(cond.value_equals[1]===true?'':'='+cond.value_equals[1]),
-    op:'is_true',value:1});
-  if(cond.event==='quest_completed'&&cond.quest)
-    out.push({type:'flag',key:'quest_'+cond.quest+'_done',op:'is_true',value:1});
-  if(cond.event==='conversation_completed'&&cond.conversation)
-    out.push({type:'flag',key:'conv_'+cond.conversation+'_done',op:'is_true',value:1});
-  if(cond.meter_at_least&&charId)
-    out.push({type:'stat',character:charId,key:cond.meter_at_least[0],op:'gte',value:cond.meter_at_least[1]});
+  const list=Array.isArray(cond)?cond:[cond];
+  list.forEach(rule=>{
+    if(!rule||typeof rule!=='object')return;
+    if(rule.value_equals)out.push({type:'flag',
+      key:String(rule.value_equals[0])+(rule.value_equals[1]===true?'':'='+rule.value_equals[1]),
+      op:'is_true',value:1});
+    if(rule.flag)out.push({type:'flag',key:String(rule.flag),op:'is_true',value:1});
+    if(rule.flag_not)out.push({type:'flag',key:String(rule.flag_not),op:'is_false',value:1});
+    if(rule.event==='quest_completed'&&rule.quest)
+      out.push({type:'flag',key:'quest_'+rule.quest+'_done',op:'is_true',value:1});
+    if(rule.event==='conversation_completed'&&rule.conversation)
+      out.push({type:'flag',key:'conv_'+rule.conversation+'_done',op:'is_true',value:1});
+    if(rule.meter_at_least){
+      const m=rule.meter_at_least,full=m.length>=3;
+      out.push({type:'stat',character:full?m[0]:charId,key:full?m[1]:m[0],op:'gte',value:full?m[2]:m[1]});
+    }
+    if(rule.meter_at_most){
+      const m=rule.meter_at_most,full=m.length>=3;
+      out.push({type:'stat',character:full?m[0]:charId,key:full?m[1]:m[0],op:'lte',value:full?m[2]:m[1]});
+    }
+    if(rule.chapter_at_least&&rule.chapter_at_least.length===2)
+      out.push({type:'chapter',character:rule.chapter_at_least[0],op:'gte',value:rule.chapter_at_least[1]});
+    if(rule.memory_exists&&rule.memory_exists.length===2)
+      out.push({type:'memory',character:rule.memory_exists[0],key:rule.memory_exists[1],op:'is_true',value:1});
+    if(rule.memory_missing&&rule.memory_missing.length===2)
+      out.push({type:'memory',character:rule.memory_missing[0],key:rule.memory_missing[1],op:'is_false',value:1});
+    if(rule.character_stat_at_least&&rule.character_stat_at_least.length===3)
+      out.push({type:'custom_stat',character:rule.character_stat_at_least[0],key:rule.character_stat_at_least[1],op:'gte',value:rule.character_stat_at_least[2]});
+    if(rule.character_stat_at_most&&rule.character_stat_at_most.length===3)
+      out.push({type:'custom_stat',character:rule.character_stat_at_most[0],key:rule.character_stat_at_most[1],op:'lte',value:rule.character_stat_at_most[2]});
+  });
   return out;
 }
 
@@ -105,8 +130,8 @@ function convertConversation(conv,sheet,report){
             else branch.push(...walk(t,new Set(seen)));
           }
           return {text:c.text||c.id||'…',flag:effectsToFlag(c.effects),
-            requires:toRequires(c.condition,sheet.id),nodes:branch,
-            _oid:c.id,_tone:c.tone};
+            requires:toRequires(c.conditions||c.condition,sheet.id),nodes:branch,
+            _oid:c.id,_tone:c.tone,_orig:c};
         })});
         break;                       // choices terminate the linear run
       }
@@ -135,7 +160,8 @@ function convertConversation(conv,sheet,report){
       premise:conv.summary||'',
       requires:toRequires(conv.condition,sheet.id),
       nodes:body,
-      _authored:{type:conv.type,repetition:conv.repetition,activation:act,locRef:act.location}
+      _authored:{type:conv.type,repetition:conv.repetition,activation:act,locRef:act.location,
+        completion_effects:conv.completion_effects}
     });
   };
 

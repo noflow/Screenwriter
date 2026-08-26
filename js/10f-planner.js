@@ -19,6 +19,13 @@ function newPlannedScene(){
 function plannerFields(){
   const character=$('pStatCharacter').value,key=$('pStatKey').value;
   const high=$('pStatHigh').value.trim(),middle=$('pStatMiddle').value.trim(),low=$('pStatLow').value.trim();
+  const consequenceCharacter=$('pConsequenceCharacter').value;
+  const chapter=Math.max(0,parseInt($('pChapterUnlock').value,10)||0);
+  const rawMemoryId=$('pMemoryId').value.trim();
+  const memoryId=rawMemoryId?slug(rawMemoryId):'';
+  const identity=Object.fromEntries(Object.entries({gender_identity:$('pIdentityGender').value.trim(),pronouns:$('pIdentityPronouns').value.trim(),
+    presentation:$('pIdentityPresentation').value.trim(),milestone:slug($('pIdentityMilestone').value.trim())}).filter(([,v])=>v));
+  const hasIdentity=Object.values(identity).some(Boolean);
   return {setting:$('pSetting').value.trim(),goal:$('pGoal').value.trim(),
     tension:$('pTension').value.trim(),beat:$('pBeat').value.trim(),
     tone:$('pTone').value.trim(),ending:$('pEnding').value.trim(),
@@ -26,7 +33,9 @@ function plannerFields(){
     statGate:character&&key&&high&&low?{character,key,value:Math.max(0,parseInt($('pStatValue').value,10)||0),high,low,
       lowValue:Math.max(0,parseInt($('pStatLowValue').value,10)||0),middle,
       highEffect:$('pStatHighEffect').value.trim(),middleEffect:$('pStatMiddleEffect').value.trim(),
-      lowEffect:$('pStatLowEffect').value.trim()}:null};
+      lowEffect:$('pStatLowEffect').value.trim()}:null,
+    consequence:consequenceCharacter&&(chapter>0||memoryId||hasIdentity)?{character:consequenceCharacter,chapter,memoryId,
+      identity:hasIdentity?identity:null}:null};
 }
 
 function plannerBrief(p){
@@ -38,7 +47,11 @@ function plannerBrief(p){
       '; otherwise, '+p.statGate.low,
     p.statGate?.middle&&'Middle outcome between '+p.statGate.lowValue+' and '+(p.statGate.value-1)+': '+p.statGate.middle,
     p.statGate?.highEffect&&'High outcome effects: '+p.statGate.highEffect,
-    p.statGate?.lowEffect&&'Low outcome effects: '+p.statGate.lowEffect].filter(Boolean).join('\n');
+    p.statGate?.lowEffect&&'Low outcome effects: '+p.statGate.lowEffect,
+    p.consequence?.chapter&&'On completion: unlock chapter '+p.consequence.chapter+' for '+(chr(p.consequence.character)?.name||p.consequence.character),
+    p.consequence?.memoryId&&'On completion: create memory '+p.consequence.memoryId+' for '+(chr(p.consequence.character)?.name||p.consequence.character),
+    p.consequence?.identity&&'On completion: update identity for '+(chr(p.consequence.character)?.name||p.consequence.character)+
+      ' ('+Object.entries(p.consequence.identity).map(([k,v])=>k+': '+v).join(', ')+')'].filter(Boolean).join('\n');
 }
 
 function putPlanOnScene(){
@@ -58,6 +71,8 @@ function openPlanner(){
   const gate=p.statGate||{};
   $('pStatCharacter').innerHTML='<option value="">— no stat outcome —</option>'+P.characters
     .filter(c=>!isPlayer(c)).map(c=>'<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>').join('');
+  $('pConsequenceCharacter').innerHTML='<option value="">— no lasting consequence —</option>'+P.characters
+    .filter(c=>!isPlayer(c)).map(c=>'<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>').join('');
   $('pStatKey').innerHTML=STAT_KEYS.map(k=>'<option value="'+k+'">'+k+'</option>').join('');
   $('pSetting').value=p.setting||'';$('pGoal').value=p.goal||'';
   $('pTension').value=p.tension||'';$('pBeat').value=p.beat||'';
@@ -67,6 +82,17 @@ function openPlanner(){
   $('pStatLowValue').value=gate.lowValue??Math.max(0,(gate.value??50)-26);
   $('pStatMiddle').value=gate.middle||'';$('pStatMiddleEffect').value=gate.middleEffect||'';
   $('pStatHighEffect').value=gate.highEffect||'';$('pStatLowEffect').value=gate.lowEffect||'';
+  const consequence=p.consequence||{};
+  $('pConsequenceCharacter').value=consequence.character||gate.character||'';
+  const chapters=chr($('pConsequenceCharacter').value)?.relationship_chapters||[];
+  $('pChapterUnlock').innerHTML='<option value="0">— do not unlock a chapter —</option>'+chapters
+    .filter(ch=>ch.level>1).map(ch=>'<option value="'+ch.level+'">Chapter '+ch.level+' — '+esc(ch.title)+'</option>').join('');
+  $('pChapterUnlock').value=consequence.chapter||0;
+  $('pMemoryId').value=consequence.memoryId||'';
+  $('pIdentityGender').value=consequence.identity?.gender_identity||'';
+  $('pIdentityPronouns').value=consequence.identity?.pronouns||'';
+  $('pIdentityPresentation').value=consequence.identity?.presentation||'';
+  $('pIdentityMilestone').value=consequence.identity?.milestone||'';
   const initial=chr(gate.character)?.relationship_defaults?.[gate.key]??0;
   $('pStatPreview').value=gate.preview??initial;
   updateGatePreview();
@@ -90,6 +116,14 @@ function updateGatePreview(){
       :$('pStatMiddle').value.trim()&&preview>low?name+' '+key+' '+preview+' → middle outcome'
       :name+' '+key+' '+preview+' → low outcome'
     : 'Choose a character to preview';
+}
+
+function updateConsequenceChapters(){
+  const previous=$('pChapterUnlock').value;
+  const chapters=chr($('pConsequenceCharacter').value)?.relationship_chapters||[];
+  $('pChapterUnlock').innerHTML='<option value="0">— do not unlock a chapter —</option>'+chapters
+    .filter(ch=>ch.level>1).map(ch=>'<option value="'+ch.level+'">Chapter '+ch.level+' — '+esc(ch.title)+'</option>').join('');
+  $('pChapterUnlock').value=chapters.some(ch=>String(ch.level)===previous)?previous:'0';
 }
 
 function outlinePrompt(p){
@@ -135,6 +169,7 @@ $('pTemplate').onchange=applySceneTemplate;
 ['pStatCharacter','pStatKey','pStatValue','pStatLowValue','pStatMiddle','pStatPreview'].forEach(id=>{
   $(id).oninput=updateGatePreview;$(id).onchange=updateGatePreview;
 });
+$('pConsequenceCharacter').onchange=updateConsequenceChapters;
 
 function paintMemory(){
   const notes=P.storyNotes||[];

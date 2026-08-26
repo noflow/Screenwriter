@@ -24,7 +24,8 @@ function tagList(id,arr,tone){
 
 function paintEditor(){
   const c=P.characters[edIx];if(!c)return;
-  c.profile=c.profile||{};c.boundaries=c.boundaries||{};
+  c.profile=c.profile||{};c.personality=c.personality||{};c.boundaries=c.boundaries||{};
+  c.identity=c.identity||{};c.characteristics=c.characteristics||{};c.custom_stats=c.custom_stats||{};
   c.private_profile=c.private_profile||{};
   c.private_profile.adult_preferences=c.private_profile.adult_preferences||{};
   c.relationship_defaults=c.relationship_defaults||{};
@@ -40,6 +41,16 @@ function paintEditor(){
     '<div class="edgrid">'+
       '<div class="field"><label>Age</label><input type="text" id="edAge" value="'+esc(c.profile.age??'')+'"></div>'+
       '<div class="field"><label>Role</label><input type="text" id="edRole" value="'+esc(c.profile.role||'')+'"></div>'+
+      '<div class="field"><label>Gender identity</label><input type="text" id="edGender" value="'+esc(c.profile.gender_identity||'')+'" placeholder="nonbinary, woman, man…"></div>'+
+      '<div class="field"><label>Pronouns</label><input type="text" id="edPronouns" value="'+esc(c.identity.pronouns||'')+'" placeholder="they/them"></div>'+
+      '<div class="field"><label>Presentation</label><input type="text" id="edPresentation" value="'+esc(c.identity.presentation||'')+'" placeholder="feminine, masc, fluid…"></div>'+
+      '<div class="field edfull"><label>Personality traits</label>'+tagList('personality.traits',c.personality?.traits,'ok')+'</div>'+
+      '<div class="field"><label>Likes</label>'+tagList('characteristics.likes',c.characteristics.likes,'ok')+'</div>'+
+      '<div class="field"><label>Dislikes</label>'+tagList('characteristics.dislikes',c.characteristics.dislikes)+'</div>'+
+      '<div class="field"><label>Fears / pressure points</label>'+tagList('characteristics.fears',c.characteristics.fears)+'</div>'+
+      '<div class="field"><label>Skills / strengths</label>'+tagList('characteristics.strengths',c.characteristics.strengths,'ok')+'</div>'+
+      '<div class="field edfull"><label>Identity change history</label>'+tagList('identity.history',c.identity.history,'ok')+
+        '<p class="hint">Use short milestones such as <code>comes_out_to_player</code>. A scene can change the live identity with an identity-change effect.</p></div>'+
       '<div class="field edfull"><label><input type="checkbox" id="edPC" style="width:auto"'+
         (isPlayer(c)?' checked':'')+'> This is the player character</label>'+
         '<p class="hint">The person playing. Their words come from choice options, never from '+
@@ -86,8 +97,13 @@ function paintEditor(){
         '<input type="text" data-cap="'+s+'" placeholder="none" value="'+
         (Number.isFinite(+c.stat_caps?.[s])?+c.stat_caps[s]:'')+'"></div>').join('')+
         '</div>'+
-        '<p class="hint">A meter with no ceiling can be pushed past every gate on it. '+
+      '<p class="hint">A meter with no ceiling can be pushed past every gate on it. '+
         'The game clamps to whatever is set here.</p></div>'+
+
+      (customStatDefs().length?'<div class="field edfull"><p class="rubric">Custom character stats</p><div class="stats">'+
+        customStatDefs().map(s=>'<div class="stat"><label>'+esc(s.label)+'</label><input type="text" data-custom-stat="'+s.id+'" value="'+
+          (Number.isFinite(+c.custom_stats[s.id])?+c.custom_stats[s.id]:s.default)+'"></div>').join('')+
+        '</div><p class="hint">Defined in World builder. These can be checked by scene branches and changed by effects.</p></div>':'')+
 
       '<div class="field edfull"><p class="rubric">Chapters</p>'+
         c.relationship_chapters.map((ch,j)=>'<div class="chapline"><span class="lv">'+ch.level+'</span>'+
@@ -143,6 +159,9 @@ function wireEditor(c,adult,romance){
     save();paintSheet();};
   $('edAge').onblur=()=>paintEditor();
   $('edRole').oninput=e=>{c.profile.role=slug(e.target.value);save();paintCast();};
+  $('edGender').oninput=e=>{c.profile.gender_identity=e.target.value.trim();save();paintSheet();};
+  $('edPronouns').oninput=e=>{c.identity.pronouns=e.target.value.trim();save();};
+  $('edPresentation').oninput=e=>{c.identity.presentation=e.target.value.trim();save();};
   $('edPC').onchange=e=>{
     if(e.target.checked)P.characters.forEach(x=>{if(x!==c&&x.profile)x.profile.is_player=false;});
     c.profile.is_player=e.target.checked;
@@ -159,6 +178,9 @@ function wireEditor(c,adult,romance){
     const n=parseInt(el.value,10);
     if(Number.isFinite(n))c.stat_caps[el.dataset.cap]=n;else delete c.stat_caps[el.dataset.cap];
     save();});
+  B.querySelectorAll('[data-custom-stat]').forEach(el=>el.oninput=()=>{
+    const def=statDefinition(el.dataset.customStat);if(!def)return;
+    c.custom_stats[def.id]=Math.max(def.minimum,Math.min(def.maximum,Number(el.value)||0));save();});
   const setGate=(j)=>{
     const ch=c.relationship_chapters[j];
     const key=B.querySelector('[data-chstat="'+j+'"]')?.value||'';
@@ -195,6 +217,12 @@ function gameReady(c){
   out.format_version=out.format_version||1;
   out.display_name=c.name;
   out.profile=out.profile||{};
+  if(Object.keys(out.custom_stats||{}).length){
+    out.custom_stat_definitions=Object.fromEntries(Object.keys(out.custom_stats).map(key=>{
+      const def=statDefinition(key)||{id:key,label:pretty(key),minimum:0,maximum:100,default:0};
+      return [key,{label:def.label,minimum:def.minimum,maximum:def.maximum}];
+    }));
+  }
   const adult=isAdult(c);
   out.profile.romance_eligible=adult&&out.profile.romance_eligible===true;
   out.boundaries=out.boundaries||{};

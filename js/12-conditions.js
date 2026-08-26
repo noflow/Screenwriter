@@ -7,7 +7,9 @@ function condLabel(r){
   const op=(OPS.find(o=>o[0]===r.op)||['','?'])[1];
   if(r.type==='chapter')return (chr(r.character)?.name||r.character)+' ch '+op+' '+r.value;
   if(r.type==='stat')  return (chr(r.character)?.name||r.character)+' '+r.key+' '+op+' '+r.value;
+  if(r.type==='custom_stat')return (chr(r.character)?.name||r.character)+' '+(statDefinition(r.key)?.label||r.key)+' '+op+' '+r.value;
   if(r.type==='met')   return 'met '+(chr(r.character)?.name||r.character);
+  if(r.type==='memory')return (chr(r.character)?.name||r.character)+' remembers '+r.key+(r.op==='is_false'?' (not yet)':'');
   return r.key+' '+op+(r.op==='is_true'||r.op==='is_false'?'':' '+r.value);
 }
 
@@ -17,7 +19,13 @@ function condMet(r,S){
   let have;
   if(r.type==='chapter')   have=num(S.chapters[r.character]);
   else if(r.type==='stat') have=num(S.stats[r.character+'.'+r.key]);
+  else if(r.type==='custom_stat')have=num(S.stats[r.character+'.'+r.key]);
   else if(r.type==='met')  return !!S.flags['met_'+r.character];
+  else if(r.type==='memory'){
+    const memories=S.memories?.[r.character]||[];
+    const found=memories.includes(r.key);
+    return r.op==='is_false'?!found:found;
+  }
   else                     have=S.flags[r.key];
 
   if(r.op==='is_true')  return have===true||num(have)>0;
@@ -34,23 +42,29 @@ function condEditor(reqs,owner){
     let mid='';
     if(r.type==='stat')mid='<select data-cf="'+owner+':'+i+':character">'+who+'</select>'+
       '<select data-cf="'+owner+':'+i+':key">'+STAT_KEYS.map(k=>'<option'+(k===r.key?' selected':'')+'>'+k+'</option>').join('')+'</select>';
+    else if(r.type==='custom_stat')mid='<select data-cf="'+owner+':'+i+':character">'+who+'</select>'+
+      '<select data-cf="'+owner+':'+i+':key">'+customStatDefs().map(s=>'<option value="'+s.id+'"'+(s.id===r.key?' selected':'')+'>'+esc(s.label)+'</option>').join('')+'</select>';
     else if(r.type==='chapter')mid='<select data-cf="'+owner+':'+i+':character">'+who+'</select>';
     else if(r.type==='met')mid='<select data-cf="'+owner+':'+i+':character">'+who+'</select>';
+    else if(r.type==='memory')mid='<select data-cf="'+owner+':'+i+':character">'+who+'</select>'+
+      '<input style="width:112px;text-align:left" data-cf="'+owner+':'+i+':key" value="'+esc(r.key||'memory_id')+'">';
     else mid='<input style="width:88px;text-align:left" data-cf="'+owner+':'+i+':key" value="'+esc(r.key||'')+'">';
 
     const ops=r.type==='met'?'':'<select data-cf="'+owner+':'+i+':op">'+
-      OPS.filter(o=>r.type==='flag'||!o[0].startsWith('is_')).map(o=>
+      OPS.filter(o=>r.type==='memory'?o[0].startsWith('is_'):r.type==='flag'||!o[0].startsWith('is_')).map(o=>
       '<option value="'+o[0]+'"'+(o[0]===r.op?' selected':'')+'>'+o[1]+'</option>').join('')+'</select>';
-    const val=(r.type==='met'||r.op==='is_true'||r.op==='is_false')?'':
+    const val=(r.type==='met'||r.type==='memory'||r.op==='is_true'||r.op==='is_false')?'':
       '<input data-cf="'+owner+':'+i+':value" value="'+esc(r.value??0)+'">';
 
     return '<span class="cond">'+(r.type==='met'?'met ':'')+mid+ops+val+
       '<button data-cx2="'+owner+':'+i+'">×</button></span>';
   }).join('')+
   '<button class="add" data-cadd="'+owner+':stat">+ stat</button>'+
+  (customStatDefs().length?'<button class="add" data-cadd="'+owner+':custom_stat">+ custom stat</button>':'')+
   '<button class="add" data-cadd="'+owner+':chapter">+ chapter</button>'+
   '<button class="add" data-cadd="'+owner+':flag">+ flag</button>'+
-  '<button class="add" data-cadd="'+owner+':met">+ met</button>';
+  '<button class="add" data-cadd="'+owner+':met">+ met</button>'+
+  '<button class="add" data-cadd="'+owner+':memory">+ memory</button>';
 }
 
 /** owner is "content", "stage:N", or a choice option path "opt:1.0" */
@@ -68,8 +82,10 @@ function wireConds(root){
       : [b.dataset.cadd.slice(0,b.dataset.cadd.lastIndexOf(':')),b.dataset.cadd.split(':').pop()];
     const id=P.characters[0]?.id||'';
     reqsOf(owner).push(type==='stat'?{type:'stat',character:id,key:'love',op:'gte',value:50}
+      :type==='custom_stat'?{type:'custom_stat',character:id,key:customStatDefs()[0]?.id||'',op:'gte',value:0}
       :type==='chapter'?{type:'chapter',character:id,op:'gte',value:2}
       :type==='met'?{type:'met',character:id}
+      :type==='memory'?{type:'memory',character:id,key:'memory_id',op:'is_true',value:1}
       :{type:'flag',key:'new_flag',op:'is_true',value:1});
     save();paintSetup();paintBody();
   });

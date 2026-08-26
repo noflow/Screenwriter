@@ -19,10 +19,12 @@ function routes(list,picks){
 }
 
 function simState(){
-  const S={stats:{},flags:{},chapters:{}};
+  const S={stats:{},flags:{},chapters:{},memories:{}};
   P.characters.forEach(c=>{
     S.chapters[c.id]=1;
+    S.memories[c.id]=[];
     Object.entries(c.relationship_defaults||{}).forEach(([k,v])=>S.stats[c.id+'.'+k]=+v||0);
+    Object.entries(c.custom_stats||{}).forEach(([k,v])=>S.stats[c.id+'.'+k]=+v||0);
   });
   return S;
 }
@@ -66,7 +68,14 @@ function wkChoose(i){
 function applyFlag(raw,S){
   // Effects arrive as "a.b +1; flag_name; c.d -2" — semicolons first, then the value.
   String(raw||'').split(';').forEach(piece=>{
-    const p=piece.trim().split(/\s+/).filter(Boolean);
+    const clean=piece.trim();
+    const memory=clean.match(/^memory:([^:]+):(.+)$/i);
+    if(memory){S.memories=S.memories||{};const list=S.memories[memory[1]]||(S.memories[memory[1]]=[]);if(!list.includes(memory[2]))list.push(memory[2]);return;}
+    const chapter=clean.match(/^chapter:([^:]+):(\d+)$/i);
+    if(chapter){S.chapters[chapter[1]]=Math.max(+S.chapters[chapter[1]]||1,+chapter[2]);return;}
+    const custom=clean.match(/^stat:([^:]+):([^\s:]+)\s+([+-]?\d+)$/i);
+    if(custom){const k=custom[1]+'.'+custom[2];S.stats[k]=(+S.stats[k]||0)+(+custom[3]);return;}
+    const p=clean.split(/\s+/).filter(Boolean);
     if(!p.length)return;
     if(p.length===1){
       if(p[0].includes('='))S.flags[p[0].split('=')[0]]=p[0].split('=')[1];

@@ -13,6 +13,8 @@
   <div class="mast-right">
     <button class="btn" id="railToggle">Panel</button>
     <button class="btn" id="importChars">Import sheets</button>
+    <button class="btn" id="openCharacterCreator">New character</button>
+    <button class="btn" id="openWorld">World builder</button>
     <button class="btn" id="pasteChars">Paste</button>
     <button class="btn" id="openMap">Map</button>
     <button class="btn" id="openInspect">Inspect</button>
@@ -161,6 +163,24 @@
   </div>
 </dialog>
 
+<dialog id="worldBuilder">
+  <div class="sheet-head"><h3>World builder</h3><span class="sp"></span><button class="btn" id="closeWorld">Done</button></div>
+  <div class="sheet-body">
+    <p class="rubric">Custom character stat</p>
+    <p class="hint">Add a stat once, then give each character a starting value. It can gate dialogue and change during scenes without replacing Port Alder's relationship meters.</p>
+    <div class="row"><input id="wsLabel" placeholder="Confidence" aria-label="Stat name"><input id="wsMin" type="number" value="0" aria-label="Minimum" style="width:62px"><input id="wsMax" type="number" value="100" aria-label="Maximum" style="width:62px"><input id="wsDefault" type="number" value="0" aria-label="Starting value" style="width:70px"><button class="btn gold" id="addWorldStat">Add stat</button></div>
+    <div id="worldStatsList" class="chip-list"></div>
+    <p class="rubric later">Location and rooms</p>
+    <p class="hint">Create a place with its rooms in one step. Rooms can be used in scene locations, schedules, and the story map.</p>
+    <div class="field"><label for="wlName">Location name</label><input id="wlName" placeholder="Harborview Apartment"></div>
+    <div class="two"><div class="field"><label for="wlDistrict">District</label><input id="wlDistrict" placeholder="old_town"></div><div class="field"><label for="wlType">Place type</label><input id="wlType" placeholder="apartment"></div></div>
+    <div class="field"><label for="wlRooms">Rooms</label><textarea id="wlRooms" rows="3" placeholder="living_room\nbedroom\nkitchen"></textarea></div>
+    <div class="field"><label for="wlNotes">Atmosphere / useful details</label><textarea id="wlNotes" rows="3" placeholder="Warm lamplight, thin walls, a view of the marina."></textarea></div>
+    <div class="row" style="justify-content:flex-end"><button class="btn" id="downloadWorldLocations">Download game locations</button><button class="btn gold" id="addWorldLocation">Create location</button></div>
+    <div id="worldMessage" class="hint"></div>
+  </div>
+</dialog>
+
 <dialog id="planner">
   <div class="sheet-head">
     <h3>Plan a scene</h3>
@@ -185,6 +205,14 @@
     <div class="field"><label for="pStatLow">Below the threshold</label><input id="pStatLow" type="text" placeholder="She keeps her distance and ends the conversation"></div>
     <div class="field"><label for="pStatLowEffect">Low-outcome effects</label><input id="pStatLowEffect" type="text" placeholder="elena_reyes.resentment +1"></div>
     <div class="field"><label for="pStatPreview">Preview stat value</label><div class="dial"><input id="pStatPreview" type="number" value="0"><output id="pGatePreview"></output></div></div>
+    <p class="rubric later">Lasting consequence <span class="hint">optional</span></p>
+    <div class="row" style="margin-bottom:8px"><select id="pConsequenceCharacter" aria-label="Character for lasting consequence"></select><select id="pChapterUnlock" aria-label="Chapter to unlock"></select></div>
+    <div class="field"><label for="pMemoryId">Memory id</label><input id="pMemoryId" type="text" placeholder="first_honest_conversation"></div>
+    <p class="rubric later">Identity change <span class="hint">optional, story-driven</span></p>
+    <div class="field"><label for="pIdentityGender">Updated gender identity</label><input id="pIdentityGender" type="text" placeholder="nonbinary"></div>
+    <div class="two"><div class="field"><label for="pIdentityPronouns">Updated pronouns</label><input id="pIdentityPronouns" type="text" placeholder="they/them"></div><div class="field"><label for="pIdentityPresentation">Updated presentation</label><input id="pIdentityPresentation" type="text" placeholder="more openly feminine"></div></div>
+    <div class="field"><label for="pIdentityMilestone">Story milestone</label><input id="pIdentityMilestone" type="text" placeholder="comes_out_to_player"></div>
+    <p class="hint">When the scene ends, this can unlock a relationship chapter, create a durable memory, or update the character's live identity. Later choices can use <code>+ memory</code> as a condition.</p>
     <div class="field"><label for="pOutline">Beat outline</label>
       <textarea id="pOutline" rows="12" spellcheck="true" placeholder="Draft an outline, then edit it here before writing the scene."></textarea></div>
     <div class="row" style="justify-content:flex-end"><button class="btn" id="draftOutline">Draft outline</button><button class="btn gold" id="writePlanned">Write scene from outline</button></div>
@@ -234,6 +262,7 @@
     <button class="mode" data-ins="tests">Branch tests</button>
     <button class="mode" data-ins="stub">Missing characters</button>
     <button class="mode" data-ins="godot">Godot</button>
+    <button class="mode" data-ins="portAlder">Port Alder</button>
     <span class="sp"></span>
     <button class="btn" id="closeInspect">Close</button>
   </div>
@@ -270,6 +299,32 @@
   </div>
 </dialog>
 
+<dialog id="characterCreator">
+  <div class="sheet-head"><h3>New Port Alder character</h3><span class="sp"></span><button class="btn" id="closeCharacterCreator">Close</button></div>
+  <div class="sheet-body edbody">
+    <p class="hint">Creates a complete adult NPC sheet with five relationship chapters, all required meters, and an editable weekday schedule.</p>
+    <div class="edgrid" style="padding-top:14px">
+      <div class="field"><label for="ccName">Display name</label><input id="ccName" type="text" placeholder="Jordan Rivers"></div>
+      <div class="field"><label for="ccRole">Role</label><input id="ccRole" type="text" value="town_resident" placeholder="barista, classmate, neighbor"></div>
+      <div class="field"><label for="ccAge">Age</label><input id="ccAge" type="text" value="22" inputmode="numeric"></div>
+      <div class="field"><label for="ccOccupation">Occupation</label><input id="ccOccupation" type="text" value="Part-time worker"></div>
+      <div class="field"><label for="ccGender">Gender identity</label><input id="ccGender" placeholder="nonbinary, woman, man…" value="female"></div>
+      <div class="field"><label for="ccPronouns">Pronouns</label><input id="ccPronouns" placeholder="she/her"></div>
+      <div class="field"><label for="ccPresentation">Presentation</label><input id="ccPresentation" placeholder="feminine, masc, fluid…"></div>
+      <div class="field"><label for="ccOrientation">Orientation</label><select id="ccOrientation"><option value="bisexual">Bisexual</option><option value="straight">Straight</option><option value="gay">Gay</option><option value="lesbian">Lesbian</option><option value="asexual">Asexual</option></select></div>
+      <div class="field"><label for="ccHome">Home location</label><select id="ccHome"></select></div>
+      <div class="field"><label for="ccTone">Dialogue voice</label><select id="ccTone"><option value="warm_direct">Warm and direct</option><option value="witty_guarded">Witty and guarded</option><option value="quiet_thoughtful">Quiet and thoughtful</option><option value="bold_playful">Bold and playful</option><option value="precise_polite">Precise and polite</option></select></div>
+      <div class="field"><label for="ccTrait1">Primary trait</label><input id="ccTrait1" type="text" value="friendly"></div>
+      <div class="field"><label for="ccTopic1">Conversation topic</label><input id="ccTopic1" type="text" value="city_life"></div>
+      <div class="field"><label for="ccFriendship">Starting friendship (0–100)</label><input id="ccFriendship" type="text" value="0" inputmode="numeric"></div>
+      <div class="field"><label for="ccRomance">Romance eligible</label><select id="ccRomance"><option value="yes">Yes</option><option value="no">No</option></select></div>
+      <div class="field edfull"><label for="ccGoal">Character goal</label><input id="ccGoal" type="text" placeholder="Build a life in Port Alder"></div>
+    </div>
+    <p id="ccMessage" class="hint"></p>
+    <div class="row" style="margin-top:14px"><button class="btn gold" id="createCharacter">Create character</button></div>
+  </div>
+</dialog>
+
 <dialog id="editor">
   <div class="sheet-head">
     <h3 id="edName">Character</h3>
@@ -283,7 +338,7 @@
 <dialog id="sheet">
   <div class="sheet-head">
     <h3>Export</h3>
-    <button class="mode on" data-fmt="sheets">Character sheets</button>
+    <button class="mode on" data-fmt="sheets">Port Alder sheets</button>
     <button class="mode" data-fmt="json">Godot JSON</button>
     <button class="mode" data-fmt="script">Plain script</button>
     <span class="sp"></span>
@@ -296,7 +351,9 @@
 
 <script src="js/00-state.js"></script>
 <script src="js/01-sheets.js"></script>
+<script src="js/01b-character-creator.js"></script>
 <script src="js/02-places.js"></script>
+<script src="js/02b-world-builder.js"></script>
 <script src="js/03-schedule.js"></script>
 <script src="js/04-ollama.js"></script>
 <script src="js/05-tree.js"></script>

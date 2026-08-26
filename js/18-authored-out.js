@@ -11,6 +11,13 @@
 /** "elena_reyes_hale.respect +1; unlocked_quests" → the game's effects array. */
 function flagToEffects(flag){
   return String(flag||'').split(';').map(s=>s.trim()).filter(Boolean).map(piece=>{
+    if(piece.startsWith('!'))return {operation:'set_flag',key:piece.slice(1).trim(),value:false};
+    const memory=piece.match(/^memory:([^:]+):(.+)$/i);
+    if(memory)return {operation:'create_memory',character:memory[1].trim(),value:memory[2].trim()};
+    const chapter=piece.match(/^chapter:([^:]+):(\d+)$/i);
+    if(chapter)return {operation:'unlock_relationship_chapter',character:chapter[1].trim(),level:+chapter[2]};
+    const custom=piece.match(/^stat:([^:]+):([^\s:]+)\s+([+-]?\d+)$/i);
+    if(custom)return {operation:'add_character_stat',character:custom[1].trim(),key:custom[2].trim(),value:+custom[3]};
     if(piece.includes('=')){
       const [k,v]=piece.split('=');
       const val=v.trim();
@@ -27,6 +34,43 @@ function flagToEffects(flag){
     if(/^quest_.+_started$/.test(key))return {operation:'start_quest',value:key.slice(6,-8)};
     return {operation:'set_flag',key,value:true};
   });
+}
+
+function conditionValue(value){
+  const v=String(value).trim();
+  if(v==='true')return true;
+  if(v==='false')return false;
+  if(/^-?(?:\d+|\d*\.\d+)$/.test(v))return Number(v);
+  return v;
+}
+
+/** Scenewright requirement rows → Port Alder dialogue conditions.
+    Dialogue conditions are an array, so multiple requirements stay ANDed instead
+    of being collapsed into one lossy object. */
+function requiresToConditions(reqs){
+  const out=[];
+  (reqs||[]).forEach(r=>{
+    if(r.type==='stat'){
+      const meter=[r.character,r.key,+r.value];
+      if(r.op==='lte')out.push({meter_at_most:meter});
+      else if(r.op==='eq')out.push({meter_at_least:meter},{meter_at_most:meter});
+      else out.push({meter_at_least:meter});
+    }else if(r.type==='custom_stat'){
+      const stat=[r.character,r.key,+r.value];
+      if(r.op==='lte')out.push({character_stat_at_most:stat});
+      else if(r.op==='eq')out.push({character_stat_at_least:stat},{character_stat_at_most:stat});
+      else out.push({character_stat_at_least:stat});
+    }else if(r.type==='chapter')out.push({chapter_at_least:[r.character,+r.value]});
+    else if(r.type==='memory')out.push(r.op==='is_false'
+      ?{memory_missing:[r.character,r.key]}:{memory_exists:[r.character,r.key]});
+    else if(r.type==='met')out.push({flag:'met_'+r.character});
+    else if(String(r.key).includes('=')){
+      const [k,v]=String(r.key).split(/=(.*)/s);
+      out.push({value_equals:[k,conditionValue(v)]});
+    }else if(r.op==='is_false')out.push({flag_not:r.key});
+    else out.push({flag:r.key});
+  });
+  return out;
 }
 
 /** Keeps the source activation intact, updating only fields it already had —
@@ -49,7 +93,12 @@ function requiresToCondition(reqs){
   if(!(reqs||[]).length)return undefined;
   const out={};
   reqs.forEach(r=>{
-    if(r.type==='stat')out.meter_at_least=[r.key,+r.value];
+    if(r.type==='stat'){
+      const meter=[r.character,r.key,+r.value];
+      if(r.op==='lte')out.meter_at_most=meter;
+      else if(r.op==='eq')out.meter_equals=meter;
+      else out.meter_at_least=meter;
+    }
     else if(r.type==='chapter')out.chapter_at_least=+r.value;
     else if(r.type==='met')out.event='character_met',out.character=r.character;
     else if(/^quest_.+_done$/.test(r.key))out.event='quest_completed',out.quest=r.key.slice(6,-5);
@@ -140,16 +189,36 @@ function buildNodes(group){
         link(id);
         nodes[id].choices=n.options.map((o,i)=>{
           const target=emit(o.nodes,null);
-          const c={id:o._oid||slug(o.text||('opt_'+(i+1))).slice(0,28),text:o.text};
+          const c=Object.assign({},o._orig,{id:o._oid||slug(o.text||('opt_'+(i+1))).slice(0,28),text:o.text});
           if(o._tone)c.tone=o._tone;
           const fx=flagToEffects(o.flag);
           if(fx.length)c.effects=fx;
-          const cond=requiresToCondition(o.requires);
-          if(cond)c.condition=cond;
+          delete c.condition;delete c.conditions;
+          const conditions=requiresToConditions(o.requires);
+          if(conditions.length)c.conditions=conditions;
           if(target)c.next=target;
           return c;
         });
         prev=null;              // choices terminate the chain
+        return first;
+      }
+
+      if(n.type==='gate'){
+        const id=idFor(n,'gate');
+        nodes[id]={branches:[]};
+        link(id);
+        nodes[id].branches=(n.options||[]).map((o,i)=>{
+          const target=emit(o.nodes,null);
+          const branch=Object.assign({},o._orig,{id:o._oid||('branch_'+(i+1)),text:o.text});
+          const fx=flagToEffects(o.flag);
+          if(fx.length)branch.effects=fx;
+          delete branch.condition;delete branch.conditions;
+          const conditions=requiresToConditions(o.requires);
+          if(conditions.length)branch.conditions=conditions;
+          if(target)branch.next=target;
+          return branch;
+        });
+        prev=null;
         return first;
       }
     }
@@ -174,6 +243,13 @@ function conversationOut(group){
   };
   if(a.repetition)out.repetition=a.repetition;
   if(group.main.premise)out.summary=group.main.premise;
+  const consequence=group.main.scenePlan?.consequence||{};
+  const planned=[];
+  if(consequence.memoryId)planned.push({operation:'create_memory',character:consequence.character,value:consequence.memoryId});
+  if(+consequence.chapter>1)planned.push({operation:'unlock_relationship_chapter',character:consequence.character,level:+consequence.chapter});
+  if(consequence.identity)planned.push(Object.assign({operation:'change_identity',character:consequence.character},consequence.identity));
+  const completion=(a.completion_effects||[]).concat(planned);
+  if(completion.length)out.completion_effects=completion;
   const cond=requiresToCondition(group.main.requires);
   if(cond)out.condition=cond;
   return out;
