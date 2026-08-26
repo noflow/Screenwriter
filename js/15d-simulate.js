@@ -13,6 +13,11 @@ function simulate(maxDays){
 
   const run=(list,depth)=>{
     (list||[]).forEach(n=>{
+      if(n.type==='gate'){
+        const open=n.options.filter(o=>allMet(o.requires,S));
+        if(open.length&&depth<12){applyFlag(open[0].flag,S);run(open[0].nodes,depth+1);}
+        return;
+      }
       if(n.type==='choice'){
         const open=n.options.filter(o=>allMet(o.requires,S));
         if(!open.length)return;

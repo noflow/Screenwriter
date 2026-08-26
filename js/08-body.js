@@ -55,6 +55,22 @@ function renderList(list,path){
         '<div class="jump-node"><span class="arrow">jump to →</span>'+
         '<select data-jump="'+p.join('.')+'"><option value="">— pick content —</option>'+opts+'</select></div></div>';
     }
+    if(n.type==='gate'){
+      return '<div class="node" data-p="'+p.join('.')+'"><div class="tools">'+
+        '<button data-act="up">↑</button><button data-act="down">↓</button>'+
+        '<button data-act="del">del</button></div>'+
+        '<div class="choice-node"><div class="choice-head">Automatic stat outcome</div>'+
+        n.options.map((o,j)=>{
+          const h=path.concat(i,j),on=h.join('.')===focusPath.join('.');
+          return '<div class="branch'+(on?' on':'')+'"><div class="branch-head">'+
+            '<input class="opt-text" value="'+esc(o.text)+'" data-opt="'+h.join('.')+'">'+
+            '<button class="branch-here" data-here="'+h.join('.')+'">'+(on?'writing here':'write here')+'</button>'+
+            '<button class="branch-rewrite" data-rewrite="'+h.join('.')+'">rewrite</button>'+
+            '</div><div class="optcond">'+condEditor(o.requires,'opt:'+h.join('.'))+
+            '<input class="flag" placeholder="effects — trust +1" value="'+esc(o.flag||'')+'" data-flag="'+h.join('.')+'"></div>'+
+            renderList(o.nodes,h)+'</div>';
+        }).join('')+'</div></div>';
+    }
     return '<div class="node" data-p="'+p.join('.')+'"><div class="tools">'+
       '<button data-act="up">↑</button><button data-act="down">↓</button>'+
       '<button data-act="addopt">+ option</button><button data-act="del">del</button></div>'+
@@ -66,6 +82,7 @@ function renderList(list,path){
           '<input class="flag" placeholder="trust +1" value="'+esc(o.flag||'')+'" data-flag="'+h.join('.')+'">'+
           '<button class="branch-go" data-cont="'+h.join('.')+'">'+
             ((o.nodes||[]).length?'continue':'write this branch')+'</button>'+
+          ((o.nodes||[]).length?'<button class="branch-rewrite" data-rewrite="'+h.join('.')+'">rewrite</button>':'')+
           '<button class="branch-here" data-here="'+h.join('.')+'">'+(on?'writing here':'write here')+'</button>'+
           '</div><div class="optcond">'+condEditor(o.requires,'opt:'+h.join('.'))+'</div>'+
           renderList(o.nodes,h)+'</div>';
@@ -105,6 +122,19 @@ function wireTree(){
     }catch(e){
       if(e.name!=='AbortError')note('Could not continue: '+esc(e.message),true);
     }finally{busy=false;$('go').disabled=false;$('stop').disabled=true;abort=null;paintBody();}
+  });
+  inner.querySelectorAll('[data-rewrite]').forEach(b=>b.onclick=async()=>{
+    if(busy)return;
+    const p=b.dataset.rewrite.split('.').map(Number),o=optAt(p),old=o.nodes.slice();
+    if(!old.length)return;
+    busy=true;$('go').disabled=true;$('stop').disabled=false;abort=new AbortController();
+    o.nodes=[];b.textContent='rewriting…';
+    try{
+      const n=await continueBranch(p,abort.signal,'Rewrite this branch from scratch. Keep its condition and outcome distinct.');
+      if(!n)o.nodes=old;
+      save();paintBody();note(n?'Rewrote that branch.':'Kept the old branch because no replacement came back.',!n);
+    }catch(e){o.nodes=old;if(e.name!=='AbortError')note('Could not rewrite: '+esc(e.message),true);}
+    finally{busy=false;$('go').disabled=false;$('stop').disabled=true;abort=null;paintBody();}
   });
   inner.querySelectorAll('[data-here]').forEach(b=>b.onclick=()=>{
     const h=b.dataset.here.split('.').map(Number);

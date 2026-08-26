@@ -442,6 +442,7 @@
     <button class="btn" id="pasteChars">Paste</button>
     <button class="btn" id="openMap">Map</button>
     <button class="btn" id="openInspect">Inspect</button>
+    <button class="btn" id="openMemory">Memory</button>
     <button class="btn" id="openExport">Export</button>
     <select class="model" id="model" aria-label="Model"></select>
     <span class="status"><span class="lamp" id="lamp"></span><span id="lampText">checking</span></span>
@@ -490,7 +491,20 @@
     </div>
 
     <div class="railpane" data-pane="dir">
-      <p class="rubric">Model</p>
+      <p class="rubric">Engine <span class="tag" id="engineHost" style="margin-left:auto;font-family:var(--util);font-size:9px;color:var(--ash)"></span></p>
+      <div class="field"><label for="engine">Where generation runs</label>
+        <select id="engine"></select>
+        <p class="hint" id="engineNote"></p></div>
+      <div class="field" id="baseField"><label for="aiBase">Base URL</label>
+        <input type="text" id="aiBase" placeholder="https://api.pawan.krd/v1"></div>
+      <div class="field" id="keyField"><label for="aiKey">API key</label>
+        <input type="password" id="aiKey" placeholder="pk-…">
+        <div class="row" style="margin-top:6px"><button class="btn" id="forgetKey">Forget API key</button></div>
+        <p class="hint">Held in this browser only — never written into the project file or an export.</p></div>
+      <div class="field" id="modelsField"><label for="aiModels">Model names</label>
+        <input type="text" id="aiModels" placeholder="cosmosrp, gpt-4o-mini">
+        <p class="hint">Comma separated. Used when the endpoint will not list its own models.</p></div>
+      <p class="rubric later">Model</p>
       <div class="field"><label for="temp">Temperature</label>
         <div class="dial"><input type="range" id="temp" min="0" max="1.6" step=".05" value=".8"><output id="tempOut"></output></div>
         <p class="hint">Above ~1.0, small models start breaking the JSON format. Long chats generate in short unique waves so lines do not loop.</p></div>
@@ -573,6 +587,47 @@
   </div>
 </dialog>
 
+<dialog id="planner">
+  <div class="sheet-head">
+    <h3>Plan a scene</h3>
+    <span class="sp"></span>
+    <button class="btn" id="closePlanner">Close</button>
+  </div>
+  <div class="sheet-body">
+    <p class="hint" style="margin:0 0 12px">Start with a few story decisions. Draft an outline, edit it if needed, then write the scene from it.</p>
+    <div class="field"><label for="pTemplate">Scene template</label><select id="pTemplate"></select></div>
+    <div class="field"><label for="pSetting">Setting / location</label><input id="pSetting" type="text" placeholder="Living room, after dinner"></div>
+    <div class="field"><label for="pGoal">Scene goal</label><input id="pGoal" type="text" placeholder="The player tries to reconnect after an argument"></div>
+    <div class="field"><label for="pTension">Tension or obstacle</label><input id="pTension" type="text" placeholder="She is guarded and keeps changing the subject"></div>
+    <div class="field"><label for="pBeat">Must-hit beat</label><input id="pBeat" type="text" placeholder="A small shared joke breaks the ice"></div>
+    <div class="field"><label for="pTone">Tone</label><input id="pTone" type="text" placeholder="quiet, tentative, warm by the end"></div>
+    <div class="field"><label for="pEnding">Ending choice</label><input id="pEnding" type="text" placeholder="Stay and watch TV, or give her space"></div>
+    <p class="rubric later">Conditional outcome <span class="hint">optional</span></p>
+    <div class="row" style="margin-bottom:8px"><select id="pStatCharacter" aria-label="Character for stat outcome"></select><select id="pStatKey" aria-label="Stat for outcome"></select><span class="lbl">high ≥</span><input id="pStatValue" type="number" min="0" value="50" aria-label="High stat threshold" style="width:62px"><span class="lbl">low ≤</span><input id="pStatLowValue" type="number" min="0" value="24" aria-label="Low stat threshold" style="width:62px"></div>
+    <div class="field"><label for="pStatHigh">At or above the threshold</label><input id="pStatHigh" type="text" placeholder="She opens up and invites the player to stay"></div>
+    <div class="field"><label for="pStatHighEffect">High-outcome effects</label><input id="pStatHighEffect" type="text" placeholder="elena_reyes.friendship +2; elena_reyes.trust +1"></div>
+    <div class="field"><label for="pStatMiddle">Between the thresholds <span class="hint">optional</span></label><input id="pStatMiddle" type="text" placeholder="She softens a little, but stays guarded"></div>
+    <div class="field"><label for="pStatMiddleEffect">Middle-outcome effects</label><input id="pStatMiddleEffect" type="text" placeholder="elena_reyes.trust +1"></div>
+    <div class="field"><label for="pStatLow">Below the threshold</label><input id="pStatLow" type="text" placeholder="She keeps her distance and ends the conversation"></div>
+    <div class="field"><label for="pStatLowEffect">Low-outcome effects</label><input id="pStatLowEffect" type="text" placeholder="elena_reyes.resentment +1"></div>
+    <div class="field"><label for="pStatPreview">Preview stat value</label><div class="dial"><input id="pStatPreview" type="number" value="0"><output id="pGatePreview"></output></div></div>
+    <div class="field"><label for="pOutline">Beat outline</label>
+      <textarea id="pOutline" rows="12" spellcheck="true" placeholder="Draft an outline, then edit it here before writing the scene."></textarea></div>
+    <div class="row" style="justify-content:flex-end"><button class="btn" id="draftOutline">Draft outline</button><button class="btn gold" id="writePlanned">Write scene from outline</button></div>
+  </div>
+</dialog>
+
+<dialog id="memory">
+  <div class="sheet-head"><h3>Story memory</h3><span class="sp"></span><button class="btn" id="closeMemory">Close</button></div>
+  <div class="sheet-body">
+    <p class="hint" style="margin:12px 0">Saved facts are fed into future scene planning and generation. Tag a note with character ids or names, separated by commas, to keep it focused.</p>
+    <div class="field"><label for="memoryText">Canon fact</label><textarea id="memoryText" rows="3" placeholder="Elena knows the player lied about the job interview."></textarea></div>
+    <div class="field"><label for="memoryTags">Relevant characters</label><input id="memoryTags" placeholder="elena_reyes, player"></div>
+    <div class="row" style="justify-content:flex-end"><button class="btn gold" id="addMemory">Save fact</button></div>
+    <div id="memoryList"></div>
+  </div>
+</dialog>
+
 <dialog id="map">
   <div class="sheet-head">
     <h3>Story map</h3>
@@ -600,6 +655,9 @@
     <button class="mode" data-ins="week">Week</button>
     <button class="mode" data-ins="reg">Flags &amp; sprites</button>
     <button class="mode" data-ins="cov">Coverage</button>
+    <button class="mode" data-ins="effects">Effects</button>
+    <button class="mode" data-ins="milestones">Milestones</button>
+    <button class="mode" data-ins="tests">Branch tests</button>
     <button class="mode" data-ins="stub">Missing characters</button>
     <button class="mode" data-ins="godot">Godot</button>
     <span class="sp"></span>
@@ -910,20 +968,159 @@ function whereIs(c,day,block){
 }
 
 /* ---- 04-ollama.js ---- */
-/* ============ ollama ============ */
+/* ============ engines ============
+   Ollama stays the default and the only local one. Anything OpenAI-compatible —
+   Pawan.Krd, a self-hosted proxy, an OpenRouter-shaped endpoint — speaks the same
+   request and response shapes, so one adapter covers all of them. */
+const ENGINES={
+  ollama:{label:'Ollama — on this machine',base:HOST,openai:false,local:true},
+  pawan:{label:'Pawan.Krd — hosted',base:'https://api.pawan.krd/v1',openai:true,
+    requiresKey:true,note:'OpenAI-compatible. Create an API key in your Pawan.Krd dashboard, then choose a chat model.'},
+  cosmosrp:{label:'Pawan.Krd · CosmosRP 3.5',base:'https://api.pawan.krd/v1',openai:true,
+    requiresKey:true,defaultModel:'pkrd/cosmosrp-3.5',
+    note:'Their dedicated roleplay model. Requires a Pawan.Krd API key; good for dialogue, weaker on strict JSON.'},
+  custom:{label:'Other OpenAI-compatible',base:'',openai:true,
+    note:'Any endpoint that answers /chat/completions the way OpenAI does.'}
+};
+
+/* Engine settings live in localStorage, never in P — a key must not ride along
+   in a saved project file or an exported sheet. */
+let AI={engine:'ollama',base:'',key:'',models:''};
+try{Object.assign(AI,JSON.parse(localStorage.getItem('scenewright.ai')||'{}'));}catch{}
+const engine=()=>ENGINES[AI.engine]||ENGINES.ollama;
+const aiBase=()=>String((AI.engine==='custom'?AI.base:'')||engine().base||'').replace(/\/+$/,'');
+const isLocalEngine=()=>!!engine().local;
+const saveAI=()=>{try{localStorage.setItem('scenewright.ai',JSON.stringify(AI))}catch{}};
+function aiHeaders(){
+  const h={'Content-Type':'application/json'};
+  if(engine().openai&&AI.key)h.Authorization='Bearer '+AI.key;
+  return h;
+}
+
 async function findModels(){
+  const s=$('model');
+  const remember=()=>{const last=localStorage.getItem('scenewright.model');
+    const preferred=engine().defaultModel;
+    if(preferred&&[...s.options].some(x=>x.value===preferred)){s.value=preferred;return;}
+    if(last&&[...s.options].some(x=>x.value===last))s.value=last;};
+  const typed=()=>{
+    const list=engine().defaultModel?[engine().defaultModel]
+      :String(AI.models||'').split(',').map(x=>x.trim()).filter(Boolean);
+    s.innerHTML='';
+    if(!list.length){s.innerHTML='<option>—</option>';return false;}
+    list.forEach(m=>s.add(new Option(m,m)));
+    return true;
+  };
+
+  if(engine().openai){
+    if(!aiBase()){lamp('dark','no endpoint');typed();
+      return raise('That engine needs a base URL. Set one in the Direction tab.');}
+    if(engine().requiresKey&&!AI.key){s.innerHTML='<option value="">enter API key</option>';
+      lamp('dark','API key needed');
+      return raise('Pawan.Krd needs an API key. Create one in its dashboard, then paste it in the Direction tab.');}
+    try{
+      const r=await fetch(aiBase()+'/models',{headers:aiHeaders()});
+      if(!r.ok)throw new Error('HTTP '+r.status);
+      const d=await r.json();
+      const ids=[...new Set((d.data||d.models||[]).map(m=>m.id||m.name).filter(Boolean))].sort();
+      if(!ids.length)throw new Error('the endpoint listed no models');
+      s.innerHTML='';ids.forEach(m=>s.add(new Option(m,m)));
+      remember();lamp('live','connected');clearAlarm();
+    }catch(e){
+      // Plenty of proxies don't expose /models at all. A typed list works fine.
+      if(typed()){remember();lamp('live','manual list');clearAlarm();}
+      else{lamp('dark','no model list');
+        raise('Could not list models from <code>'+esc(aiBase())+'</code> — '+esc(e.message)+
+          '.<br>Type the model names you want in the Direction tab and they will be used as given.');}
+    }
+    return;
+  }
+
   try{
-    const r=await fetch(HOST+'/api/tags'); if(!r.ok)throw 0;
-    const {models=[]}=await r.json(),s=$('model');s.innerHTML='';
+    const r=await fetch(aiBase()+'/api/tags'); if(!r.ok)throw 0;
+    const {models=[]}=await r.json();s.innerHTML='';
     if(!models.length){s.innerHTML='<option>no models</option>';lamp('dark','no models');
       return raise('Ollama is running but has no models. Pull one: <code>ollama pull huihui_ai/dolphin3-abliterated:8b</code>');}
     models.sort((a,b)=>a.name.localeCompare(b.name)).forEach(m=>s.add(new Option(m.name,m.name)));
-    const last=localStorage.getItem('scenewright.model');
-    if(last&&models.some(m=>m.name===last))s.value=last;
+    remember();
     lamp('live','connected');clearAlarm();
-  }catch{lamp('dark','no connection');$('model').innerHTML='<option>—</option>';
-    raise('Can\'t reach Ollama. Check <code>ollama list</code>, and that you ran <code>setx OLLAMA_ORIGINS "*"</code> then restarted Ollama from the tray.');}
+  }catch{lamp('dark','no connection');s.innerHTML='<option>—</option>';
+    raise('Can\'t reach Ollama. Check <code>ollama list</code>, and that you ran <code>setx OLLAMA_ORIGINS "*"</code> then restarted Ollama from the tray.'+
+      '<br>Or switch to a hosted engine in the Direction tab.');}
 }
+
+/** One generation call against whichever engine is selected. Returns raw text. */
+async function chatComplete(prompt,signal,json){
+  if(engine().requiresKey&&!AI.key)
+    throw new Error(engine().label+' needs an API key. Add one in the Direction tab.');
+  const model=$('model').value;
+  const temp=parseFloat($('temp').value);
+  const ctx=parseInt($('ctx').value,10);
+
+  if(!engine().openai){
+    const res=await fetch(aiBase()+'/api/chat',{method:'POST',signal,headers:aiHeaders(),
+      body:JSON.stringify({model,stream:false,
+        messages:[{role:'user',content:prompt}],
+        format:json?'json':undefined,
+        options:{temperature:temp,num_ctx:ctx,num_predict:2048,
+          repeat_penalty:1.22,repeat_last_n:256}})});
+    if(!res.ok)throw new Error('Ollama returned '+res.status);
+    return (await res.json()).message?.content||'';
+  }
+
+  const send=async withFormat=>{
+    const body={model,stream:false,temperature:temp,max_tokens:2048,
+      frequency_penalty:.35,presence_penalty:.15,
+      messages:[{role:'user',content:prompt}]};
+    if(withFormat&&json)body.response_format={type:'json_object'};
+    const res=await fetch(aiBase()+'/chat/completions',{method:'POST',signal,
+      headers:aiHeaders(),body:JSON.stringify(body)});
+    if(!res.ok){
+      const text=await res.text().catch(()=>'');
+      const err=new Error(engine().label+' returned '+res.status+
+        (res.status===401?' — the API key was rejected':'')+
+        (text?': '+text.slice(0,160):''));
+      err.status=res.status;throw err;
+    }
+    const d=await res.json();
+    return d.choices?.[0]?.message?.content||d.choices?.[0]?.text||'';
+  };
+
+  try{ return await send(true); }
+  catch(e){
+    // Not every proxy honours response_format, and the prompt already demands JSON.
+    if(json&&(e.status===400||e.status===422||e.status===404))return await send(false);
+    throw e;
+  }
+}
+
+function paintEngine(){
+  const s=$('engine');if(!s)return;
+  if(!s.options.length)Object.keys(ENGINES).forEach(k=>s.add(new Option(ENGINES[k].label,k)));
+  s.value=AI.engine;
+  const e=engine();
+  $('engineNote').textContent=e.local
+    ? 'Nothing leaves this machine.'
+    : (e.note||'');
+  $('baseField').style.display=AI.engine==='custom'?'':'none';
+  $('keyField').style.display=e.openai?'':'none';
+  $('modelsField').style.display=e.openai&&!e.defaultModel?'':'none';
+  $('aiBase').value=AI.base||'';
+  $('aiKey').value=AI.key||'';
+  $('aiModels').value=AI.models||'';
+  $('engineHost').textContent=e.local?'local':aiBase().replace(/^https?:\/\//,'');
+  privacyWatch();
+}
+
+/** The tool's promise is that nothing leaves the machine. If that stops being
+    true, say so — especially with the private profile switched on. */
+function privacyWatch(){
+  if(!isLocalEngine()&&$('useAdult')?.checked)
+    note('<b>Private profile is on and generation is remote.</b> The private_profile block '+
+      'is being sent to '+esc(engine().label)+'. Switch the engine back to Ollama, or that '+
+      'checkbox off, if you would rather it stayed here.',true);
+}
+
 const lamp=(c,t)=>{$('lamp').className='lamp '+c;$('lampText').textContent=t;};
 const raise=h=>{const a=$('alarmSlot');
   const keep=a.querySelector('.note');
@@ -943,6 +1140,15 @@ function note(msg,bad){
   if(!bad)setTimeout(()=>d.remove(),6000);
 }
 $('model').onchange=e=>{try{localStorage.setItem('scenewright.model',e.target.value)}catch{}};
+$('engine').onchange=()=>{AI.engine=$('engine').value;saveAI();paintEngine();findModels();};
+$('aiBase').onchange=()=>{AI.base=$('aiBase').value.trim();saveAI();findModels();};
+$('aiKey').onchange=()=>{AI.key=$('aiKey').value.trim();saveAI();findModels();};
+$('aiModels').onchange=()=>{AI.models=$('aiModels').value;saveAI();findModels();};
+$('forgetKey').onclick=()=>{
+  AI.key='';saveAI();$('aiKey').value='';
+  note('Saved API key removed from this browser.');
+  findModels();
+};
 
 /* ---- 05-tree.js ---- */
 /* ============ node tree ============ */
@@ -1221,6 +1427,22 @@ function renderList(list,path){
         '<div class="jump-node"><span class="arrow">jump to →</span>'+
         '<select data-jump="'+p.join('.')+'"><option value="">— pick content —</option>'+opts+'</select></div></div>';
     }
+    if(n.type==='gate'){
+      return '<div class="node" data-p="'+p.join('.')+'"><div class="tools">'+
+        '<button data-act="up">↑</button><button data-act="down">↓</button>'+
+        '<button data-act="del">del</button></div>'+
+        '<div class="choice-node"><div class="choice-head">Automatic stat outcome</div>'+
+        n.options.map((o,j)=>{
+          const h=path.concat(i,j),on=h.join('.')===focusPath.join('.');
+          return '<div class="branch'+(on?' on':'')+'"><div class="branch-head">'+
+            '<input class="opt-text" value="'+esc(o.text)+'" data-opt="'+h.join('.')+'">'+
+            '<button class="branch-here" data-here="'+h.join('.')+'">'+(on?'writing here':'write here')+'</button>'+
+            '<button class="branch-rewrite" data-rewrite="'+h.join('.')+'">rewrite</button>'+
+            '</div><div class="optcond">'+condEditor(o.requires,'opt:'+h.join('.'))+
+            '<input class="flag" placeholder="effects — trust +1" value="'+esc(o.flag||'')+'" data-flag="'+h.join('.')+'"></div>'+
+            renderList(o.nodes,h)+'</div>';
+        }).join('')+'</div></div>';
+    }
     return '<div class="node" data-p="'+p.join('.')+'"><div class="tools">'+
       '<button data-act="up">↑</button><button data-act="down">↓</button>'+
       '<button data-act="addopt">+ option</button><button data-act="del">del</button></div>'+
@@ -1232,6 +1454,7 @@ function renderList(list,path){
           '<input class="flag" placeholder="trust +1" value="'+esc(o.flag||'')+'" data-flag="'+h.join('.')+'">'+
           '<button class="branch-go" data-cont="'+h.join('.')+'">'+
             ((o.nodes||[]).length?'continue':'write this branch')+'</button>'+
+          ((o.nodes||[]).length?'<button class="branch-rewrite" data-rewrite="'+h.join('.')+'">rewrite</button>':'')+
           '<button class="branch-here" data-here="'+h.join('.')+'">'+(on?'writing here':'write here')+'</button>'+
           '</div><div class="optcond">'+condEditor(o.requires,'opt:'+h.join('.'))+'</div>'+
           renderList(o.nodes,h)+'</div>';
@@ -1271,6 +1494,19 @@ function wireTree(){
     }catch(e){
       if(e.name!=='AbortError')note('Could not continue: '+esc(e.message),true);
     }finally{busy=false;$('go').disabled=false;$('stop').disabled=true;abort=null;paintBody();}
+  });
+  inner.querySelectorAll('[data-rewrite]').forEach(b=>b.onclick=async()=>{
+    if(busy)return;
+    const p=b.dataset.rewrite.split('.').map(Number),o=optAt(p),old=o.nodes.slice();
+    if(!old.length)return;
+    busy=true;$('go').disabled=true;$('stop').disabled=false;abort=new AbortController();
+    o.nodes=[];b.textContent='rewriting…';
+    try{
+      const n=await continueBranch(p,abort.signal,'Rewrite this branch from scratch. Keep its condition and outcome distinct.');
+      if(!n)o.nodes=old;
+      save();paintBody();note(n?'Rewrote that branch.':'Kept the old branch because no replacement came back.',!n);
+    }catch(e){o.nodes=old;if(e.name!=='AbortError')note('Could not rewrite: '+esc(e.message),true);}
+    finally{busy=false;$('go').disabled=false;$('stop').disabled=true;abort=null;paintBody();}
   });
   inner.querySelectorAll('[data-here]').forEach(b=>b.onclick=()=>{
     const h=b.dataset.here.split('.').map(Number);
@@ -1637,10 +1873,12 @@ function paintModes(){
   if(!c){
     mode='scene';
     bar.innerHTML='<button class="mode on" data-mode="scene">Whole scene</button>'+
+      '<button class="mode" id="openPlanner">Plan scene</button>'+
       '<span class="as">describe a scene and it will be written as a new conversation</span>';
     $('line').placeholder='Describe the scene — "mom is in the living room in the evening '+
       'watching TV, player starts a conversation and she asks if he wants to join her"…';
     $('go').textContent='Write the scene';
+    $('openPlanner').onclick=openPlanner;
     return;
   }
   const m=c.type==='repeatable'
@@ -1649,6 +1887,7 @@ function paintModes(){
   if(!m.some(x=>x[0]===mode))mode=m[0][0];
   const dangling=c.type!=='repeatable'?emptyBranches().length:0;
   bar.innerHTML=m.map(([k,l])=>'<button class="mode'+(mode===k?' on':'')+'" data-mode="'+k+'">'+l+'</button>').join('')+
+    (c.type==='conversation'?'<button class="mode" id="openPlanner">Plan scene</button>':'')+
     (dangling?'<button class="mode fill" id="fillEmpty">Continue '+dangling+
       ' unfinished branch'+(dangling===1?'':'es')+'</button>':'')+
     (c.type!=='repeatable'?'<span class="as">as <select id="playAs">'+
@@ -1660,6 +1899,7 @@ function paintModes(){
         '<option value="'+esc(id)+'">'+esc(chr(id)?.name||id)+'</option>').join('')+
       '</select></span>':'');
   bar.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;paintModes();});
+  if($('openPlanner'))$('openPlanner').onclick=openPlanner;
   if($('fillEmpty'))$('fillEmpty').onclick=fillEmpty;
   $('line').placeholder = mode==='scene'
       ? 'Describe the scene — "mom is in the living room in the evening watching TV, player starts a conversation and she asks if he wants to join her"…'
@@ -1728,6 +1968,12 @@ function adultBrief(){
   return '\n\n# Private profile (writer enabled)\n'+
     'Use each character\'s private profile as in-character context. Stay inside the hard limits.'+
     (bits.length?'\n'+bits.join('\n'):'');
+}
+
+function canonBrief(){
+  const notes=P.storyNotes||[],c=cur(),ids=new Set([...(c?.cast||[]),playerChar()?.id].filter(Boolean));
+  const relevant=notes.filter(n=>!(n.tags||[]).length||(n.tags||[]).some(t=>ids.has(t)));
+  return relevant.length?'\n\n# Story memory\n'+relevant.slice(-18).map(n=>'- '+n.text).join('\n'):'';
 }
 
 const present=()=>{const c=cur();return (c?.cast||[]).map(chr).filter(Boolean);};
@@ -1914,7 +2160,7 @@ function buildPrompt(input){
   const c=cur(),n=+$('burst').value||3;
   const cast=presentNPCs().map(charBrief).join('\n\n')||'(no characters marked present)';
   const head='You write dialogue for a visual novel. Stay strictly in character.\n\n# Characters\n'+cast+
-    playerRule()+'\n\n'+sceneBrief()+boundsBrief()+adultBrief();
+    playerRule()+'\n\n'+sceneBrief()+boundsBrief()+adultBrief()+canonBrief();
 
   if(mode==='variants'){
     const who=chr(c.character);
@@ -1930,34 +2176,50 @@ function buildPrompt(input){
   const ids=speakableIds(c).join(', ');
 
   if(mode==='scene'){
-    const roster=(($('writePlayer')?.checked&&playerChar())
-      ? P.characters : npcs()).map(x=>x.id+' ('+x.name+')').join(', ');
+    const plan=c.scenePlan||{};
+    const planned=plan.outline
+      ? '# Approved beat outline\n'+plan.outline+'\n\n# Original plan\n'+(plan.brief||input)
+      : input;
     return 'You write scenes for a life-sim visual novel. Stay strictly in character.\n\n'+
       '# Everyone in this game\n'+npcs().map(charBrief).join('\n\n')+playerRule()+
       '\n\n# Places\n'+P.locations.map(l=>l.id+' — '+l.name+(l.notes?': '+l.notes:'')).join('\n')+
-      boundsBrief()+adultBrief()+
-      '\n\n# The scene to write\n'+input+
+      boundsBrief()+adultBrief()+canonBrief()+
+      '\n\n# The scene to write\n'+planned+
       '\n\n# How to build it\n'+
       'Open with a line of narration setting the place. Let the characters talk through a real '+
-      'exchange (roughly 12–25 lines total is fine — do not rush). Then give the player a real choice — '+
-      '2 or 3 options that lead somewhere genuinely different, not three phrasings of yes. '+
-      'EVERY option must have a "then" list holding at least two nodes — a choice that leads nowhere '+
-      'is unusable. Make each branch feel distinct. You may leave a branch open for later continuation '+
-      'rather than forcing a hard ending.\n\n'+
-      '# Format\nReply with ONLY this JSON, no prose or fences:\n'+
-      '{"title":"Short scene name",'+
-      '"location":"<a location id from the list, or empty>",'+
-      '"block":"early_morning|morning|lunch|afternoon|evening|late_evening|night",'+
-      '"cast":["character_id",...],'+
-      '"nodes":[ ... ]}\n\n'+
-      'A node is one of:\n'+
-      '  {"speaker":"__narrator__","text":"What the player sees."}\n'+
-      '  {"speaker":"character_id","text":"Spoken line. *Action in asterisks.*","emotion":"one_word"}\n'+
-      '  {"choice":[{"text":"What the player says","effect":"character_id.meter +1",'+
-      '"then":[ ...more nodes... ]}]}\n\n'+
-      'speaker must be "__narrator__" or one of: '+roster+'. '+
-      'effect is optional and looks like "elena_reyes_hale.comfort +1" or a bare flag name. '+
-      'A "then" list may contain one more nested choice, but no deeper than that.';
+      'exchange (roughly 12–25 lines total is fine — do not rush).\n\n'+
+      '# Format\nWrite ordinary role-play transcript text — NOT JSON. Use one line per beat:\n'+
+      '  *The room is quiet except for the television.*\n'+
+      '  Elena Reyes: "Want to join me?"\n'+
+      '  Elena Reyes: *She pats the cushion beside her.*\n\n'+
+      'Use the characters\' names before spoken lines. Put narration and actions in *asterisks*. '+
+      'Do not use markdown tables, code fences, or JSON.\n\n'+
+      (plan.statGate
+        ? 'This scene ends with an AUTOMATIC stat outcome. Do not give the player a choice at this point. '+
+          'After the shared scene, use exactly this shape. Each outcome needs at least two response beats:\n'+
+          '  STAT OUTCOMES:\n'+
+          '  HIGH:\n'+
+          '  '+(chr(plan.statGate.character)?.name||plan.statGate.character)+': "A line fitting the high-stat outcome."\n'+
+          '  *A second beat.*\n'+
+          (plan.statGate.middle
+            ? '  MIDDLE:\n'+
+              '  '+(chr(plan.statGate.character)?.name||plan.statGate.character)+': "A line fitting the middle-stat outcome."\n'+
+              '  *A second beat.*\n'
+            : '')+
+          '  LOW:\n'+
+          '  '+(chr(plan.statGate.character)?.name||plan.statGate.character)+': "A line fitting the low-stat outcome."\n'+
+          '  *A second beat.*\n\n'
+        : 'To end with player choices, use this simple shape. Each option needs at least two response beats:\n'+
+      '  CHOICES:\n'+
+      '  1. "Sure, I\'ll stay a while."\n'+
+      '     THEN:\n'+
+      '     Elena Reyes: "Good."\n'+
+      '     *She makes room on the sofa.*\n'+
+      '  2. "I should get going."\n'+
+      '     THEN:\n'+
+      '     Elena Reyes: "Another time, then."\n'+
+      '     *She tries not to sound disappointed.*\n\n')+
+      'Keep the branches genuinely different. Reply with the transcript only.';
   }
 
   if(mode==='choice')
@@ -2027,6 +2289,106 @@ function buildScene(list,ids,depth){
       emotion:sp==='__narrator__'?'':String(n.emotion||n.expression||'').toLowerCase().slice(0,18)});
   });
   return out;
+}
+
+/** Converts a normal role-play transcript into editor nodes. Scene generation uses
+    this instead of asking the model to hand-author a fragile JSON tree. */
+function roleplayNodes(source,c){
+  const out=[];
+  String(source||'').split(/\r?\n/).forEach(raw=>{
+    let line=raw.trim();
+    if(!line||/^then\s*:?$/i.test(line))return;
+    line=line.replace(/^[-•]\s*/,'').replace(/^\*\*(.+?):\*\*\s*/,'$1: ');
+    const hit=line.match(/^([^:]{1,80}):\s*(.+)$/);
+    if(hit){
+      const speaker=resolveSpeaker(hit[1].trim(),c);
+      const text=hit[2].trim();
+      if(speaker&&text)out.push({type:'line',speaker,text,emotion:''});
+      else if(text)out.push({type:'line',speaker:'__narrator__',text,emotion:''});
+    }else{
+      out.push({type:'line',speaker:'__narrator__',text:line,emotion:''});
+    }
+  });
+  return out;
+}
+
+function sceneLocation(raw){
+  const value=String(raw||'').trim();
+  if(!value)return '';
+  const found=P.locations.find(l=>l.id===value||l.name.toLowerCase()===value.toLowerCase());
+  return found?found.id:'';
+}
+
+function cleanChoiceText(raw){
+  return String(raw||'').trim().replace(/^["“]/,'').replace(/["”]$/,'').trim();
+}
+
+function parseRoleplayScene(raw,c){
+  let text=String(raw||'').replace(/<think>[\s\S]*?<\/think>/gi,'').trim();
+  text=text.replace(/```(?:text|markdown)?\s*/gi,'').replace(/```/g,'').trim();
+  const result={title:'',location:'',block:'',cast:[],nodes:[]};
+  const lines=text.split(/\r?\n/);
+  const story=[],choiceLines=[],outcomeLines=[];
+  let section='story';
+
+  lines.forEach(rawLine=>{
+    const line=rawLine.trim();
+    if(/^choices?\s*:\s*$/i.test(line)){section='choices';return;}
+    if(/^stat outcomes?\s*:\s*$/i.test(line)){section='outcomes';return;}
+    if(section==='choices'){choiceLines.push(rawLine);return;}
+    if(section==='outcomes'){outcomeLines.push(rawLine);return;}
+    const title=line.match(/^title\s*:\s*(.+)$/i);
+    const location=line.match(/^location\s*:\s*(.+)$/i);
+    const block=line.match(/^(?:time|block)\s*:\s*(.+)$/i);
+    if(title){result.title=title[1].trim().slice(0,60);return;}
+    if(location){result.location=sceneLocation(location[1]);return;}
+    if(block&&BLOCKS.includes(block[1].trim())){result.block=block[1].trim();return;}
+    story.push(rawLine);
+  });
+
+  result.nodes=roleplayNodes(story.join('\n'),c);
+  const options=[];let current=null;
+  choiceLines.forEach(rawLine=>{
+    const line=rawLine.trim();
+    const option=line.match(/^(?:\d+\s*[.)]|[-•])\s*(.+)$/);
+    if(option){
+      current={text:cleanChoiceText(option[1]),flag:'',requires:[],nodes:[]};
+      if(current.text)options.push(current);
+      return;
+    }
+    if(current)current.nodes.push(...roleplayNodes(rawLine,c));
+  });
+  // Keep only choices that actually lead somewhere, so the editor never opens on
+  // empty branches just because the writer stopped after listing options.
+  const complete=options.filter(o=>o.nodes.length);
+  if(complete.length>1)result.nodes.push({type:'choice',options:complete.slice(0,4)});
+
+  const gate=c.scenePlan?.statGate;
+  if(gate&&outcomeLines.length){
+    const buckets={high:[],middle:[],low:[]};let active='';
+    outcomeLines.forEach(rawLine=>{
+      const label=rawLine.trim();
+      if(/^high\s*:?$/i.test(label)){active='high';return;}
+      if(/^middle\s*:?$/i.test(label)){active='middle';return;}
+      if(/^low\s*:?$/i.test(label)){active='low';return;}
+      if(active)buckets[active].push(rawLine);
+    });
+    const high=roleplayNodes(buckets.high.join('\n'),c),middle=roleplayNodes(buckets.middle.join('\n'),c),low=roleplayNodes(buckets.low.join('\n'),c);
+    if(high.length&&low.length){
+      const name=chr(gate.character)?.name||gate.character;
+      const value=Math.max(0,+gate.value||0);
+      const lowValue=Math.min(value-1,Math.max(0,+gate.lowValue||0));
+      const options=[
+        {text:name+' '+gate.key+' ≥ '+value,requires:[{type:'stat',character:gate.character,key:gate.key,op:'gte',value}],flag:gate.highEffect||'',nodes:high},
+        {text:name+' '+gate.key+' ≤ '+(gate.middle?lowValue:value-1),requires:[{type:'stat',character:gate.character,key:gate.key,op:'lte',value:gate.middle?lowValue:value-1}],flag:gate.lowEffect||'',nodes:low}
+      ];
+      if(gate.middle&&middle.length)options.splice(1,0,{text:name+' '+gate.key+' '+(lowValue+1)+'–'+(value-1),
+        requires:[{type:'stat',character:gate.character,key:gate.key,op:'gte',value:lowValue+1},{type:'stat',character:gate.character,key:gate.key,op:'lte',value:value-1}],flag:gate.middleEffect||'',nodes:middle});
+      result.nodes.push({type:'gate',options});
+    }
+  }
+  if(!result.nodes.length)throw new Error('the reply did not contain any usable role-play lines');
+  return result;
 }
 
 /** Closes anything the model left open — long scenes get cut off mid-structure. */
@@ -2135,19 +2497,9 @@ function harvest(raw,asObject){
 /** One call to Ollama. format:'json' constrains the model so it can't wander into prose. */
 
 /* ---- 10e-generate.js ---- */
+/** Every generation call goes through here, whichever engine is selected. */
 async function askModel(prompt,signal,json){
-  const res=await fetch(HOST+'/api/chat',{method:'POST',signal,
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:$('model').value,stream:false,
-      messages:[{role:'user',content:prompt}],
-      format:json?'json':undefined,
-      options:{temperature:parseFloat($('temp').value),
-        num_ctx:parseInt($('ctx').value,10),
-        num_predict:2048,
-        repeat_penalty:1.22,
-        repeat_last_n:256}})});
-  if(!res.ok)throw new Error('Ollama returned '+res.status);
-  return (await res.json()).message?.content||'';
+  return chatComplete(prompt,signal,json);
 }
 
 /** Writes the next beat inside one branch. The model sees every line leading here,
@@ -2250,7 +2602,8 @@ async function run(){
   const c=cur();if(!c)return;
   const canRunEmpty=mode==='choice'||mode==='variants'||mode==='chat'||
     (mode==='play'&&$('writePlayer')?.checked&&(c.nodes||c.stages)&&countLines(rootList()));
-  if(!input&&!canRunEmpty)return;
+  const hasPlan=mode==='scene'&&!!c.scenePlan?.outline;
+  if(!input&&!canRunEmpty&&!hasPlan)return;
   if(c.type!=='repeatable'&&mode!=='scene'&&!(c.cast||[]).length)
     return raise('Mark at least one character as present, top right.');
   if(c.type==='repeatable'&&!c.character)return raise('Pick whose repeatable this is in the strip above.');
@@ -2268,22 +2621,24 @@ async function run(){
 
   try{
     const prompt=buildPrompt(input);
-    const wantObject=mode==='scene';
-    let payload=await askModel(prompt,abort.signal,true);
+    const wantsJSON=mode!=='scene';
+    let payload=await askModel(prompt,abort.signal,wantsJSON);
 
-    // If it still isn't parseable, ask once more with the shape restated. Cheap and
-    // it fixes most of the cases where a model wandered off format.
-    try{ harvest(payload,wantObject); }
-    catch(e){
-      note('First reply was malformed — asking again…');
-      payload=await askModel(prompt+
-        '\n\nIMPORTANT: your previous answer was not valid JSON. Reply with the single JSON '+
-        'object only. No commentary, no markdown fences, no trailing commas. Close every bracket.',
-        abort.signal,true);
+    if(mode!=='scene'){
+      // If it still isn't parseable, ask once more with the shape restated. Cheap and
+      // it fixes most of the cases where a model wandered off format.
+      try{ harvest(payload); }
+      catch(e){
+        note('First reply was malformed — asking again…');
+        payload=await askModel(prompt+
+          '\n\nIMPORTANT: your previous answer was not valid JSON. Reply with the single JSON '+
+          'object only. No commentary, no markdown fences, no trailing commas. Close every bracket.',
+          abort.signal,true);
+      }
     }
 
     if(mode==='scene'){
-      const d=harvest(payload,true);
+      const d=parseRoleplayScene(payload,c);
       const ids=P.characters.map(x=>x.id);
       const nodes=buildScene(coerceArray(d.nodes||d.scene||d),ids,0);
       if(!nodes.length)throw new Error('the reply parsed but held no lines — '+
@@ -2367,6 +2722,165 @@ async function run(){
     else raise('Generation failed: '+esc(e.message));
   }finally{busy=false;$('go').disabled=false;$('stop').disabled=true;abort=null;}
 }
+
+/* ---- 10f-planner.js ---- */
+/* ============ scene planner ============ */
+const SCENE_TEMPLATES={
+  meeting:{label:'First meeting',goal:'Two people size each other up and find a reason to talk again.',tension:'Neither knows whether the other is safe to trust.',beat:'A small unexpected kindness changes the first impression.',tone:'curious, cautious, grounded',ending:'Offer to meet again, or leave it there.'},
+  apology:{label:'Apology',goal:'The player tries to repair a recent hurt.',tension:'The other person is not ready to forgive automatically.',beat:'The apology names a specific harm instead of making excuses.',tone:'quiet, honest, fragile',ending:'Accept a small step forward, or ask for space.'},
+  date:{label:'Date',goal:'Two people test a new level of closeness.',tension:'Both risk embarrassment by being sincere.',beat:'A private joke or shared memory makes the moment personal.',tone:'warm, playful, tentative',ending:'Extend the evening, or end on a hopeful note.'},
+  confrontation:{label:'Confrontation',goal:'A hidden problem can no longer be avoided.',tension:'Each person wants something incompatible.',beat:'One person says the thing they were avoiding.',tone:'tense, direct, emotionally honest',ending:'Work toward a compromise, or leave the conflict unresolved.'},
+  quest:{label:'Quest handoff',goal:'A character asks the player for help with a concrete problem.',tension:'The request costs something or has an unclear motive.',beat:'The player learns why this matters personally.',tone:'purposeful, character-led',ending:'Take the task, negotiate terms, or decline.'}
+};
+function newPlannedScene(){
+  if(cur())return cur();
+  const uid='u'+Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+  P.content.push({uid,type:'conversation',id:'scene_'+(P.content.length+1),title:'Planned scene',
+    location:P.locations[0]?.id||'',day:'monday',block:'evening',chapter:1,
+    cast:[],requires:[],nodes:[],premise:'',scenePlan:{}});
+  sel=uid;focusPath=[];stageIx=0;mode='scene';save();paintAll();
+  return cur();
+}
+
+function plannerFields(){
+  const character=$('pStatCharacter').value,key=$('pStatKey').value;
+  const high=$('pStatHigh').value.trim(),middle=$('pStatMiddle').value.trim(),low=$('pStatLow').value.trim();
+  return {setting:$('pSetting').value.trim(),goal:$('pGoal').value.trim(),
+    tension:$('pTension').value.trim(),beat:$('pBeat').value.trim(),
+    tone:$('pTone').value.trim(),ending:$('pEnding').value.trim(),
+    outline:$('pOutline').value.trim(),
+    statGate:character&&key&&high&&low?{character,key,value:Math.max(0,parseInt($('pStatValue').value,10)||0),high,low,
+      lowValue:Math.max(0,parseInt($('pStatLowValue').value,10)||0),middle,
+      highEffect:$('pStatHighEffect').value.trim(),middleEffect:$('pStatMiddleEffect').value.trim(),
+      lowEffect:$('pStatLowEffect').value.trim()}:null};
+}
+
+function plannerBrief(p){
+  return [p.setting&&'Setting: '+p.setting,p.goal&&'Goal: '+p.goal,
+    p.tension&&'Tension: '+p.tension,p.beat&&'Must-hit beat: '+p.beat,
+    p.tone&&'Tone: '+p.tone,p.ending&&'Ending choice: '+p.ending,
+    p.statGate&&'Conditional outcome: if '+(chr(p.statGate.character)?.name||p.statGate.character)+
+      ' '+p.statGate.key+' is '+p.statGate.value+' or higher, '+p.statGate.high+
+      '; otherwise, '+p.statGate.low,
+    p.statGate?.middle&&'Middle outcome between '+p.statGate.lowValue+' and '+(p.statGate.value-1)+': '+p.statGate.middle,
+    p.statGate?.highEffect&&'High outcome effects: '+p.statGate.highEffect,
+    p.statGate?.lowEffect&&'Low outcome effects: '+p.statGate.lowEffect].filter(Boolean).join('\n');
+}
+
+function putPlanOnScene(){
+  const c=newPlannedScene(),p=plannerFields();
+  p.brief=plannerBrief(p);c.scenePlan=p;c.premise=p.brief;
+  const place=P.locations.find(l=>l.id===p.setting||l.name.toLowerCase()===p.setting.toLowerCase());
+  if(place)c.location=place.id;
+  if(p.goal&&(!c.title||c.title==='Planned scene'))c.title=p.goal.slice(0,60);
+  save();paintSetup();paintContent();
+  return c;
+}
+
+function openPlanner(){
+  const p=cur()?.scenePlan||{};
+  $('pTemplate').innerHTML='<option value="">— start from scratch —</option>'+Object.entries(SCENE_TEMPLATES)
+    .map(([id,t])=>'<option value="'+id+'">'+t.label+'</option>').join('');
+  const gate=p.statGate||{};
+  $('pStatCharacter').innerHTML='<option value="">— no stat outcome —</option>'+P.characters
+    .filter(c=>!isPlayer(c)).map(c=>'<option value="'+esc(c.id)+'">'+esc(c.name)+'</option>').join('');
+  $('pStatKey').innerHTML=STAT_KEYS.map(k=>'<option value="'+k+'">'+k+'</option>').join('');
+  $('pSetting').value=p.setting||'';$('pGoal').value=p.goal||'';
+  $('pTension').value=p.tension||'';$('pBeat').value=p.beat||'';
+  $('pTone').value=p.tone||'';$('pEnding').value=p.ending||'';
+  $('pStatCharacter').value=gate.character||'';$('pStatKey').value=gate.key||'friendship';
+  $('pStatValue').value=gate.value??50;$('pStatHigh').value=gate.high||'';$('pStatLow').value=gate.low||'';
+  $('pStatLowValue').value=gate.lowValue??Math.max(0,(gate.value??50)-26);
+  $('pStatMiddle').value=gate.middle||'';$('pStatMiddleEffect').value=gate.middleEffect||'';
+  $('pStatHighEffect').value=gate.highEffect||'';$('pStatLowEffect').value=gate.lowEffect||'';
+  const initial=chr(gate.character)?.relationship_defaults?.[gate.key]??0;
+  $('pStatPreview').value=gate.preview??initial;
+  updateGatePreview();
+  $('pOutline').value=p.outline||'';$('planner').showModal();
+  $('pGoal').focus();
+}
+
+function applySceneTemplate(){
+  const t=SCENE_TEMPLATES[$('pTemplate').value];if(!t)return;
+  $('pGoal').value=t.goal;$('pTension').value=t.tension;$('pBeat').value=t.beat;
+  $('pTone').value=t.tone;$('pEnding').value=t.ending;
+  $('pOutline').value='';updateGatePreview();
+}
+
+function updateGatePreview(){
+  const character=$('pStatCharacter').value,key=$('pStatKey').value;
+  const value=Number($('pStatValue').value)||0,low=Number($('pStatLowValue').value)||0,preview=Number($('pStatPreview').value)||0;
+  const name=chr(character)?.name||'This character';
+  $('pGatePreview').value=character
+    ? preview>=value?name+' '+key+' '+preview+' → high outcome'
+      :$('pStatMiddle').value.trim()&&preview>low?name+' '+key+' '+preview+' → middle outcome'
+      :name+' '+key+' '+preview+' → low outcome'
+    : 'Choose a character to preview';
+}
+
+function outlinePrompt(p){
+  return 'You are planning a scene for a life-sim visual novel. Make a concise, practical beat outline. '+
+    'Use ordinary text, never JSON. The scene should leave room for player agency.\n\n'+
+    '# Available characters\n'+P.characters.map(c=>c.name+' ('+c.id+')').join(', ')+
+    '\n\n# Plan\n'+(plannerBrief(p)||'Create a grounded scene that fits the available characters.')+
+    '\n\nReturn these headings:\nOPENING\nBEATS\nTURNING POINT\n'+
+    (p.statGate?('STAT OUTCOME — HIGH\n'+(p.statGate.middle?'STAT OUTCOME — MIDDLE\n':'')+'STAT OUTCOME — LOW\n'):'CHOICE\nBRANCH 1\nBRANCH 2\n')+
+    'Keep each section brief and concrete. The branches must lead to meaningfully different emotional directions.';
+}
+
+function plannerBusy(on){
+  $('draftOutline').disabled=on;$('writePlanned').disabled=on;
+  $('draftOutline').textContent=on?'Planning…':'Draft outline';
+  $('go').disabled=on;$('stop').disabled=!on;
+}
+
+async function draftSceneOutline(){
+  if(busy)return;
+  const p=plannerFields();
+  if(!p.goal&&!p.beat&&!p.setting)return note('Add a goal, a must-hit beat, or a setting before drafting an outline.',true);
+  putPlanOnScene();busy=true;abort=new AbortController();plannerBusy(true);
+  try{
+    const outline=await askModel(outlinePrompt(p),abort.signal,false);
+    $('pOutline').value=outline.trim();
+    putPlanOnScene();note('Outline drafted. Edit it if you like, then write the scene.');
+  }catch(e){
+    if(e.name!=='AbortError')note('Could not draft the outline: '+esc(e.message),true);
+  }finally{busy=false;abort=null;plannerBusy(false);}
+}
+
+function writeSceneFromPlan(){
+  const c=putPlanOnScene();
+  if(!c.scenePlan.outline)return note('Draft or paste an outline first.',true);
+  $('planner').close();mode='scene';$('line').value='';paintModes();run();
+}
+
+$('closePlanner').onclick=()=>$('planner').close();
+$('draftOutline').onclick=draftSceneOutline;
+$('writePlanned').onclick=writeSceneFromPlan;
+$('pTemplate').onchange=applySceneTemplate;
+['pStatCharacter','pStatKey','pStatValue','pStatLowValue','pStatMiddle','pStatPreview'].forEach(id=>{
+  $(id).oninput=updateGatePreview;$(id).onchange=updateGatePreview;
+});
+
+function paintMemory(){
+  const notes=P.storyNotes||[];
+  $('memoryList').innerHTML=notes.length?'<p class="rubric later">Saved facts</p>'+notes.map((n,i)=>
+    '<div class="issue info"><span class="sev">canon</span><span class="msg">'+esc(n.text)+
+    '<span class="where">'+esc((n.tags||[]).join(', ')||'all scenes')+'</span><button class="fix" data-memory-del="'+i+'">remove</button></span></div>').join('')
+    :'<p class="empty" style="margin-top:14px">No canon facts saved yet.</p>';
+  $('memoryList').querySelectorAll('[data-memory-del]').forEach(b=>b.onclick=()=>{
+    P.storyNotes.splice(+b.dataset.memoryDel,1);save();paintMemory();});
+}
+function openMemory(){ $('memoryText').value='';$('memoryTags').value='';paintMemory();$('memory').showModal();$('memoryText').focus(); }
+$('openMemory').onclick=openMemory;
+$('closeMemory').onclick=()=>$('memory').close();
+$('addMemory').onclick=()=>{
+  const text=$('memoryText').value.trim();if(!text)return;
+  const tags=$('memoryTags').value.split(',').map(x=>x.trim()).filter(Boolean).map(x=>
+    P.characters.find(c=>c.id===x||c.name.toLowerCase()===x.toLowerCase())?.id||x);
+  P.storyNotes=P.storyNotes||[];P.storyNotes.push({text:text.slice(0,500),tags});save();
+  $('memoryText').value='';$('memoryTags').value='';paintMemory();
+};
 
 /* ---- 11-editor.js ---- */
 /* ============ sheet editor ============ */
@@ -2685,10 +3199,10 @@ function routes(list,picks){
   let out=null;
   for(let i=0;i<list.length;i++){
     if(list[i].type==='jump')return [{picks,lines:countLines(list.slice(0,i)),jump:list[i].target}];
-    if(list[i].type!=='choice')continue;
+    if(list[i].type!=='choice'&&list[i].type!=='gate')continue;
     out=[];
     list[i].options.forEach((o,j)=>{
-      const deeper=routes(o.nodes,picks.concat({text:o.text,reqs:o.requires||[]}));
+      const deeper=routes(o.nodes,picks.concat({text:(list[i].type==='gate'?'[auto] ':'')+o.text,reqs:o.requires||[]}));
       const rest=routes(list.slice(i+1),[]);
       deeper.forEach(d=>rest.forEach(r=>out.push({
         picks:d.picks,lines:countLines(list.slice(0,i))+d.lines+r.lines})));
@@ -2726,6 +3240,11 @@ function wkStep(){
     const n=f.nodes[f.index++];
     if(n.type==='line'){wkLog.push(n);continue;}
     if(n.type==='jump'){wkLog.push({jump:n.target});wkStack.length=0;break;}
+    if(n.type==='gate'){
+      const o=(n.options||[]).find(x=>allMet(x.requires,WS));
+      if(o){wkLog.push({gate:o.text});applyFlag(o.flag,WS);wkStack.push({nodes:o.nodes,index:0});}
+      continue;
+    }
     wkPending=n;return paintWalk();
   }
   wkPending=null;paintWalk();
@@ -2772,6 +3291,8 @@ function paintWalk(){
       esc(P.content.find(x=>x.id===l.jump)?.title||l.jump||'(nothing set)')+'</div></div>'
     :l.pick!==undefined
     ?'<div class="wkline"><div class="n" style="color:var(--sage)">▸ player</div><div class="t">'+esc(l.pick)+'</div></div>'
+    :l.gate!==undefined
+    ?'<div class="wkline"><div class="n" style="color:var(--blue)">◇ stat outcome</div><div class="t">'+esc(l.gate)+'</div></div>'
     :'<div class="wkline"><div class="n" style="color:'+(chr(l.speaker)?.color||'#938599')+'">'+
       esc(chr(l.speaker)?.name||l.speaker)+'</div><div class="t">'+dress(l.text)+'</div></div>').join('');
   if(wkPending)h+='<div class="wkopts">'+wkPending.options.map((o,i)=>{
@@ -2918,7 +3439,7 @@ $('grSvg').onclick=()=>{
 function walkAll(cb){
   const rec=(list,c,base)=>list.forEach((n,i)=>{
     const p=base.concat(i);cb(n,c,p);
-    if(n.type==='choice')n.options.forEach((o,j)=>{cb(o,c,p.concat(j),true);rec(o.nodes,c,p.concat(j));});
+    if(n.type==='choice'||n.type==='gate')n.options.forEach((o,j)=>{cb(o,c,p.concat(j),true);rec(o.nodes,c,p.concat(j));});
   });
   P.content.forEach(c=>{
     if(c.type==='quest')(c.stages||[]).forEach((s,i)=>rec(s.nodes||[],c,['s'+i]));
@@ -3036,6 +3557,17 @@ const lev=(a,b)=>{
 function validate(){
   const out=[],add=(sev,msg,where,fix)=>out.push({sev,msg,where,fix});
   const ids=new Set(),cids=new Set();
+  const impossibleStats=reqs=>{
+    const limits={};
+    (reqs||[]).filter(r=>r.type==='stat').forEach(r=>{
+      const key=r.character+'.'+r.key,box=limits[key]||(limits[key]={min:-Infinity,max:Infinity});
+      const v=+r.value;
+      if(r.op==='gte')box.min=Math.max(box.min,v);
+      if(r.op==='lte')box.max=Math.min(box.max,v);
+      if(r.op==='eq'){box.min=Math.max(box.min,v);box.max=Math.min(box.max,v);}
+    });
+    return Object.entries(limits).find(([,box])=>box.min>box.max);
+  };
 
   P.characters.forEach(c=>{
     if(cids.has(c.id))add('err','Two characters share the id "'+c.id+'".','Cast');
@@ -3113,6 +3645,9 @@ function validate(){
       if(!countLines(n.nodes||[])&&!(n.nodes||[]).some(x=>x.type==='jump'))
         add('warn','Choice "'+(n.text||'').slice(0,34)+'" leads nowhere.',w);
       if(!String(n.text||'').trim())add('warn','A choice option has no text.',w);
+      const impossible=impossibleStats(n.requires);
+      if(impossible)add('warn','Branch "'+(n.text||'').slice(0,34)+'" can never run: '+
+        impossible[0]+' must be both at least '+impossible[1].min+' and at most '+impossible[1].max+'.',w);
       return;
     }
     if(n.type==='jump'){
@@ -3294,6 +3829,11 @@ function simulate(maxDays){
 
   const run=(list,depth)=>{
     (list||[]).forEach(n=>{
+      if(n.type==='gate'){
+        const open=n.options.filter(o=>allMet(o.requires,S));
+        if(open.length&&depth<12){applyFlag(open[0].flag,S);run(open[0].nodes,depth+1);}
+        return;
+      }
       if(n.type==='choice'){
         const open=n.options.filter(o=>allMet(o.requires,S));
         if(!open.length)return;
@@ -3372,8 +3912,53 @@ document.querySelectorAll('[data-ins]').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('[data-ins]').forEach(x=>x.classList.toggle('on',x===b));
   paintInspect();});
 
+function effectLedger(){
+  const rows=[];
+  walkAll((n,c,p,isOpt)=>{if(isOpt&&String(n.flag||'').trim())rows.push({scene:c.title||c.id,
+    branch:n.text||'unnamed branch',effect:n.flag,where:p.join('.')});});
+  return rows;
+}
+function branchTests(){
+  const S=simState(),out=[];
+  walkAll((n,c,p)=>{
+    if(n.type!=='gate')return;
+    const open=(n.options||[]).filter(o=>allMet(o.requires,S));
+    out.push({scene:c.title||c.id,where:p.join('.'),open,total:n.options.length,
+      sev:open.length===1?'ok':open.length?'warn':'err'});
+  });
+  return out;
+}
+
 function paintInspect(){
   const B=$('insBody');
+  if(insTab==='effects'){
+    const rows=effectLedger();
+    B.innerHTML=rows.length?'<p class="hint">Every stat or flag change caused by a player choice or automatic outcome.</p>'+
+      '<table class="regtable"><tr><th>Scene</th><th>Branch</th><th>Effects</th></tr>'+rows.map(r=>
+        '<tr><td class="k">'+esc(r.scene)+'</td><td class="w">'+esc(r.branch)+'</td><td class="w">'+esc(r.effect)+'</td></tr>').join('')+'</table>'
+      :'<div class="clean">No branch effects yet.</div>';
+    return;
+  }
+  if(insTab==='milestones'){
+    const rows=[];
+    P.characters.forEach(c=>(c.relationship_chapters||[]).forEach(ch=>rows.push({name:c.name,
+      level:ch.level,title:ch.title,needs:(ch.requires||[]).map(condLabel).join(' · ')||'—'})));
+    const planned=P.content.filter(c=>c.scenePlan?.statGate).map(c=>{const g=c.scenePlan.statGate;
+      return {name:chr(g.character)?.name||g.character,level:'stat',title:c.title||c.id,
+        needs:g.key+' low ≤ '+(g.lowValue??g.value-1)+' · high ≥ '+g.value};});
+    B.innerHTML='<p class="hint">Relationship chapters and planned stat thresholds in one place.</p><table class="regtable"><tr><th>Character</th><th>Milestone</th><th>Scene / chapter</th><th>Requirements</th></tr>'+
+      rows.concat(planned).map(r=>'<tr><td class="k">'+esc(r.name)+'</td><td class="w">'+esc(r.level)+'</td><td class="w">'+esc(r.title)+'</td><td class="w">'+esc(r.needs)+'</td></tr>').join('')+'</table>';
+    return;
+  }
+  if(insTab==='tests'){
+    const tests=branchTests(),jumps=links().filter(l=>l.kind!=='chain').length;
+    B.innerHTML='<div class="legend"><span>'+tests.length+' automatic branch'+(tests.length===1?'':'es')+'</span><span>'+jumps+' merge/jump link'+(jumps===1?'':'s')+'</span></div>'+
+      (tests.length?tests.map(t=>'<div class="issue '+t.sev+'"><span class="sev">'+t.sev+'</span><span class="msg">'+esc(t.scene)+
+        '<span class="where">gate '+esc(t.where)+' — '+t.open+' of '+t.total+' branches match the default starting state</span></span></div>').join('')
+        :'<div class="clean">No automatic branches to test yet.</div>')+
+      '<p class="hint" style="margin-top:12px">Use a jump node at the end of two branches to merge them into one shared passage. Validate also reports impossible combined stat conditions.</p>';
+    return;
+  }
   if(insTab==='lint'){
     const issues=validate();
     if(!issues.length){B.innerHTML='<div class="clean">Nothing to flag.<br>No dangling references, '+
@@ -4581,6 +5166,7 @@ function sheetOut(c){
 function clean(l){return l.map(n=>n.type==='line'
   ?{type:'line',speaker:n.speaker,text:n.text,emotion:n.emotion||''}
   :n.type==='jump'?{type:'jump',target:n.target||''}
+  :n.type==='gate'?{type:'gate',options:n.options.map(o=>({text:o.text,flag:o.flag||'',requires:o.requires||[],nodes:clean(o.nodes)}))}
   :{type:'choice',options:n.options.map(o=>({text:o.text,flag:o.flag||'',
      effects:compileEffects(o.flag),
      requires:o.requires||[],nodes:clean(o.nodes)}))});}
@@ -4832,7 +5418,7 @@ $('line').addEventListener('input',e=>{e.target.style.height='auto';
   e.target.style.height=Math.min(e.target.scrollHeight,140)+'px';
   if(mode==='play')paintModes();});
 $('railToggle').onclick=()=>$('rail').classList.toggle('open');
-['useBounds','useAdult','useConn','writePlayer'].forEach(k=>$(k).onchange=()=>{save();paintBody();});
+['useBounds','useAdult','useConn','writePlayer'].forEach(k=>$(k).onchange=()=>{save();paintBody();privacyWatch();});
 
 function paintAll(){paintCast();paintSheet();paintPlaces();paintPlaceForm();paintContent();paintSetup();paintBody();paintSayAs();}
 
@@ -4844,7 +5430,7 @@ document.addEventListener('keydown',e=>{
   document.querySelectorAll('dialog[open]').forEach(d=>d.close());
 });
 
-paintAll();findModels();setInterval(findModels,30000);
+paintAll();paintEngine();findModels();setInterval(findModels,30000);
 try{localStorage.setItem('__t','1');localStorage.removeItem('__t');}
 catch{note('This page can\'t save anything — browser storage is blocked. '+
   'Download the file and open it from <code>http://localhost:8000/</code> instead of previewing it.',true);}

@@ -1,16 +1,6 @@
+/** Every generation call goes through here, whichever engine is selected. */
 async function askModel(prompt,signal,json){
-  const res=await fetch(HOST+'/api/chat',{method:'POST',signal,
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({model:$('model').value,stream:false,
-      messages:[{role:'user',content:prompt}],
-      format:json?'json':undefined,
-      options:{temperature:parseFloat($('temp').value),
-        num_ctx:parseInt($('ctx').value,10),
-        num_predict:2048,
-        repeat_penalty:1.22,
-        repeat_last_n:256}})});
-  if(!res.ok)throw new Error('Ollama returned '+res.status);
-  return (await res.json()).message?.content||'';
+  return chatComplete(prompt,signal,json);
 }
 
 /** Writes the next beat inside one branch. The model sees every line leading here,
@@ -113,7 +103,8 @@ async function run(){
   const c=cur();if(!c)return;
   const canRunEmpty=mode==='choice'||mode==='variants'||mode==='chat'||
     (mode==='play'&&$('writePlayer')?.checked&&(c.nodes||c.stages)&&countLines(rootList()));
-  if(!input&&!canRunEmpty)return;
+  const hasPlan=mode==='scene'&&!!c.scenePlan?.outline;
+  if(!input&&!canRunEmpty&&!hasPlan)return;
   if(c.type!=='repeatable'&&mode!=='scene'&&!(c.cast||[]).length)
     return raise('Mark at least one character as present, top right.');
   if(c.type==='repeatable'&&!c.character)return raise('Pick whose repeatable this is in the strip above.');
@@ -131,22 +122,24 @@ async function run(){
 
   try{
     const prompt=buildPrompt(input);
-    const wantObject=mode==='scene';
-    let payload=await askModel(prompt,abort.signal,true);
+    const wantsJSON=mode!=='scene';
+    let payload=await askModel(prompt,abort.signal,wantsJSON);
 
-    // If it still isn't parseable, ask once more with the shape restated. Cheap and
-    // it fixes most of the cases where a model wandered off format.
-    try{ harvest(payload,wantObject); }
-    catch(e){
-      note('First reply was malformed — asking again…');
-      payload=await askModel(prompt+
-        '\n\nIMPORTANT: your previous answer was not valid JSON. Reply with the single JSON '+
-        'object only. No commentary, no markdown fences, no trailing commas. Close every bracket.',
-        abort.signal,true);
+    if(mode!=='scene'){
+      // If it still isn't parseable, ask once more with the shape restated. Cheap and
+      // it fixes most of the cases where a model wandered off format.
+      try{ harvest(payload); }
+      catch(e){
+        note('First reply was malformed — asking again…');
+        payload=await askModel(prompt+
+          '\n\nIMPORTANT: your previous answer was not valid JSON. Reply with the single JSON '+
+          'object only. No commentary, no markdown fences, no trailing commas. Close every bracket.',
+          abort.signal,true);
+      }
     }
 
     if(mode==='scene'){
-      const d=harvest(payload,true);
+      const d=parseRoleplayScene(payload,c);
       const ids=P.characters.map(x=>x.id);
       const nodes=buildScene(coerceArray(d.nodes||d.scene||d),ids,0);
       if(!nodes.length)throw new Error('the reply parsed but held no lines — '+

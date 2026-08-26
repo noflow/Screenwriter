@@ -20,6 +20,7 @@
  "js/10c-prompt.js",
  "js/10d-parse.js",
  "js/10e-generate.js",
+ "js/10f-planner.js",
  "js/11-editor.js",
  "js/12-conditions.js",
  "js/13-routes.js",

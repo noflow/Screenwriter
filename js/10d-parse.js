@@ -22,6 +22,106 @@ function buildScene(list,ids,depth){
   return out;
 }
 
+/** Converts a normal role-play transcript into editor nodes. Scene generation uses
+    this instead of asking the model to hand-author a fragile JSON tree. */
+function roleplayNodes(source,c){
+  const out=[];
+  String(source||'').split(/\r?\n/).forEach(raw=>{
+    let line=raw.trim();
+    if(!line||/^then\s*:?$/i.test(line))return;
+    line=line.replace(/^[-•]\s*/,'').replace(/^\*\*(.+?):\*\*\s*/,'$1: ');
+    const hit=line.match(/^([^:]{1,80}):\s*(.+)$/);
+    if(hit){
+      const speaker=resolveSpeaker(hit[1].trim(),c);
+      const text=hit[2].trim();
+      if(speaker&&text)out.push({type:'line',speaker,text,emotion:''});
+      else if(text)out.push({type:'line',speaker:'__narrator__',text,emotion:''});
+    }else{
+      out.push({type:'line',speaker:'__narrator__',text:line,emotion:''});
+    }
+  });
+  return out;
+}
+
+function sceneLocation(raw){
+  const value=String(raw||'').trim();
+  if(!value)return '';
+  const found=P.locations.find(l=>l.id===value||l.name.toLowerCase()===value.toLowerCase());
+  return found?found.id:'';
+}
+
+function cleanChoiceText(raw){
+  return String(raw||'').trim().replace(/^["“]/,'').replace(/["”]$/,'').trim();
+}
+
+function parseRoleplayScene(raw,c){
+  let text=String(raw||'').replace(/<think>[\s\S]*?<\/think>/gi,'').trim();
+  text=text.replace(/```(?:text|markdown)?\s*/gi,'').replace(/```/g,'').trim();
+  const result={title:'',location:'',block:'',cast:[],nodes:[]};
+  const lines=text.split(/\r?\n/);
+  const story=[],choiceLines=[],outcomeLines=[];
+  let section='story';
+
+  lines.forEach(rawLine=>{
+    const line=rawLine.trim();
+    if(/^choices?\s*:\s*$/i.test(line)){section='choices';return;}
+    if(/^stat outcomes?\s*:\s*$/i.test(line)){section='outcomes';return;}
+    if(section==='choices'){choiceLines.push(rawLine);return;}
+    if(section==='outcomes'){outcomeLines.push(rawLine);return;}
+    const title=line.match(/^title\s*:\s*(.+)$/i);
+    const location=line.match(/^location\s*:\s*(.+)$/i);
+    const block=line.match(/^(?:time|block)\s*:\s*(.+)$/i);
+    if(title){result.title=title[1].trim().slice(0,60);return;}
+    if(location){result.location=sceneLocation(location[1]);return;}
+    if(block&&BLOCKS.includes(block[1].trim())){result.block=block[1].trim();return;}
+    story.push(rawLine);
+  });
+
+  result.nodes=roleplayNodes(story.join('\n'),c);
+  const options=[];let current=null;
+  choiceLines.forEach(rawLine=>{
+    const line=rawLine.trim();
+    const option=line.match(/^(?:\d+\s*[.)]|[-•])\s*(.+)$/);
+    if(option){
+      current={text:cleanChoiceText(option[1]),flag:'',requires:[],nodes:[]};
+      if(current.text)options.push(current);
+      return;
+    }
+    if(current)current.nodes.push(...roleplayNodes(rawLine,c));
+  });
+  // Keep only choices that actually lead somewhere, so the editor never opens on
+  // empty branches just because the writer stopped after listing options.
+  const complete=options.filter(o=>o.nodes.length);
+  if(complete.length>1)result.nodes.push({type:'choice',options:complete.slice(0,4)});
+
+  const gate=c.scenePlan?.statGate;
+  if(gate&&outcomeLines.length){
+    const buckets={high:[],middle:[],low:[]};let active='';
+    outcomeLines.forEach(rawLine=>{
+      const label=rawLine.trim();
+      if(/^high\s*:?$/i.test(label)){active='high';return;}
+      if(/^middle\s*:?$/i.test(label)){active='middle';return;}
+      if(/^low\s*:?$/i.test(label)){active='low';return;}
+      if(active)buckets[active].push(rawLine);
+    });
+    const high=roleplayNodes(buckets.high.join('\n'),c),middle=roleplayNodes(buckets.middle.join('\n'),c),low=roleplayNodes(buckets.low.join('\n'),c);
+    if(high.length&&low.length){
+      const name=chr(gate.character)?.name||gate.character;
+      const value=Math.max(0,+gate.value||0);
+      const lowValue=Math.min(value-1,Math.max(0,+gate.lowValue||0));
+      const options=[
+        {text:name+' '+gate.key+' ≥ '+value,requires:[{type:'stat',character:gate.character,key:gate.key,op:'gte',value}],flag:gate.highEffect||'',nodes:high},
+        {text:name+' '+gate.key+' ≤ '+(gate.middle?lowValue:value-1),requires:[{type:'stat',character:gate.character,key:gate.key,op:'lte',value:gate.middle?lowValue:value-1}],flag:gate.lowEffect||'',nodes:low}
+      ];
+      if(gate.middle&&middle.length)options.splice(1,0,{text:name+' '+gate.key+' '+(lowValue+1)+'–'+(value-1),
+        requires:[{type:'stat',character:gate.character,key:gate.key,op:'gte',value:lowValue+1},{type:'stat',character:gate.character,key:gate.key,op:'lte',value:value-1}],flag:gate.middleEffect||'',nodes:middle});
+      result.nodes.push({type:'gate',options});
+    }
+  }
+  if(!result.nodes.length)throw new Error('the reply did not contain any usable role-play lines');
+  return result;
+}
+
 /** Closes anything the model left open — long scenes get cut off mid-structure. */
 function closeJSON(t){
   const stack=[];let inStr=false,esc2=false;

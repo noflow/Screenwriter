@@ -25,7 +25,7 @@ a copy of, back up, or hand to someone else.
     manifest.json       load order (regenerate by sorting js/ filenames)
     _markup.html        shared markup template with @@CSS@@ / @@JS@@ slots
     css/app.css         all styles
-    js/                 36 modules, loaded in filename order
+    js/                 37 modules, loaded in filename order
 
 ## The modules
 
@@ -35,7 +35,7 @@ Numeric prefixes are load order, not importance.
     01-sheets           .character import, location derivation
     02-places           location package, rooms, district grouping
     03-schedule         grid <-> fixed_commitments, availability
-    04-ollama           connection, model list
+    04-ollama           engines (Ollama, Pawan.Krd, any OpenAI-compatible), model list
     05-tree             node tree traversal (listAt, transcriptAt)
     06-rail             cast / places / content sidebar
     07-setup            setup strip, presence, condition bar
@@ -52,6 +52,7 @@ Numeric prefixes are load order, not importance.
     10c-prompt          buildPrompt for every mode
     10d-parse           JSON recovery, speaker resolution
     10e-generate        askModel, run, continueBranch, fillEmpty
+    10f-planner          scene planner and outline-first generation
     11-editor           sheet & limits editor
     12-conditions       condition rows and evaluation
     13-routes           route enumeration, the walker

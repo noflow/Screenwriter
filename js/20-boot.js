@@ -15,7 +15,7 @@ $('line').addEventListener('input',e=>{e.target.style.height='auto';
   e.target.style.height=Math.min(e.target.scrollHeight,140)+'px';
   if(mode==='play')paintModes();});
 $('railToggle').onclick=()=>$('rail').classList.toggle('open');
-['useBounds','useAdult','useConn','writePlayer'].forEach(k=>$(k).onchange=()=>{save();paintBody();});
+['useBounds','useAdult','useConn','writePlayer'].forEach(k=>$(k).onchange=()=>{save();paintBody();privacyWatch();});
 
 function paintAll(){paintCast();paintSheet();paintPlaces();paintPlaceForm();paintContent();paintSetup();paintBody();paintSayAs();}
 
@@ -27,7 +27,7 @@ document.addEventListener('keydown',e=>{
   document.querySelectorAll('dialog[open]').forEach(d=>d.close());
 });
 
-paintAll();findModels();setInterval(findModels,30000);
+paintAll();paintEngine();findModels();setInterval(findModels,30000);
 try{localStorage.setItem('__t','1');localStorage.removeItem('__t');}
 catch{note('This page can\'t save anything — browser storage is blocked. '+
   'Download the file and open it from <code>http://localhost:8000/</code> instead of previewing it.',true);}

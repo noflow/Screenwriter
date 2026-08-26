@@ -4,10 +4,12 @@ function paintModes(){
   if(!c){
     mode='scene';
     bar.innerHTML='<button class="mode on" data-mode="scene">Whole scene</button>'+
+      '<button class="mode" id="openPlanner">Plan scene</button>'+
       '<span class="as">describe a scene and it will be written as a new conversation</span>';
     $('line').placeholder='Describe the scene — "mom is in the living room in the evening '+
       'watching TV, player starts a conversation and she asks if he wants to join her"…';
     $('go').textContent='Write the scene';
+    $('openPlanner').onclick=openPlanner;
     return;
   }
   const m=c.type==='repeatable'
@@ -16,6 +18,7 @@ function paintModes(){
   if(!m.some(x=>x[0]===mode))mode=m[0][0];
   const dangling=c.type!=='repeatable'?emptyBranches().length:0;
   bar.innerHTML=m.map(([k,l])=>'<button class="mode'+(mode===k?' on':'')+'" data-mode="'+k+'">'+l+'</button>').join('')+
+    (c.type==='conversation'?'<button class="mode" id="openPlanner">Plan scene</button>':'')+
     (dangling?'<button class="mode fill" id="fillEmpty">Continue '+dangling+
       ' unfinished branch'+(dangling===1?'':'es')+'</button>':'')+
     (c.type!=='repeatable'?'<span class="as">as <select id="playAs">'+
@@ -27,6 +30,7 @@ function paintModes(){
         '<option value="'+esc(id)+'">'+esc(chr(id)?.name||id)+'</option>').join('')+
       '</select></span>':'');
   bar.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{mode=b.dataset.mode;paintModes();});
+  if($('openPlanner'))$('openPlanner').onclick=openPlanner;
   if($('fillEmpty'))$('fillEmpty').onclick=fillEmpty;
   $('line').placeholder = mode==='scene'
       ? 'Describe the scene — "mom is in the living room in the evening watching TV, player starts a conversation and she asks if he wants to join her"…'

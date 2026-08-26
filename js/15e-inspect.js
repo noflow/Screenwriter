@@ -7,8 +7,53 @@ document.querySelectorAll('[data-ins]').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('[data-ins]').forEach(x=>x.classList.toggle('on',x===b));
   paintInspect();});
 
+function effectLedger(){
+  const rows=[];
+  walkAll((n,c,p,isOpt)=>{if(isOpt&&String(n.flag||'').trim())rows.push({scene:c.title||c.id,
+    branch:n.text||'unnamed branch',effect:n.flag,where:p.join('.')});});
+  return rows;
+}
+function branchTests(){
+  const S=simState(),out=[];
+  walkAll((n,c,p)=>{
+    if(n.type!=='gate')return;
+    const open=(n.options||[]).filter(o=>allMet(o.requires,S));
+    out.push({scene:c.title||c.id,where:p.join('.'),open,total:n.options.length,
+      sev:open.length===1?'ok':open.length?'warn':'err'});
+  });
+  return out;
+}
+
 function paintInspect(){
   const B=$('insBody');
+  if(insTab==='effects'){
+    const rows=effectLedger();
+    B.innerHTML=rows.length?'<p class="hint">Every stat or flag change caused by a player choice or automatic outcome.</p>'+
+      '<table class="regtable"><tr><th>Scene</th><th>Branch</th><th>Effects</th></tr>'+rows.map(r=>
+        '<tr><td class="k">'+esc(r.scene)+'</td><td class="w">'+esc(r.branch)+'</td><td class="w">'+esc(r.effect)+'</td></tr>').join('')+'</table>'
+      :'<div class="clean">No branch effects yet.</div>';
+    return;
+  }
+  if(insTab==='milestones'){
+    const rows=[];
+    P.characters.forEach(c=>(c.relationship_chapters||[]).forEach(ch=>rows.push({name:c.name,
+      level:ch.level,title:ch.title,needs:(ch.requires||[]).map(condLabel).join(' · ')||'—'})));
+    const planned=P.content.filter(c=>c.scenePlan?.statGate).map(c=>{const g=c.scenePlan.statGate;
+      return {name:chr(g.character)?.name||g.character,level:'stat',title:c.title||c.id,
+        needs:g.key+' low ≤ '+(g.lowValue??g.value-1)+' · high ≥ '+g.value};});
+    B.innerHTML='<p class="hint">Relationship chapters and planned stat thresholds in one place.</p><table class="regtable"><tr><th>Character</th><th>Milestone</th><th>Scene / chapter</th><th>Requirements</th></tr>'+
+      rows.concat(planned).map(r=>'<tr><td class="k">'+esc(r.name)+'</td><td class="w">'+esc(r.level)+'</td><td class="w">'+esc(r.title)+'</td><td class="w">'+esc(r.needs)+'</td></tr>').join('')+'</table>';
+    return;
+  }
+  if(insTab==='tests'){
+    const tests=branchTests(),jumps=links().filter(l=>l.kind!=='chain').length;
+    B.innerHTML='<div class="legend"><span>'+tests.length+' automatic branch'+(tests.length===1?'':'es')+'</span><span>'+jumps+' merge/jump link'+(jumps===1?'':'s')+'</span></div>'+
+      (tests.length?tests.map(t=>'<div class="issue '+t.sev+'"><span class="sev">'+t.sev+'</span><span class="msg">'+esc(t.scene)+
+        '<span class="where">gate '+esc(t.where)+' — '+t.open+' of '+t.total+' branches match the default starting state</span></span></div>').join('')
+        :'<div class="clean">No automatic branches to test yet.</div>')+
+      '<p class="hint" style="margin-top:12px">Use a jump node at the end of two branches to merge them into one shared passage. Validate also reports impossible combined stat conditions.</p>';
+    return;
+  }
   if(insTab==='lint'){
     const issues=validate();
     if(!issues.length){B.innerHTML='<div class="clean">Nothing to flag.<br>No dangling references, '+

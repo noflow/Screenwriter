@@ -2,6 +2,7 @@
 function clean(l){return l.map(n=>n.type==='line'
   ?{type:'line',speaker:n.speaker,text:n.text,emotion:n.emotion||''}
   :n.type==='jump'?{type:'jump',target:n.target||''}
+  :n.type==='gate'?{type:'gate',options:n.options.map(o=>({text:o.text,flag:o.flag||'',requires:o.requires||[],nodes:clean(o.nodes)}))}
   :{type:'choice',options:n.options.map(o=>({text:o.text,flag:o.flag||'',
      effects:compileEffects(o.flag),
      requires:o.requires||[],nodes:clean(o.nodes)}))});}

@@ -490,6 +490,16 @@ func advance() -> void:
 					labels.append(opt.get("text", ""))
 				choices_shown.emit(labels)
 				return
+			"gate":
+				# A gate is an automatic branch: first matching outcome wins. The
+				# authoring tool writes complementary stat conditions for high/low paths.
+				for branch: Dictionary in node.get("options", []):
+					if check_all(branch.get("requires", [])):
+						var effect: String = String(branch.get("flag", "")).strip_edges()
+						if effect != "":
+							set_flag(effect)
+						_stack.append({"nodes": branch.get("nodes", []), "index": 0})
+						break
 			"jump":
 				var target: String = node.get("target", "")
 				if target == "":

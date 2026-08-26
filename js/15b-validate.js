@@ -10,6 +10,17 @@ const lev=(a,b)=>{
 function validate(){
   const out=[],add=(sev,msg,where,fix)=>out.push({sev,msg,where,fix});
   const ids=new Set(),cids=new Set();
+  const impossibleStats=reqs=>{
+    const limits={};
+    (reqs||[]).filter(r=>r.type==='stat').forEach(r=>{
+      const key=r.character+'.'+r.key,box=limits[key]||(limits[key]={min:-Infinity,max:Infinity});
+      const v=+r.value;
+      if(r.op==='gte')box.min=Math.max(box.min,v);
+      if(r.op==='lte')box.max=Math.min(box.max,v);
+      if(r.op==='eq'){box.min=Math.max(box.min,v);box.max=Math.min(box.max,v);}
+    });
+    return Object.entries(limits).find(([,box])=>box.min>box.max);
+  };
 
   P.characters.forEach(c=>{
     if(cids.has(c.id))add('err','Two characters share the id "'+c.id+'".','Cast');
@@ -87,6 +98,9 @@ function validate(){
       if(!countLines(n.nodes||[])&&!(n.nodes||[]).some(x=>x.type==='jump'))
         add('warn','Choice "'+(n.text||'').slice(0,34)+'" leads nowhere.',w);
       if(!String(n.text||'').trim())add('warn','A choice option has no text.',w);
+      const impossible=impossibleStats(n.requires);
+      if(impossible)add('warn','Branch "'+(n.text||'').slice(0,34)+'" can never run: '+
+        impossible[0]+' must be both at least '+impossible[1].min+' and at most '+impossible[1].max+'.',w);
       return;
     }
     if(n.type==='jump'){

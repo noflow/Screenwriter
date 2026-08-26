@@ -5,10 +5,10 @@ function routes(list,picks){
   let out=null;
   for(let i=0;i<list.length;i++){
     if(list[i].type==='jump')return [{picks,lines:countLines(list.slice(0,i)),jump:list[i].target}];
-    if(list[i].type!=='choice')continue;
+    if(list[i].type!=='choice'&&list[i].type!=='gate')continue;
     out=[];
     list[i].options.forEach((o,j)=>{
-      const deeper=routes(o.nodes,picks.concat({text:o.text,reqs:o.requires||[]}));
+      const deeper=routes(o.nodes,picks.concat({text:(list[i].type==='gate'?'[auto] ':'')+o.text,reqs:o.requires||[]}));
       const rest=routes(list.slice(i+1),[]);
       deeper.forEach(d=>rest.forEach(r=>out.push({
         picks:d.picks,lines:countLines(list.slice(0,i))+d.lines+r.lines})));
@@ -46,6 +46,11 @@ function wkStep(){
     const n=f.nodes[f.index++];
     if(n.type==='line'){wkLog.push(n);continue;}
     if(n.type==='jump'){wkLog.push({jump:n.target});wkStack.length=0;break;}
+    if(n.type==='gate'){
+      const o=(n.options||[]).find(x=>allMet(x.requires,WS));
+      if(o){wkLog.push({gate:o.text});applyFlag(o.flag,WS);wkStack.push({nodes:o.nodes,index:0});}
+      continue;
+    }
     wkPending=n;return paintWalk();
   }
   wkPending=null;paintWalk();
@@ -92,6 +97,8 @@ function paintWalk(){
       esc(P.content.find(x=>x.id===l.jump)?.title||l.jump||'(nothing set)')+'</div></div>'
     :l.pick!==undefined
     ?'<div class="wkline"><div class="n" style="color:var(--sage)">▸ player</div><div class="t">'+esc(l.pick)+'</div></div>'
+    :l.gate!==undefined
+    ?'<div class="wkline"><div class="n" style="color:var(--blue)">◇ stat outcome</div><div class="t">'+esc(l.gate)+'</div></div>'
     :'<div class="wkline"><div class="n" style="color:'+(chr(l.speaker)?.color||'#938599')+'">'+
       esc(chr(l.speaker)?.name||l.speaker)+'</div><div class="t">'+dress(l.text)+'</div></div>').join('');
   if(wkPending)h+='<div class="wkopts">'+wkPending.options.map((o,i)=>{

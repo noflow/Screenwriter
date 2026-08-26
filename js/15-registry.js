@@ -1,7 +1,7 @@
 function walkAll(cb){
   const rec=(list,c,base)=>list.forEach((n,i)=>{
     const p=base.concat(i);cb(n,c,p);
-    if(n.type==='choice')n.options.forEach((o,j)=>{cb(o,c,p.concat(j),true);rec(o.nodes,c,p.concat(j));});
+    if(n.type==='choice'||n.type==='gate')n.options.forEach((o,j)=>{cb(o,c,p.concat(j),true);rec(o.nodes,c,p.concat(j));});
   });
   P.content.forEach(c=>{
     if(c.type==='quest')(c.stages||[]).forEach((s,i)=>rec(s.nodes||[],c,['s'+i]));

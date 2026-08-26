@@ -30,6 +30,9 @@ again. `setx` only affects new processes, so the restart matters.
 
 Leave that window open — closing it stops the server.
 
+Or simply double-click `Start Scenewright.bat`. It starts the server if needed and
+opens the app for you.
+
 **4. Open it:**
 
     http://localhost:8000/scenewright.html
@@ -37,6 +40,29 @@ Leave that window open — closing it stops the server.
 Not by double-clicking the file. A page opened from `file://` can't reach Ollama.
 
 ---
+
+## Using a hosted model instead
+
+Ollama is the default and the only one that keeps everything on your machine. If you
+want something stronger than an 8B, the **Direction** tab now has an **Engine** picker:
+
+    Ollama — on this machine     the default, nothing leaves
+    Pawan.Krd — hosted           https://api.pawan.krd/v1, OpenAI-compatible
+    Pawan.Krd · CosmosRP 3.5     their dedicated roleplay model
+    Other OpenAI-compatible      any endpoint shaped like OpenAI's
+
+For Pawan.Krd, create an API key in its dashboard and paste it into the Engine block.
+The CosmosRP choice automatically selects `pkrd/cosmosrp-3.5`. If another endpoint
+won't list its own models, type the model names you want in **Model names** and they
+are used as given.
+
+The key is kept in this browser only — it is never written into the project file or
+an export. Use **Forget API key** in the Engine block to remove it from this browser.
+Two things worth knowing before you switch: your prompts, character sheets
+and dialogue are sent to a third party, and **Include private profile** sends the
+private_profile block with them. The tool warns you when both are on at once.
+Whole-scene mode accepts an ordinary role-play transcript and converts it into the
+editor's scene structure automatically, so the model does not need to write JSON.
 
 ## First run
 
@@ -53,11 +79,38 @@ work won't be there. **Content → Save file** writes a copy you can keep.
 
 ---
 
+## Planning a stronger first draft
+
+Choose **Plan scene** beside Whole scene. Add whatever you know about the setting,
+goal, tension, must-hit beat, tone, and final player choice, then choose **Draft
+outline**. You can edit the outline before choosing **Write scene from outline**.
+The plan is saved with the conversation, so you can reopen it later and revise the
+next draft without recreating the setup.
+
+For a stat-based ending, use **Conditional outcome** in the planner. Pick a character,
+stat, and threshold, then describe what should happen at or above it and what should
+happen below it. For example, `friendship ≥ 50` can lead to a warmer outcome while
+`friendship ≤ 49` leads to a guarded one. These are automatic runtime branches, not
+player choice buttons, and remain editable in the generated scene.
+
+Add a middle outcome to use three tiers: for example, low at `≤ 24`, middle from
+`25–49`, and high at `≥ 50`. In the generated scene, use **+ stat** inside any
+automatic outcome to combine rules, such as friendship at least 50 *and* trust at
+least 30. Validate warns when combined stat rules contradict each other and a branch
+can never run.
+
+Each outcome can also change game state. Add effects such as `elena_reyes.friendship +2`,
+`elena_reyes.trust +1`, or `argument_resolved`; separate several effects with semicolons.
+Use **Preview stat value** to see which outcome a given number would take before you
+generate the scene.
+
+---
+
 ## What's in here
 
     scenewright.html    the tool — this is the one to open
     index.html          same tool, loading js/ separately, for editing sources
-    js/  css/           the 35 source modules
+    js/  css/           the 37 source modules
     build.py            rebuilds scenewright.html from those sources
     README.md           what each module does
     godot/
@@ -97,9 +150,9 @@ this runtime reads.
 **Nothing generates** — check the lamp top right. Grey means Ollama isn't reachable;
 re-do step 2 above.
 
-**"Reply couldn't be parsed"** — the error now shows what the model actually sent.
-If it looks cut off, raise the memory window in the Direction tab. Whole-scene mode
-asks the most of the model; an 8B is near its limit on nested choices.
+**"Reply couldn't be parsed"** — this applies to short JSON-based tools such as
+choices and chat continuation. The whole-scene writer uses ordinary role-play text
+instead. If a reply looks cut off, raise the memory window in the Direction tab.
 
 **A sheet won't import** — open `import-test.html` and drop the file on it. It
 reports the real cause: encoding, a stray comma, wrong shape.

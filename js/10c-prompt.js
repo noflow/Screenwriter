@@ -74,7 +74,7 @@ function buildPrompt(input){
   const c=cur(),n=+$('burst').value||3;
   const cast=presentNPCs().map(charBrief).join('\n\n')||'(no characters marked present)';
   const head='You write dialogue for a visual novel. Stay strictly in character.\n\n# Characters\n'+cast+
-    playerRule()+'\n\n'+sceneBrief()+boundsBrief()+adultBrief();
+    playerRule()+'\n\n'+sceneBrief()+boundsBrief()+adultBrief()+canonBrief();
 
   if(mode==='variants'){
     const who=chr(c.character);
@@ -90,34 +90,50 @@ function buildPrompt(input){
   const ids=speakableIds(c).join(', ');
 
   if(mode==='scene'){
-    const roster=(($('writePlayer')?.checked&&playerChar())
-      ? P.characters : npcs()).map(x=>x.id+' ('+x.name+')').join(', ');
+    const plan=c.scenePlan||{};
+    const planned=plan.outline
+      ? '# Approved beat outline\n'+plan.outline+'\n\n# Original plan\n'+(plan.brief||input)
+      : input;
     return 'You write scenes for a life-sim visual novel. Stay strictly in character.\n\n'+
       '# Everyone in this game\n'+npcs().map(charBrief).join('\n\n')+playerRule()+
       '\n\n# Places\n'+P.locations.map(l=>l.id+' — '+l.name+(l.notes?': '+l.notes:'')).join('\n')+
-      boundsBrief()+adultBrief()+
-      '\n\n# The scene to write\n'+input+
+      boundsBrief()+adultBrief()+canonBrief()+
+      '\n\n# The scene to write\n'+planned+
       '\n\n# How to build it\n'+
       'Open with a line of narration setting the place. Let the characters talk through a real '+
-      'exchange (roughly 12–25 lines total is fine — do not rush). Then give the player a real choice — '+
-      '2 or 3 options that lead somewhere genuinely different, not three phrasings of yes. '+
-      'EVERY option must have a "then" list holding at least two nodes — a choice that leads nowhere '+
-      'is unusable. Make each branch feel distinct. You may leave a branch open for later continuation '+
-      'rather than forcing a hard ending.\n\n'+
-      '# Format\nReply with ONLY this JSON, no prose or fences:\n'+
-      '{"title":"Short scene name",'+
-      '"location":"<a location id from the list, or empty>",'+
-      '"block":"early_morning|morning|lunch|afternoon|evening|late_evening|night",'+
-      '"cast":["character_id",...],'+
-      '"nodes":[ ... ]}\n\n'+
-      'A node is one of:\n'+
-      '  {"speaker":"__narrator__","text":"What the player sees."}\n'+
-      '  {"speaker":"character_id","text":"Spoken line. *Action in asterisks.*","emotion":"one_word"}\n'+
-      '  {"choice":[{"text":"What the player says","effect":"character_id.meter +1",'+
-      '"then":[ ...more nodes... ]}]}\n\n'+
-      'speaker must be "__narrator__" or one of: '+roster+'. '+
-      'effect is optional and looks like "elena_reyes_hale.comfort +1" or a bare flag name. '+
-      'A "then" list may contain one more nested choice, but no deeper than that.';
+      'exchange (roughly 12–25 lines total is fine — do not rush).\n\n'+
+      '# Format\nWrite ordinary role-play transcript text — NOT JSON. Use one line per beat:\n'+
+      '  *The room is quiet except for the television.*\n'+
+      '  Elena Reyes: "Want to join me?"\n'+
+      '  Elena Reyes: *She pats the cushion beside her.*\n\n'+
+      'Use the characters\' names before spoken lines. Put narration and actions in *asterisks*. '+
+      'Do not use markdown tables, code fences, or JSON.\n\n'+
+      (plan.statGate
+        ? 'This scene ends with an AUTOMATIC stat outcome. Do not give the player a choice at this point. '+
+          'After the shared scene, use exactly this shape. Each outcome needs at least two response beats:\n'+
+          '  STAT OUTCOMES:\n'+
+          '  HIGH:\n'+
+          '  '+(chr(plan.statGate.character)?.name||plan.statGate.character)+': "A line fitting the high-stat outcome."\n'+
+          '  *A second beat.*\n'+
+          (plan.statGate.middle
+            ? '  MIDDLE:\n'+
+              '  '+(chr(plan.statGate.character)?.name||plan.statGate.character)+': "A line fitting the middle-stat outcome."\n'+
+              '  *A second beat.*\n'
+            : '')+
+          '  LOW:\n'+
+          '  '+(chr(plan.statGate.character)?.name||plan.statGate.character)+': "A line fitting the low-stat outcome."\n'+
+          '  *A second beat.*\n\n'
+        : 'To end with player choices, use this simple shape. Each option needs at least two response beats:\n'+
+      '  CHOICES:\n'+
+      '  1. "Sure, I\'ll stay a while."\n'+
+      '     THEN:\n'+
+      '     Elena Reyes: "Good."\n'+
+      '     *She makes room on the sofa.*\n'+
+      '  2. "I should get going."\n'+
+      '     THEN:\n'+
+      '     Elena Reyes: "Another time, then."\n'+
+      '     *She tries not to sound disappointed.*\n\n')+
+      'Keep the branches genuinely different. Reply with the transcript only.';
   }
 
   if(mode==='choice')

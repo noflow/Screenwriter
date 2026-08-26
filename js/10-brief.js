@@ -48,6 +48,12 @@ function adultBrief(){
     (bits.length?'\n'+bits.join('\n'):'');
 }
 
+function canonBrief(){
+  const notes=P.storyNotes||[],c=cur(),ids=new Set([...(c?.cast||[]),playerChar()?.id].filter(Boolean));
+  const relevant=notes.filter(n=>!(n.tags||[]).length||(n.tags||[]).some(t=>ids.has(t)));
+  return relevant.length?'\n\n# Story memory\n'+relevant.slice(-18).map(n=>'- '+n.text).join('\n'):'';
+}
+
 const present=()=>{const c=cur();return (c?.cast||[]).map(chr).filter(Boolean);};
 /** Only NPCs can be given generated dialogue. */
 const presentNPCs=()=>present().filter(c=>!isPlayer(c));
