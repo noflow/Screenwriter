@@ -4,7 +4,8 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const siblingGameRoot=path.resolve(root,'..','testgodot');
+const siblingGameRoot=['testgodot','Testing'].map(name=>path.resolve(root,'..',name))
+  .find(candidate=>fs.existsSync(candidate))||path.resolve(root,'..','testgodot');
 const gameRoot=process.env.SCENEWRIGHT_GAME_ROOT||siblingGameRoot;
 const context = vm.createContext({console});
 const load = file => vm.runInContext(
@@ -207,19 +208,23 @@ if (fs.existsSync(path.join(gameRoot, 'characters'))) {
   assert.deepEqual(danielScheduleRoundTrip, context.danielSheet.schedule.fixed_commitments);
   assert.equal(run(`gridToCommitments(scheduleGrid(gameSheets.find(s=>s.id==='hannah_brooks')),
     gameSheets.find(s=>s.id==='hannah_brooks')).some(f=>f.days.some(d=>d.startsWith('rotation_day_')))`), true);
-  assert.equal(run("scheduleGrid(elenaSheet)['friday|evening'].location"), 'hale_home.living_room');
+  context.homeScheduleSheet={id:'home_schedule_fixture',home:{location_id:'hale_home'},schedule:{fixed_commitments:[{
+    days:['friday','saturday'],blocks:['evening'],activity:'watching_tv',label:'Watching TV in the living room',
+    location:'hale_home',home_placement:{room:'living_room',position:[340,590]},unavailable:false
+  }]}};
+  assert.equal(run("scheduleGrid(homeScheduleSheet)['friday|evening'].location"), 'hale_home.living_room');
   run(`
-    const editedSchedule=scheduleGrid(elenaSheet);editedSchedule['friday|evening'].unavailable=true;
-    globalThis.EDITED_TV_COMMITMENT=gridToCommitments(editedSchedule,elenaSheet).find(f=>
+    const editedSchedule=scheduleGrid(homeScheduleSheet);editedSchedule['friday|evening'].unavailable=true;
+    globalThis.EDITED_TV_COMMITMENT=gridToCommitments(editedSchedule,homeScheduleSheet).find(f=>
       f.days.includes('friday')&&f.blocks.includes('evening'));
   `);
   assert.equal(context.EDITED_TV_COMMITMENT.label, 'Watching TV in the living room');
   assert.equal(context.EDITED_TV_COMMITMENT.home_placement.room, 'living_room');
   assert.deepEqual(Array.from(context.EDITED_TV_COMMITMENT.home_placement.position), [340, 590]);
   run(`
-    const clearedRoomSchedule=scheduleGrid(elenaSheet);
+    const clearedRoomSchedule=scheduleGrid(homeScheduleSheet);
     clearedRoomSchedule['friday|evening'].location='hale_home';
-    const clearedRoomCommitments=gridToCommitments(clearedRoomSchedule,elenaSheet);
+    const clearedRoomCommitments=gridToCommitments(clearedRoomSchedule,homeScheduleSheet);
     globalThis.CLEARED_FRIDAY_HOME=clearedRoomCommitments.find(f=>
       f.days.includes('friday')&&f.blocks.includes('evening'));
     globalThis.KEPT_SATURDAY_ROOM=clearedRoomCommitments.find(f=>

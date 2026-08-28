@@ -22,8 +22,8 @@ def game_location_source():
     """
     configured = os.environ.get('SCENEWRIGHT_GAME_LOCATIONS', '').strip()
     candidates = [configured] if configured else []
-    candidates.append(os.path.abspath(os.path.join(
-        HERE, '..', 'testgodot', 'content', 'world', 'all_locations.json')))
+    candidates.extend(os.path.abspath(os.path.join(HERE, '..', directory,
+        'content', 'world', 'all_locations.json')) for directory in ('testgodot', 'Testing'))
     return next((path for path in candidates if path and os.path.isfile(path)), None)
 
 def sync_game_locations():
@@ -61,7 +61,8 @@ def game_character_source():
     """Find the canonical Port Alder character-sheet directory."""
     configured = os.environ.get('SCENEWRIGHT_GAME_CHARACTERS', '').strip()
     candidates = [configured] if configured else []
-    candidates.append(os.path.abspath(os.path.join(HERE, '..', 'testgodot', 'characters')))
+    candidates.extend(os.path.abspath(os.path.join(HERE, '..', directory, 'characters'))
+        for directory in ('testgodot', 'Testing'))
     return next((path for path in candidates if path and os.path.isdir(path)), None)
 
 def sync_game_characters():

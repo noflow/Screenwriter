@@ -25,7 +25,10 @@ const locationPackageView=pkg=>({
     const out={...l};delete out.background;delete out.tags;delete out.notes;
     Object.assign(out,{id:l.id||'',name:l.name||'',district:l.district||'',type:l.type||'',
       travel_node:l.travel_node!==false,access:l.access||{},privacy:l.privacy||null,
-      residents:l.residents||[],services:l.services||[],housing:l.housing||null,
+      // Authored character sheets own their current home link, so their resident
+      // entries are intentionally excluded from canonical-registry equality.
+      residents:(l.residents||[]).filter(id=>!(P.characters||[]).some(character=>character.id===id)),
+      services:l.services||[],housing:l.housing||null,
       named_npcs:l.named_npcs||[],content_rules:l.content_rules||[]});
     out.rooms=(l.rooms||[]).map(r=>Object.assign({},r,{id:r.id||'',name:r.name||'',
       access:r.access||'',actions:r.actions||[]}));
@@ -42,14 +45,56 @@ const sameLocationPackage=pkg=>JSON.stringify(orderedJson(locationPackageView(pk
 function restoreProject(project,{refreshLocations=true}={}){
   const source=project&&typeof project==='object'?project:{};
   P=Object.assign({characters:[],locations:[],content:[],districts:[],travel:null,aliases:{},
-    dismissedBundledCharacters:[]},source);
+    dismissedBundledCharacters:[],residence_overrides:{}},source);
   if(!Array.isArray(P.characters))P.characters=[];
   if(!Array.isArray(P.locations))P.locations=[];
   if(!Array.isArray(P.content))P.content=[];
   if(!Array.isArray(P.dismissedBundledCharacters))P.dismissedBundledCharacters=[];
+  if(!P.residence_overrides||typeof P.residence_overrides!=='object'||Array.isArray(P.residence_overrides))
+    P.residence_overrides={};
   DISTRICTS=Array.isArray(P.districts)?P.districts:[];
   TRAVEL=P.travel||null;ALIASES=P.aliases||{};
   return refreshLocations?syncBundledLocations():null;
+}
+
+/** Per-project discovery/access decisions survive a refresh of the game-owned
+    location registry without copying the whole registry into the project. */
+function rememberResidenceOverride(location){
+  if(!location?.id||!location.tags?.includes('package'))return;
+  if(!P.residence_overrides||typeof P.residence_overrides!=='object')P.residence_overrides={};
+  P.residence_overrides[location.id]={
+    discovery:JSON.parse(JSON.stringify(location.discovery||{})),
+    access:JSON.parse(JSON.stringify(location.access||{})),
+    outside_room:location.outside_room||''
+  };
+}
+
+function applyResidenceOverrides(){
+  Object.entries(P.residence_overrides||{}).forEach(([id,override])=>{
+    const location=P.locations.find(item=>item.id===id);if(!location||!override)return;
+    if(override.discovery&&typeof override.discovery==='object')
+      location.discovery=JSON.parse(JSON.stringify(override.discovery));
+    if(override.access&&typeof override.access==='object')
+      location.access=JSON.parse(JSON.stringify(override.access));
+    if(Object.prototype.hasOwnProperty.call(override,'outside_room'))
+      location.outside_room=override.outside_room||'';
+  });
+}
+
+/** Character sheets own authored home assignments. Rebuild resident links after
+    a canonical registry refresh so moving an NPC remains stable across reloads. */
+function reconcileCharacterHomeResidents(){
+  (P.characters||[]).forEach(character=>{
+    P.locations.forEach(location=>{
+      if(Array.isArray(location.residents))location.residents=location.residents.filter(id=>id!==character.id);
+    });
+    const homeId=character?.home?.location_id||character?.home?.residence_id||'';
+    const home=P.locations.find(location=>location.id===homeId);if(!home)return;
+    if(!Array.isArray(home.residents))home.residents=[];
+    if(!home.residents.includes(character.id))home.residents.push(character.id);
+    character.home.location_id=home.id;character.home.district=home.district||'';
+    character.home.residence=home.name||pretty(home.id);
+  });
 }
 
 /** Bring saved/browser state up to the exact registry bundled from the game. */
@@ -59,6 +104,7 @@ function syncBundledLocations(){
     P.locationPackage={id:BUNDLED_LOCATION_PACKAGE.package_id||'',
       signature:typeof BUNDLED_LOCATION_SIGNATURE==='undefined'?'':BUNDLED_LOCATION_SIGNATURE,
       source:'bundled'};
+    applyResidenceOverrides();reconcileCharacterHomeResidents();
     return {updated:false,count:P.locations.length,districts:DISTRICTS.length,
       rooms:P.locations.reduce((n,l)=>n+(l.rooms||[]).length,0),moved:0,sched:0,
       deduped:0,unplaced:[],lost:[]};
@@ -192,6 +238,9 @@ function importLocations(pkg,{source='imported',signature=''}={}){
       if(to){c.home.location_id=locPart(to);c.home.residence_id=locPart(to);}
     }
   });
+
+  applyResidenceOverrides();
+  reconcileCharacterHomeResidents();
 
   return {count:P.locations.length,districts:DISTRICTS.length,moved,sched,
     deduped,

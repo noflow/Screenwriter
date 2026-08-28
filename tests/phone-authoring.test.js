@@ -4,7 +4,8 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const siblingGameRoot=path.resolve(root,'..','testgodot');
+const siblingGameRoot=['testgodot','Testing'].map(name=>path.resolve(root,'..',name))
+  .find(candidate=>fs.existsSync(candidate))||path.resolve(root,'..','testgodot');
 const gameRoot=process.env.SCENEWRIGHT_GAME_ROOT||siblingGameRoot;
 const elements = new Proxy({}, {get(target, id) {
   if (!target[id]) target[id] = {checked: id === 'writePlayer', value: '', innerHTML: ''};
@@ -19,6 +20,7 @@ const load = file => vm.runInContext(
 
 load('js/00-state.js');
 load('js/01a-game-characters.js');
+load('js/02a-game-locations.js');
 vm.runInContext(`
   var DISTRICTS=[],TRAVEL=null,ALIASES={};
   function customStatDefs(){ return []; }
@@ -53,7 +55,9 @@ context.SHEETS = sheets;
 
 vm.runInContext(`
   P={characters:SHEETS.map(sheet=>Object.assign({},sheet,{name:sheet.display_name})),
-    locations:[],content:[],districts:[],travel:null,aliases:{}};
+    locations:JSON.parse(JSON.stringify(BUNDLED_LOCATION_PACKAGE.locations)),content:[],
+    districts:JSON.parse(JSON.stringify(BUNDLED_LOCATION_PACKAGE.districts)),travel:null,aliases:{}};
+  DISTRICTS=P.districts;
   globalThis.REAL_MESSAGE_COUNT=allTextMessages().length;
   globalThis.REAL_MESSAGE_OWNERS=allTextMessages().map(entry=>entry.owner.id).sort();
   globalThis.REAL_ROUND_TRIPS=P.characters.filter(character=>character.text_messages?.length).map(character=>({

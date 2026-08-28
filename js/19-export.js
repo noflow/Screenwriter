@@ -15,8 +15,10 @@ function toJSON(){
         family_only:!!g.boundaries.family_only,
         hard_limits:g.boundaries.hard_limits||[],
         adult_hard_limits:g.private_profile?.adult_preferences?.hard_limits||[],
+        home:g.home||{},home_routine:g.home_routine||{},
         chapters:(c.relationship_chapters||[]).map(x=>({level:x.level,id:x.id,title:x.title,
           route:x.route||'shared',story_plan:x.story_plan||undefined,requires:x.requires||[]})),
+        story_arcs:g.story_arcs||[],
         social_preferences:g.social_preferences||{},
         stat_caps:c.stat_caps||{},
         relationship_defaults:c.relationship_defaults||{}};
@@ -25,7 +27,10 @@ function toJSON(){
     // the runtime needs the room table to resolve one.
     locations:P.locations.map(l=>({id:l.id,name:l.name,background:l.background,
       district:l.district,type:l.type||'',
-      rooms:(l.rooms||[]).map(r=>({id:r.id,name:r.name,access:r.access||''})),
+      outside_room:l.outside_room||'',discovery:l.discovery||{},access:l.access||{},
+      residents:l.residents||[],housing:l.housing||null,
+      rooms:(l.rooms||[]).map(r=>({id:r.id,name:r.name,access:r.access||'',
+        navigation:r.navigation||{},actions:r.actions||[]})),
       travel_node:l.travel_node!==false})),
     // The declared state contract — types, starting values and ceilings.
     registry:stateRegistry(),
@@ -36,7 +41,8 @@ function toJSON(){
        replayable:!!c.replayable,sets_flag:c.flag||'',
        days:contentDays(c),nodes:clean(c.nodes||[])})).concat(acts.conversations),
     quests:pick('quest').map(c=>({id:c.id,title:c.title,giver:c.character||'',hook:c.hook||'',
-      cast:c.cast||[],requires:c.requires||[],
+      cast:c.cast||[],requires:c.requires||[],after:c.after||'',
+      character_arc:c.questPlan?.characterArc||null,relationship_arc:c.questPlan?.relationshipArc||null,
       stages:(c.stages||[]).map(s=>Object.assign({id:s.id,title:s.title},place(s.location),
         {sets_flag:s.flag||'',effects:compileEffects(s.flag),
          requires:s.requires||[],

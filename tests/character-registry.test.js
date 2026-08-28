@@ -4,7 +4,8 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const siblingGameRoot=path.resolve(root,'..','testgodot');
+const siblingGameRoot=['testgodot','Testing'].map(name=>path.resolve(root,'..',name))
+  .find(candidate=>fs.existsSync(candidate))||path.resolve(root,'..','testgodot');
 const gameRoot=process.env.SCENEWRIGHT_GAME_ROOT||siblingGameRoot;
 const context = vm.createContext({console});
 const load = file => vm.runInContext(
@@ -28,6 +29,18 @@ assert.ok(bundled.every(sheet => Number.isFinite(sheet.social_preferences?.invit
 assert.ok(bundled.every(sheet => sheet.social_preferences?.preferred_activities?.length));
 assert.equal(run('PA_RELATIONSHIP_MILESTONES.length'), 5);
 assert.equal(run('PA_SOCIAL_ACTIVITIES.length'), 5);
+
+run(`
+  const renameTarget={id:'stable_character_id',name:'Old Name'};
+  globalThis.RENAMED_DISPLAY=setCharacterDisplayName(renameTarget,'  New Name  ');
+  globalThis.RENAMED_CHARACTER=JSON.stringify(renameTarget);
+  try{setCharacterDisplayName(renameTarget,'   ');}catch(error){globalThis.BLANK_NAME_ERROR=error.message;}
+`);
+assert.equal(context.RENAMED_DISPLAY, 'New Name');
+assert.deepEqual(JSON.parse(context.RENAMED_CHARACTER), {
+  id:'stable_character_id',name:'New Name',display_name:'New Name'
+});
+assert.equal(context.BLANK_NAME_ERROR, 'Character display name cannot be blank.');
 
 run(`
   P={characters:[{id:'test_friend',name:'Test Friend',home:{location_id:'test_home'},

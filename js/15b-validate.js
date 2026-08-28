@@ -242,7 +242,7 @@ function validatePhoneAuthoring(add){
 function validate(){
   const out=[],add=(sev,msg,where,fix)=>out.push({sev,msg,where,fix});
   const districts=typeof DISTRICTS==='undefined'?(P.districts||[]):DISTRICTS;
-  const ids=new Set(),cids=new Set(),chapterArcIds=new Map();
+  const ids=new Set(),cids=new Set(),chapterArcIds=new Map(),characterStoryArcIds=new Map();
   const impossibleStats=reqs=>{
     const limits={};
     (reqs||[]).filter(r=>r.type==='stat').forEach(r=>{
@@ -260,6 +260,31 @@ function validate(){
     cids.add(c.id);
     if(isPlayer(c))return;
     const where=c.name||c.id||'Cast',chapters=Array.isArray(c.relationship_chapters)?c.relationship_chapters:[];
+    if(!String(c.name||c.display_name||'').trim())add('err','Character "'+(c.id||'?')+'" needs a display name.',where);
+    const homeId=c.home?.location_id||c.home?.residence_id||'',home=loc(homeId);
+    if(!homeId)add('err',where+' needs a home residence.',where);
+    else if(!home)add('err',where+' home "'+homeId+'" is not in the location registry.',where);
+    else{
+      if(!(home.residents||[]).includes(c.id))add('err',where+' is not listed as a resident of '+home.name+'.',where);
+      if(home.outside_room&&!(home.rooms||[]).some(room=>room.id===home.outside_room))
+        add('err',home.name+' entrance room "'+home.outside_room+'" does not exist.',where);
+      if(/^(npc_residence|npc_and_rentable_apartment)$/.test(home.type||'')){
+        if(!home.discovery||home.discovery.discoverable!==true)
+          add('err',home.name+' must be explicitly discoverable.',where);
+        if(!Object.prototype.hasOwnProperty.call(home.discovery||{},'hidden_until_discovered'))
+          add('err',home.name+' must say whether it is hidden until discovered.',where);
+      }
+      const checkHomeRoom=(placement,label)=>{
+        if(placement?.room&&!(home.rooms||[]).some(room=>room.id===placement.room))
+          add('err',label+' uses room "'+placement.room+'", which is not mapped in '+home.name+'.',where);
+      };
+      Object.entries(c.home_routine?.default_by_block||{}).forEach(([block,placement])=>
+        checkHomeRoom(placement,pretty(block)+' home routine'));
+      (c.home_routine?.overrides||[]).forEach((placement,index)=>
+        checkHomeRoom(placement,'Home-routine override '+(index+1)));
+      (c.schedule?.fixed_commitments||[]).forEach((commitment,index)=>
+        checkHomeRoom(commitment.home_placement,'Schedule home placement '+(index+1)));
+    }
     if(chapters.length!==5)add('err',where+' needs exactly five relationship story milestones; found '+chapters.length+'.',where);
     const levels=chapters.map(ch=>+ch.level);
     if(levels.join(',')!=='1,2,3,4,5')add('err',where+' relationship milestones must be ordered as levels 1 through 5.',where);
@@ -284,6 +309,10 @@ function validate(){
         else{
           if(!PA_STORY_STATUSES.includes(plan.status))add('err','Relationship milestone "'+(id||'?')+
             '" has unknown writing status "'+plan.status+'".',where);
+          if(plan.quest_count!==undefined&&(!Number.isInteger(+plan.quest_count)||+plan.quest_count<0||
+            +plan.quest_count>PA_RELATIONSHIP_QUESTS_PER_LEVEL_MAX))
+            add('err','Relationship milestone "'+(id||'?')+'" quest count must be a whole number from 0 to '+
+              PA_RELATIONSHIP_QUESTS_PER_LEVEL_MAX+'.',where);
           ['supporting_characters','required_memories','prerequisite_quests'].forEach(key=>{
             if(!Array.isArray(plan[key]))add('err','Story plan field "'+key+'" must be a list.',where);
           });
@@ -294,6 +323,46 @@ function validate(){
             if(issues.length)add('err','Milestone "'+(ch.title||id)+'" is marked complete but still needs: '+issues.join(' '),where);
           }
         }
+      }
+    });
+    const storyArcs=Array.isArray(c.story_arcs)?c.story_arcs:[];
+    const localStoryArcIds=new Set();
+    storyArcs.forEach(arc=>{
+      const id=String(arc?.id||'');
+      if(!id)add('err','An independent character story has no id.',where);
+      else if(slug(id)!==id)add('err','Character story id "'+id+'" must use lowercase words joined by underscores.',where);
+      if(id&&localStoryArcIds.has(id))add('err','Two independent character stories share id "'+id+'".',where);
+      localStoryArcIds.add(id);
+      if(id&&chapterArcIds.has(id))add('err','Character story id "'+id+'" is also used by a relationship milestone.',where);
+      if(id&&characterStoryArcIds.has(id)&&characterStoryArcIds.get(id)!==c.id)
+        add('err','Character story id "'+id+'" is also used by '+
+          (chr(characterStoryArcIds.get(id))?.name||characterStoryArcIds.get(id))+'.',where);
+      else if(id)characterStoryArcIds.set(id,c.id);
+      if(!String(arc?.title||'').trim())add('err','Character story "'+(id||'?')+'" needs a title.',where);
+      if(!PA_CHARACTER_ARC_CATEGORIES.some(category=>category.id===arc.category))
+        add('err','Character story "'+(id||'?')+'" has unknown category "'+arc.category+'".',where);
+      if(!PA_STORY_STATUSES.includes(arc.status))add('err','Character story "'+(id||'?')+
+        '" has unknown writing status "'+arc.status+'".',where);
+      if(!Number.isInteger(+arc.quest_count)||+arc.quest_count<1||+arc.quest_count>PA_CHARACTER_ARC_QUEST_MAX)
+        add('err','Character story "'+(id||'?')+'" quest count must be a whole number from 1 to '+
+          PA_CHARACTER_ARC_QUEST_MAX+'.',where);
+      if(!PA_CHARACTER_ARC_ENTRY_POLICIES.includes(arc.entry_policy))
+        add('err','Character story "'+(id||'?')+'" has unknown entry policy.',where);
+      if(!PA_CHARACTER_ARC_DECLINE_POLICIES.includes(arc.decline_policy))
+        add('err','Character story "'+(id||'?')+'" has unknown decline policy.',where);
+      if(arc.gate_meter&&!PA_CHARACTER_ARC_METERS.includes(arc.gate_meter))
+        add('err','Character story "'+(id||'?')+'" has unknown relationship gate "'+arc.gate_meter+'".',where);
+      if(!Number.isFinite(+arc.gate_value)||+arc.gate_value<0||+arc.gate_value>100)
+        add('err','Character story "'+(id||'?')+'" meter minimum must be from 0 to 100.',where);
+      ['supporting_characters','required_memories','prerequisite_quests','custom_requirements'].forEach(key=>{
+        if(!Array.isArray(arc[key]))add('err','Character story field "'+key+'" must be a list.',where);
+      });
+      if(arc.primary_location&&!loc(locPart(arc.primary_location)))
+        add('err','Character story location "'+arc.primary_location+'" is not in the registry.',where);
+      if(arc.status==='complete'&&typeof characterStoryArcIssues==='function'){
+        const issues=characterStoryArcIssues(c,arc);
+        if(issues.length)add('err','Character story "'+(arc.title||id)+'" is marked complete but still needs: '+
+          issues.join(' '),where);
       }
     });
     const social=c.social_preferences;

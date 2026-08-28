@@ -20,22 +20,36 @@ a copy of, back up, or hand to someone else.
 The Player is a built-in runtime role, not a `.character` package. Port Alder
 creates the user's identity and game-state sheet separately for every new game.
 
-The 15 Port Alder NPC sheets and the location registry are built in. When the sibling
-`testgodot` project is present, `build.py` refreshes `js/01a-game-characters.js` from
-`testgodot/characters/*.character` and `js/02a-game-locations.js` from
-`testgodot/content/world/all_locations.json` before creating the one-page build.
+The 15 Port Alder NPC sheets and the location registry are built in. When a sibling
+game checkout named `testgodot` or `Testing` is present, `build.py` refreshes
+`js/01a-game-characters.js` from its `characters/*.character` files and
+`js/02a-game-locations.js` from `content/world/all_locations.json` before creating
+the one-page build.
 Set `SCENEWRIGHT_GAME_CHARACTERS` to the character directory and
 `SCENEWRIGHT_GAME_LOCATIONS` to the location file when the repositories are not siblings.
 
 The guided character creator and existing-sheet editor both author Port Alder's
 hangout invitation threshold, preferred non-romantic activities, and exactly five
-relationship story milestones. Each milestone can create or reopen a same-id quest
-in the Quest builder; that id is the runtime link that starts the arc when the
-shared-activity, bond, trust, and dating-agreement requirements are met.
-The Character Story Arc Workshop adds a five-level overview with route, conflict,
-choice, consequence, callback, location, cast, memory, and prerequisite planning;
-quest/dialogue readiness checks; linked-conversation access; objective reordering;
-and one-click scaffolding for every missing milestone quest.
+relationship levels. Display names are editable without changing the stable character
+id, so existing quest and conversation references remain connected.
+
+The sheet editor also has a **Residence** workspace. It links an NPC to any registered
+home, keeps the home’s resident list synchronized, displays its entrance, access rules,
+rooms, actions, and directional exits, and edits the NPC’s seven-block default home
+routine. Discovery sources, hidden state, and invitation policy are saved as small
+project overrides so refreshing the game-owned location registry does not erase the
+writer’s choices. Hale Home’s legacy Godot navigation map is shown read-only; the
+newer residences are read directly from the location registry.
+
+The Character Story Arc Workshop has two parallel systems. **Relationship path**
+keeps the five meter levels, with zero to ten sequential quests at each level.
+Independent character-story tabs add any number of friendship, workplace, career,
+family, personal, transformation, mystery, slice-of-life, or custom arcs. Each can
+contain 1–50 sequential quests and unlock from any supported relationship meter,
+a world-state flag/value, memories, or prerequisite quests. Optional arcs record
+accept/defer/decline behavior and keep unrelated character content available when
+declined. Both systems include planning, readiness checks, linked conversations,
+and one-click scaffolding without deleting authored quests when a plan is shortened.
 
 Run the focused state/player and quest-workshop regression checks with:
 
@@ -45,6 +59,8 @@ Run the focused state/player and quest-workshop regression checks with:
     node tests/location-registry.test.js
     node tests/phone-authoring.test.js
     node tests/relationship-arc-workshop.test.js
+    node tests/character-story-arcs.test.js
+    node tests/residence-authoring.test.js
 
 ## Layout
 
@@ -90,7 +106,7 @@ Numeric prefixes are load order, not importance.
     10e-generate        askModel, run, continueBranch, fillEmpty
     10f-planner          scene planner and outline-first generation
     11-editor           sheet & limits editor
-    11b-relationship-arc five-milestone character story planning and quest readiness
+    11b-relationship-arc flexible-length character story planning and quest readiness
     12-conditions       condition rows and evaluation
     13-routes           route enumeration, the walker
     14-graph            flow diagrams

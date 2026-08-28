@@ -28,6 +28,24 @@ const PA_RELATIONSHIP_ROUTES=Object.freeze([
   Object.freeze({id:'romantic',name:'Romantic'})
 ]);
 const PA_STORY_STATUSES=Object.freeze(['draft','ready','complete']);
+const PA_RELATIONSHIP_QUESTS_PER_LEVEL_MAX=10;
+const PA_CHARACTER_ARC_QUEST_MAX=50;
+const PA_CHARACTER_ARC_CATEGORIES=Object.freeze([
+  Object.freeze({id:'friendship',name:'Friendship'}),
+  Object.freeze({id:'workplace',name:'Workplace'}),
+  Object.freeze({id:'career',name:'Career'}),
+  Object.freeze({id:'family',name:'Family'}),
+  Object.freeze({id:'personal',name:'Personal'}),
+  Object.freeze({id:'transformation',name:'Transformation'}),
+  Object.freeze({id:'mystery',name:'Mystery'}),
+  Object.freeze({id:'slice_of_life',name:'Slice of life'}),
+  Object.freeze({id:'custom',name:'Custom'})
+]);
+const PA_CHARACTER_ARC_METERS=Object.freeze([
+  'friendship','trust','respect','comfort','love','attraction','lust','commitment','compatibility','satisfaction'
+]);
+const PA_CHARACTER_ARC_ENTRY_POLICIES=Object.freeze(['optional','automatic']);
+const PA_CHARACTER_ARC_DECLINE_POLICIES=Object.freeze(['defer','close_arc','alternate_path']);
 
 function defaultSocialPreferences(){
   return {invitation_threshold:20,preferred_activities:['waterfront_hangout','cafe_catchup']};
@@ -49,7 +67,8 @@ function relationshipMilestoneRule(level){
 function defaultRelationshipStoryPlan(character,level=1){
   return {status:'draft',primary_location:character?.home?.location_id||'',
     conflict:'',important_choice:'',consequence:'',callback:'',
-    supporting_characters:[],required_memories:[],prerequisite_quests:[],notes:'',level:+level||1};
+    supporting_characters:[],required_memories:[],prerequisite_quests:[],notes:'',
+    quest_count:1,level:+level||1};
 }
 function normalizeRelationshipChapterStory(character,chapter){
   if(!PA_RELATIONSHIP_ROUTES.some(route=>route.id===chapter.route))chapter.route='shared';
@@ -64,11 +83,105 @@ function normalizeRelationshipChapterStory(character,chapter){
   ['supporting_characters','required_memories','prerequisite_quests'].forEach(key=>{
     if(!Array.isArray(plan[key]))plan[key]=[];
   });
+  const questCount=parseInt(plan.quest_count,10);
+  plan.quest_count=Number.isFinite(questCount)
+    ?Math.max(0,Math.min(PA_RELATIONSHIP_QUESTS_PER_LEVEL_MAX,questCount)):1;
   plan.level=+chapter.level||1;
   return plan;
 }
 
-let P={characters:[],locations:[],content:[],districts:[],travel:null,aliases:{},dismissedBundledCharacters:[]};
+/** Independent character stories sit beside the five relationship levels. They
+    can cover work, friendship, family, transformation, or any custom subject. */
+function defaultCharacterStoryArc(character,index=0){
+  const number=+index+1;
+  return {id:(character?.id||'character')+'_story_'+number,title:'New character story',
+    category:'personal',status:'draft',summary:'',primary_location:character?.home?.location_id||'',
+    quest_count:3,entry_policy:'optional',decline_policy:'defer',decline_outcome:'',
+    gate_meter:'friendship',gate_value:20,required_state:'',
+    conflict:'',important_choice:'',consequence:'',callback:'',
+    supporting_characters:[],required_memories:[],prerequisite_quests:[],custom_requirements:[],notes:''};
+}
+function normalizeCharacterStoryArc(character,arc,index=0){
+  const defaults=defaultCharacterStoryArc(character,index);
+  Object.keys(defaults).forEach(key=>{
+    if(arc[key]===undefined)arc[key]=Array.isArray(defaults[key])?defaults[key].slice():defaults[key];
+  });
+  arc.id=String(arc.id||defaults.id);
+  arc.title=String(arc.title||'');
+  if(!PA_CHARACTER_ARC_CATEGORIES.some(category=>category.id===arc.category))arc.category='custom';
+  if(!PA_STORY_STATUSES.includes(arc.status))arc.status='draft';
+  if(!PA_CHARACTER_ARC_ENTRY_POLICIES.includes(arc.entry_policy))arc.entry_policy='optional';
+  if(!PA_CHARACTER_ARC_DECLINE_POLICIES.includes(arc.decline_policy))arc.decline_policy='defer';
+  if(arc.gate_meter&&!PA_CHARACTER_ARC_METERS.includes(arc.gate_meter))arc.gate_meter='friendship';
+  const count=parseInt(arc.quest_count,10);
+  arc.quest_count=Number.isFinite(count)?Math.max(1,Math.min(PA_CHARACTER_ARC_QUEST_MAX,count)):3;
+  const gate=parseInt(arc.gate_value,10);
+  arc.gate_value=Number.isFinite(gate)?Math.max(0,Math.min(100,gate)):0;
+  ['supporting_characters','required_memories','prerequisite_quests','custom_requirements'].forEach(key=>{
+    if(!Array.isArray(arc[key]))arc[key]=[];
+  });
+  return arc;
+}
+function normalizeCharacterStoryArcs(character){
+  if(!Array.isArray(character.story_arcs))character.story_arcs=[];
+  character.story_arcs.forEach((arc,index)=>normalizeCharacterStoryArc(character,arc,index));
+  return character.story_arcs;
+}
+function characterStoryArcRequirements(character,arc){
+  normalizeCharacterStoryArc(character,arc);
+  const requirements=[];
+  if(arc.gate_meter&&arc.gate_value>0)requirements.push({type:'stat',character:character.id,
+    key:arc.gate_meter,op:'gte',value:arc.gate_value});
+  if(String(arc.required_state||'').trim())requirements.push({type:'flag',
+    key:String(arc.required_state).trim(),op:'is_true',value:1});
+  arc.required_memories.forEach(memory=>requirements.push({type:'memory',character:character.id,
+    key:memory,op:'is_true',value:1}));
+  arc.prerequisite_quests.forEach(quest=>requirements.push({type:'flag',
+    key:'quest_'+quest+'_done',op:'is_true',value:1}));
+  return requirements.concat(JSON.parse(JSON.stringify(arc.custom_requirements||[])));
+}
+function characterStoryArcQuestSlots(character,arc){
+  normalizeCharacterStoryArc(character,arc);
+  return Array.from({length:arc.quest_count},(_,slotIndex)=>({
+    id:slotIndex?arc.id+'_part_'+(slotIndex+1):arc.id,
+    title:slotIndex?(arc.title||pretty(arc.id))+' — Part '+(slotIndex+1):(arc.title||pretty(arc.id)),
+    arc_id:arc.id,slot_index:slotIndex,part:slotIndex+1,arc,
+    after:slotIndex?(slotIndex===1?arc.id:arc.id+'_part_'+slotIndex):''
+  }));
+}
+function characterStoryArcQuest(character,slot){
+  if(!character||!slot?.id)return null;
+  return P.content.find(item=>item.type==='quest'&&item.id===slot.id&&
+    (item.character===character.id||(item.cast||[]).includes(character.id)))||null;
+}
+function ensureCharacterStoryArcQuest(character,slot){
+  const existing=characterStoryArcQuest(character,slot);
+  if(existing)return {quest:existing,created:false};
+  const collision=P.content.find(item=>item.type==='quest'&&item.id===slot.id);
+  if(collision)throw new Error('Quest id "'+slot.id+'" already belongs to '+
+    (collision.title||'another quest')+'. Give this story arc a unique id first.');
+  const arc=normalizeCharacterStoryArc(character,slot.arc||{}),location=arc.primary_location||
+    character.home?.location_id||P.locations[0]?.id||'';
+  const optional=arc.entry_policy==='optional',part=+slot.part||(+slot.slot_index+1)||1;
+  const quest={uid:'u'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),
+    type:'quest',id:slot.id,title:slot.title||pretty(slot.id),character:character.id,
+    hook:arc.summary||'Write part '+part+' of '+arc.title+'.',location,day:'',block:'',cast:[],
+    premise:arc.summary||'',after:slot.after||'',requires:characterStoryArcRequirements(character,arc),
+    stages:[{id:'objective_1',title:part===1&&optional?
+      'Hear the proposal and choose whether to accept, defer, or decline':'Write the next story objective',
+      location,nodes:[],flag:'',requires:[]}],
+    questPlan:{category:arc.category,summary:arc.summary||'Write part '+part+' of '+arc.title+'.',
+      characterArc:{character:character.id,arc_id:arc.id,part,entry_policy:arc.entry_policy,
+        decline_policy:arc.decline_policy},rewards:'',rewardRows:[],advancedRewards:'',participants:[],
+      deadline:'',branchIdeas:optional?'Offer three valid responses: accept, defer, or decline. '+
+        (arc.decline_outcome||'Declining must not block this character’s unrelated content.'):'',
+      event:null,eventDraft:null}};
+  P.content.push(quest);
+  return {quest,created:true};
+}
+
+let P={characters:[],locations:[],content:[],districts:[],travel:null,aliases:{},
+  dismissedBundledCharacters:[],residence_overrides:{}};
 let sel=null, selChar=null, selPlace=null, focusPath=[], stageIx=0;
 let mode='play', busy=false, abort=null, fmt='sheets';
 
@@ -76,6 +189,14 @@ const slug=s=>String(s).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const dress=s=>esc(s).replace(/\*([^*\n]+)\*/g,'<em class="dir">$1</em>');
 const pretty=s=>String(s??'').replace(/_/g,' ');
+/** Changes only the writer-facing name. The stable character id deliberately
+    stays unchanged so quests, conversations, schedules, and saves keep working. */
+function setCharacterDisplayName(character,value){
+  const name=String(value??'').trim();
+  if(!name)throw new Error('Character display name cannot be blank.');
+  character.name=name;character.display_name=name;
+  return name;
+}
 /** Conversations and activities may be offered on several days. `day` remains
     the primary/legacy day so schedules and older project files keep working. */
 function contentDays(c){
@@ -163,6 +284,22 @@ function relationshipChapterQuest(character,chapter){
     (item.character===character.id||(item.cast||[]).includes(character.id)))||null;
 }
 
+/** A five-level relationship can carry any practical number of authored quests.
+    The first quest keeps the milestone id for backward compatibility; later parts
+    receive stable derived ids and are sequenced after the part before them. */
+function relationshipChapterQuestSlots(character,chapter){
+  if(!character||!chapter?.id)return [];
+  const plan=normalizeRelationshipChapterStory(character,chapter);
+  return Array.from({length:plan.quest_count},(_,slotIndex)=>({
+    level:+chapter.level||1,
+    id:slotIndex?chapter.id+'_part_'+(slotIndex+1):chapter.id,
+    title:slotIndex?(chapter.title||pretty(chapter.id))+' — Part '+(slotIndex+1):(chapter.title||pretty(chapter.id)),
+    route:chapter.route||'shared',story_plan:plan,
+    arc_chapter_id:chapter.id,slot_index:slotIndex,
+    after:slotIndex?(slotIndex===1?chapter.id:chapter.id+'_part_'+slotIndex):''
+  }));
+}
+
 /** Makes a writer-ready quest for a chapter. Its chapter requirement prevents
     the arc from being discovered before the runtime milestone is reached. */
 function ensureRelationshipChapterQuest(character,chapter){
@@ -171,15 +308,17 @@ function ensureRelationshipChapterQuest(character,chapter){
   const collision=P.content.find(item=>item.type==='quest'&&item.id===chapter.id);
   if(collision)throw new Error('Quest id "'+chapter.id+'" already belongs to '+
     (collision.title||'another quest')+'. Give this chapter a unique id first.');
-  const location=character.home?.location_id||P.locations[0]?.id||'';
+  const location=chapter.story_plan?.primary_location||character.home?.location_id||P.locations[0]?.id||'';
   const level=+chapter.level||1;
+  const part=Number.isFinite(+chapter.slot_index)?+chapter.slot_index+1:1;
   const quest={uid:'u'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),
     type:'quest',id:chapter.id,title:chapter.title||pretty(chapter.id),
     character:character.id,hook:'Write the relationship story for chapter '+level+'.',
-    location,day:'',block:'',cast:[],premise:'',
+    location,day:'',block:'',cast:[],premise:'',after:chapter.after||'',
     requires:[{type:'chapter',character:character.id,key:'',op:'gte',value:level}],
     stages:[{id:'objective_1',title:'Write the first story objective',location,nodes:[],flag:'',requires:[]}],
-    questPlan:{category:'relationship',summary:'Write the relationship story for chapter '+level+'.',
+    questPlan:{category:'relationship',summary:'Write part '+part+' of the relationship story for chapter '+level+'.',
+      relationshipArc:{character:character.id,level,part,chapter_id:chapter.arc_chapter_id||chapter.id},
       rewards:'',rewardRows:[{character:character.id,reward:'relationship:trust',value:1}],
       advancedRewards:'',participants:[],deadline:'',branchIdeas:'',event:null,eventDraft:null}};
   P.content.push(quest);

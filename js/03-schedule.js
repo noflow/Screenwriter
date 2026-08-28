@@ -11,7 +11,8 @@ function scheduleGrid(c){
       ? locPart(f.location)+'.'+placedRoom:(f.location||'');
     (f.days||[]).forEach(d=>(f.blocks||[]).forEach(b=>{
       g[d+'|'+b]={activity:f.activity||'',location:shownLocation,
-        unavailable:!!f.unavailable,_meta:meta};
+        unavailable:!!f.unavailable,_meta:meta,
+        _original_location:shownLocation,_had_home_placement:!!placedRoom};
     }));
   });
   return g;
@@ -38,8 +39,14 @@ function gridToCommitments(g,c={}){
     const meta=scheduleCopy(v._meta||{}),home=c.home?.location_id||c.home?.residence_id||'';
     let location=v.location||'',room=roomPart(location);
     if(room&&locPart(location)===locPart(home)){
-      meta.home_placement=knownHomePlacement(c,room,meta.home_placement);
-      location=locPart(location);
+      // Preserve older sheets that deliberately use a fully qualified home-room
+      // location without home_placement. A newly chosen room still receives the
+      // placement metadata needed by the visual home runtime.
+      const changed=v._original_location===undefined||v._original_location!==location;
+      if(v._had_home_placement||changed){
+        meta.home_placement=knownHomePlacement(c,room,meta.home_placement);
+        location=locPart(location);
+      }else delete meta.home_placement;
     }else delete meta.home_placement;
     const id=[v.activity,location,v.unavailable?1:0,JSON.stringify(meta)].join('\u0001');
     const e=byKey[id]=byKey[id]||{activity:v.activity,location,

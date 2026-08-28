@@ -284,15 +284,76 @@
   .chapline .chapter-quest{white-space:nowrap;padding:5px 8px;font-size:9px}
   .chapter-actions{display:flex;align-items:center;gap:3px}
   .chapline .chapter-remove{background:none;border:none;color:var(--ash);cursor:pointer;padding:0 4px}
+  .residence-editor{border-top:1px solid var(--edge);padding-top:5px}
+  .residence-link-grid{display:grid;grid-template-columns:2fr repeat(3,1fr);gap:8px;align-items:stretch}
+  .residence-link-grid>.field{margin:0}.residence-fact{display:flex;flex-direction:column;justify-content:center;
+    min-width:0;background:var(--curtain);border:1px solid var(--edge);border-radius:4px;padding:7px 9px}
+  .residence-fact span{font-family:var(--util);font-size:8px;letter-spacing:.08em;text-transform:uppercase;color:var(--ash)}
+  .residence-fact b{font-family:var(--util);font-size:10px;line-height:1.45;color:var(--paper);overflow-wrap:anywhere}
+  .residence-policy{display:grid;grid-template-columns:auto auto auto 1fr;gap:10px;align-items:center;
+    background:rgba(127,163,196,.07);border:1px solid rgba(127,163,196,.28);border-radius:4px;padding:9px 10px}
+  .residence-policy>label{display:flex;align-items:center;gap:5px;margin:0;font-family:var(--util);font-size:9px;white-space:nowrap}
+  .residence-policy input[type="checkbox"]{width:auto}.residence-policy .field{margin:0}
+  .residence-summary{font-family:var(--util);font-size:9px;color:var(--ash);line-height:1.6;margin:7px 0 10px}
+  .residence-section-head{display:flex;align-items:center;gap:8px;margin:12px 0 6px}
+  .residence-section-head>b{font-family:var(--util);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--brass)}
+  .residence-section-head .btn{margin-left:auto;padding:4px 8px;font-size:8px}
+  .residence-room-map{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+  .residence-room{min-width:0;background:var(--curtain);border:1px solid var(--edge);border-radius:4px;padding:8px}
+  .residence-room.entrance{border-color:rgba(201,162,39,.55);box-shadow:inset 0 0 0 1px rgba(201,162,39,.08)}
+  .residence-room header{display:flex;align-items:baseline;gap:5px}.residence-room header b{font-family:var(--display);font-size:15px;font-weight:400}
+  .residence-room header small{margin-left:auto;font-family:var(--util);font-size:7.5px;color:var(--ash);overflow-wrap:anywhere}
+  .residence-room-badges{display:flex;flex-wrap:wrap;gap:4px;margin:5px 0}
+  .residence-room-badges span{font-family:var(--util);font-size:7px;text-transform:uppercase;color:var(--sky);
+    border:1px solid rgba(127,163,196,.3);border-radius:8px;padding:2px 5px}
+  .residence-room-nav{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+  .residence-room-nav span,.residence-room>p{font-family:var(--util);font-size:8px;color:var(--ash);margin:0;line-height:1.35}
+  .residence-room-nav b{color:var(--brass)}
+  .residence-room-actions{margin-top:6px!important;line-height:1.4!important}
+  .residence-runtime-note{border-left:3px solid var(--brass);padding:7px 10px;background:rgba(201,162,39,.07)}
+  .home-routine-grid{display:grid;grid-template-columns:105px minmax(130px,1fr) minmax(130px,1fr) minmax(115px,.8fr) 58px;
+    gap:5px;align-items:center;background:var(--curtain);border:1px solid var(--edge);border-radius:4px;padding:8px}
+  .home-routine-head{font-family:var(--util);font-size:7.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ash)}
+  .home-routine-time{font-family:var(--util);font-size:9px;color:var(--brass)}
+  .home-routine-grid input,.home-routine-grid select{min-width:0;padding:5px 6px;font-size:10px}
+  .home-routine-visible{display:flex;align-items:center;gap:4px;margin:0;font-family:var(--util);font-size:8px;color:var(--ash)}
+  .home-routine-visible input{width:auto}
+  .scheduled-home-placements{display:flex;flex-direction:column;gap:4px;margin-top:8px;padding:8px 10px;
+    border-left:2px solid var(--sky);background:rgba(127,163,196,.06)}
+  .scheduled-home-placements b{font-family:var(--util);font-size:8px;text-transform:uppercase;color:var(--sky)}
+  .scheduled-home-placements span{font-family:var(--util);font-size:8.5px;color:var(--ash)}
   @media(max-width:720px){
     .social-choice-grid{grid-template-columns:1fr}
     .chapline{grid-template-columns:28px 1fr}
     .chapline .milestone-rule,.chapline .chapter-quest{grid-column:2}
+    .residence-link-grid,.residence-policy{grid-template-columns:1fr 1fr}
+    .residence-room-map{grid-template-columns:1fr 1fr}
+    .home-routine-grid{grid-template-columns:90px 1fr 1fr}
+    .home-routine-head:nth-of-type(4),.home-routine-head:nth-of-type(5),
+    .home-routine-grid>[data-home-routine-activity],.home-routine-visible{display:none}
   }
 
   /* relationship story arc workshop */
   #relationshipArcWorkshop{max-width:1120px;width:96vw}
   .arc-workshop-body{max-height:76vh;overflow-y:auto;padding-top:14px}
+  .character-arc-tabs{display:flex;align-items:center;gap:5px;overflow-x:auto;padding:0 0 10px;
+    margin-bottom:10px;border-bottom:1px solid var(--edge)}
+  .character-arc-tabs button{flex:none;background:var(--curtain);border:1px solid var(--edge);border-radius:14px;
+    color:var(--ash);cursor:pointer;font-family:var(--util);font-size:9px;padding:5px 10px}
+  .character-arc-tabs button.on{color:var(--brass);border-color:rgba(201,162,39,.55);background:rgba(201,162,39,.1)}
+  .character-arc-tabs button.add{border-style:dashed;color:var(--sage)}
+  .character-arc-intro,.character-arc-choice{display:flex;align-items:center;gap:10px;border-radius:4px;
+    padding:9px 11px;margin-bottom:10px;font-family:var(--util);font-size:9px;line-height:1.55}
+  .character-arc-intro{background:rgba(127,163,196,.08);border:1px solid rgba(127,163,196,.3)}
+  .character-arc-choice{background:rgba(143,176,138,.09);border:1px solid rgba(143,176,138,.35)}
+  .character-arc-intro b,.character-arc-choice b{white-space:nowrap;color:var(--paper)}
+  .character-arc-intro span,.character-arc-choice span{color:var(--ash)}
+  .character-story-card>.field{margin-top:10px}.character-story-identity{grid-template-columns:2fr 1.5fr 1fr 1fr}
+  .character-story-gates{grid-template-columns:1fr .7fr 2fr 1.5fr}
+  .arc-length-bar{display:flex;align-items:end;gap:14px;background:rgba(201,162,39,.08);
+    border:1px solid rgba(201,162,39,.3);border-radius:4px;padding:10px 12px;margin-bottom:10px}
+  .arc-length-bar .field{width:150px;flex:none;margin:0}.arc-length-bar select{font-size:16px;color:var(--brass)}
+  .arc-length-bar p{margin:0 0 3px;font-family:var(--util);font-size:9px;line-height:1.6;color:var(--ash)}
   .arc-overview{display:grid;grid-template-columns:repeat(3,130px) 1fr;gap:8px;margin-bottom:14px}
   .arc-overview>div{display:flex;flex-direction:column;align-items:center;justify-content:center;
     min-height:60px;background:var(--curtain);border:1px solid var(--edge);border-radius:4px}
@@ -303,6 +364,7 @@
   .arc-card{background:rgba(20,13,22,.35);border:1px solid var(--edge);border-left:3px solid var(--ash);
     border-radius:4px;padding:13px}
   .arc-card.ready{border-left-color:var(--sky)}.arc-card.complete{border-left-color:var(--sage)}
+  .arc-card.skipped{border-left-color:var(--edge);opacity:.88}
   .arc-card.ready_needs_work,.arc-card.complete_needs_work{border-left-color:var(--rose)}
   .arc-card>header{display:grid;grid-template-columns:34px 1fr auto;gap:9px;align-items:center}
   .arc-card>header>span:nth-child(2){display:flex;flex-direction:column}
@@ -316,14 +378,18 @@
   .arc-status.complete{color:var(--sage);border-color:rgba(143,176,138,.45)}
   .arc-status.ready_needs_work,.arc-status.complete_needs_work{color:var(--rose);border-color:rgba(196,119,142,.45)}
   .arc-rule{font-family:var(--util);font-size:9px;color:var(--brass);margin:8px 0 12px 43px}
-  .arc-controls{display:grid;grid-template-columns:1fr 1fr 2fr;gap:9px}
+  .arc-controls{display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:9px}
   .arc-story-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
   .arc-detail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
   .arc-quest-box{display:flex;align-items:center;gap:10px;background:var(--curtain);border:1px solid var(--edge);
     border-radius:4px;padding:9px 10px;margin-top:5px}
   .arc-quest-box>div{display:flex;flex-direction:column;min-width:0;flex:1}
   .arc-quest-box b{font-family:var(--util);font-size:10px;font-weight:400;color:var(--paper)}
+  .arc-quest-box small{font-family:var(--util);font-size:8px;color:var(--brass)}
   .arc-quest-box span{font-family:var(--util);font-size:8.5px;color:var(--ash)}
+  .arc-quest-group+.arc-quest-group{margin-top:10px;padding-top:5px;border-top:1px dashed var(--edge)}
+  .arc-no-quests{margin-top:6px;padding:9px 10px;border:1px dashed var(--edge);border-radius:4px;
+    font-family:var(--util);font-size:9px;color:var(--ash);text-align:center}
   .arc-objectives,.arc-conversations{margin-top:9px}
   .arc-objectives>p,.arc-conversations>p{margin:0 0 5px;font-family:var(--util);font-size:8px;
     letter-spacing:.12em;text-transform:uppercase;color:var(--ash)}
@@ -345,6 +411,7 @@
     border-radius:3px;color:var(--sage);font-family:var(--util);font-size:8.5px}
   @media(max-width:800px){
     .arc-overview{grid-template-columns:repeat(3,1fr)}.arc-overview p{grid-column:1/-1;border-left:none;border-top:2px solid var(--edge)}
+    .arc-length-bar{align-items:stretch;flex-direction:column}.arc-length-bar .field{width:100%}
     .arc-controls,.arc-detail-grid{grid-template-columns:1fr}.arc-story-grid{grid-template-columns:1fr}
   }
 
@@ -1383,6 +1450,24 @@ const PA_RELATIONSHIP_ROUTES=Object.freeze([
   Object.freeze({id:'romantic',name:'Romantic'})
 ]);
 const PA_STORY_STATUSES=Object.freeze(['draft','ready','complete']);
+const PA_RELATIONSHIP_QUESTS_PER_LEVEL_MAX=10;
+const PA_CHARACTER_ARC_QUEST_MAX=50;
+const PA_CHARACTER_ARC_CATEGORIES=Object.freeze([
+  Object.freeze({id:'friendship',name:'Friendship'}),
+  Object.freeze({id:'workplace',name:'Workplace'}),
+  Object.freeze({id:'career',name:'Career'}),
+  Object.freeze({id:'family',name:'Family'}),
+  Object.freeze({id:'personal',name:'Personal'}),
+  Object.freeze({id:'transformation',name:'Transformation'}),
+  Object.freeze({id:'mystery',name:'Mystery'}),
+  Object.freeze({id:'slice_of_life',name:'Slice of life'}),
+  Object.freeze({id:'custom',name:'Custom'})
+]);
+const PA_CHARACTER_ARC_METERS=Object.freeze([
+  'friendship','trust','respect','comfort','love','attraction','lust','commitment','compatibility','satisfaction'
+]);
+const PA_CHARACTER_ARC_ENTRY_POLICIES=Object.freeze(['optional','automatic']);
+const PA_CHARACTER_ARC_DECLINE_POLICIES=Object.freeze(['defer','close_arc','alternate_path']);
 
 function defaultSocialPreferences(){
   return {invitation_threshold:20,preferred_activities:['waterfront_hangout','cafe_catchup']};
@@ -1404,7 +1489,8 @@ function relationshipMilestoneRule(level){
 function defaultRelationshipStoryPlan(character,level=1){
   return {status:'draft',primary_location:character?.home?.location_id||'',
     conflict:'',important_choice:'',consequence:'',callback:'',
-    supporting_characters:[],required_memories:[],prerequisite_quests:[],notes:'',level:+level||1};
+    supporting_characters:[],required_memories:[],prerequisite_quests:[],notes:'',
+    quest_count:1,level:+level||1};
 }
 function normalizeRelationshipChapterStory(character,chapter){
   if(!PA_RELATIONSHIP_ROUTES.some(route=>route.id===chapter.route))chapter.route='shared';
@@ -1419,11 +1505,105 @@ function normalizeRelationshipChapterStory(character,chapter){
   ['supporting_characters','required_memories','prerequisite_quests'].forEach(key=>{
     if(!Array.isArray(plan[key]))plan[key]=[];
   });
+  const questCount=parseInt(plan.quest_count,10);
+  plan.quest_count=Number.isFinite(questCount)
+    ?Math.max(0,Math.min(PA_RELATIONSHIP_QUESTS_PER_LEVEL_MAX,questCount)):1;
   plan.level=+chapter.level||1;
   return plan;
 }
 
-let P={characters:[],locations:[],content:[],districts:[],travel:null,aliases:{},dismissedBundledCharacters:[]};
+/** Independent character stories sit beside the five relationship levels. They
+    can cover work, friendship, family, transformation, or any custom subject. */
+function defaultCharacterStoryArc(character,index=0){
+  const number=+index+1;
+  return {id:(character?.id||'character')+'_story_'+number,title:'New character story',
+    category:'personal',status:'draft',summary:'',primary_location:character?.home?.location_id||'',
+    quest_count:3,entry_policy:'optional',decline_policy:'defer',decline_outcome:'',
+    gate_meter:'friendship',gate_value:20,required_state:'',
+    conflict:'',important_choice:'',consequence:'',callback:'',
+    supporting_characters:[],required_memories:[],prerequisite_quests:[],custom_requirements:[],notes:''};
+}
+function normalizeCharacterStoryArc(character,arc,index=0){
+  const defaults=defaultCharacterStoryArc(character,index);
+  Object.keys(defaults).forEach(key=>{
+    if(arc[key]===undefined)arc[key]=Array.isArray(defaults[key])?defaults[key].slice():defaults[key];
+  });
+  arc.id=String(arc.id||defaults.id);
+  arc.title=String(arc.title||'');
+  if(!PA_CHARACTER_ARC_CATEGORIES.some(category=>category.id===arc.category))arc.category='custom';
+  if(!PA_STORY_STATUSES.includes(arc.status))arc.status='draft';
+  if(!PA_CHARACTER_ARC_ENTRY_POLICIES.includes(arc.entry_policy))arc.entry_policy='optional';
+  if(!PA_CHARACTER_ARC_DECLINE_POLICIES.includes(arc.decline_policy))arc.decline_policy='defer';
+  if(arc.gate_meter&&!PA_CHARACTER_ARC_METERS.includes(arc.gate_meter))arc.gate_meter='friendship';
+  const count=parseInt(arc.quest_count,10);
+  arc.quest_count=Number.isFinite(count)?Math.max(1,Math.min(PA_CHARACTER_ARC_QUEST_MAX,count)):3;
+  const gate=parseInt(arc.gate_value,10);
+  arc.gate_value=Number.isFinite(gate)?Math.max(0,Math.min(100,gate)):0;
+  ['supporting_characters','required_memories','prerequisite_quests','custom_requirements'].forEach(key=>{
+    if(!Array.isArray(arc[key]))arc[key]=[];
+  });
+  return arc;
+}
+function normalizeCharacterStoryArcs(character){
+  if(!Array.isArray(character.story_arcs))character.story_arcs=[];
+  character.story_arcs.forEach((arc,index)=>normalizeCharacterStoryArc(character,arc,index));
+  return character.story_arcs;
+}
+function characterStoryArcRequirements(character,arc){
+  normalizeCharacterStoryArc(character,arc);
+  const requirements=[];
+  if(arc.gate_meter&&arc.gate_value>0)requirements.push({type:'stat',character:character.id,
+    key:arc.gate_meter,op:'gte',value:arc.gate_value});
+  if(String(arc.required_state||'').trim())requirements.push({type:'flag',
+    key:String(arc.required_state).trim(),op:'is_true',value:1});
+  arc.required_memories.forEach(memory=>requirements.push({type:'memory',character:character.id,
+    key:memory,op:'is_true',value:1}));
+  arc.prerequisite_quests.forEach(quest=>requirements.push({type:'flag',
+    key:'quest_'+quest+'_done',op:'is_true',value:1}));
+  return requirements.concat(JSON.parse(JSON.stringify(arc.custom_requirements||[])));
+}
+function characterStoryArcQuestSlots(character,arc){
+  normalizeCharacterStoryArc(character,arc);
+  return Array.from({length:arc.quest_count},(_,slotIndex)=>({
+    id:slotIndex?arc.id+'_part_'+(slotIndex+1):arc.id,
+    title:slotIndex?(arc.title||pretty(arc.id))+' — Part '+(slotIndex+1):(arc.title||pretty(arc.id)),
+    arc_id:arc.id,slot_index:slotIndex,part:slotIndex+1,arc,
+    after:slotIndex?(slotIndex===1?arc.id:arc.id+'_part_'+slotIndex):''
+  }));
+}
+function characterStoryArcQuest(character,slot){
+  if(!character||!slot?.id)return null;
+  return P.content.find(item=>item.type==='quest'&&item.id===slot.id&&
+    (item.character===character.id||(item.cast||[]).includes(character.id)))||null;
+}
+function ensureCharacterStoryArcQuest(character,slot){
+  const existing=characterStoryArcQuest(character,slot);
+  if(existing)return {quest:existing,created:false};
+  const collision=P.content.find(item=>item.type==='quest'&&item.id===slot.id);
+  if(collision)throw new Error('Quest id "'+slot.id+'" already belongs to '+
+    (collision.title||'another quest')+'. Give this story arc a unique id first.');
+  const arc=normalizeCharacterStoryArc(character,slot.arc||{}),location=arc.primary_location||
+    character.home?.location_id||P.locations[0]?.id||'';
+  const optional=arc.entry_policy==='optional',part=+slot.part||(+slot.slot_index+1)||1;
+  const quest={uid:'u'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),
+    type:'quest',id:slot.id,title:slot.title||pretty(slot.id),character:character.id,
+    hook:arc.summary||'Write part '+part+' of '+arc.title+'.',location,day:'',block:'',cast:[],
+    premise:arc.summary||'',after:slot.after||'',requires:characterStoryArcRequirements(character,arc),
+    stages:[{id:'objective_1',title:part===1&&optional?
+      'Hear the proposal and choose whether to accept, defer, or decline':'Write the next story objective',
+      location,nodes:[],flag:'',requires:[]}],
+    questPlan:{category:arc.category,summary:arc.summary||'Write part '+part+' of '+arc.title+'.',
+      characterArc:{character:character.id,arc_id:arc.id,part,entry_policy:arc.entry_policy,
+        decline_policy:arc.decline_policy},rewards:'',rewardRows:[],advancedRewards:'',participants:[],
+      deadline:'',branchIdeas:optional?'Offer three valid responses: accept, defer, or decline. '+
+        (arc.decline_outcome||'Declining must not block this character’s unrelated content.'):'',
+      event:null,eventDraft:null}};
+  P.content.push(quest);
+  return {quest,created:true};
+}
+
+let P={characters:[],locations:[],content:[],districts:[],travel:null,aliases:{},
+  dismissedBundledCharacters:[],residence_overrides:{}};
 let sel=null, selChar=null, selPlace=null, focusPath=[], stageIx=0;
 let mode='play', busy=false, abort=null, fmt='sheets';
 
@@ -1431,6 +1611,14 @@ const slug=s=>String(s).toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const dress=s=>esc(s).replace(/\*([^*\n]+)\*/g,'<em class="dir">$1</em>');
 const pretty=s=>String(s??'').replace(/_/g,' ');
+/** Changes only the writer-facing name. The stable character id deliberately
+    stays unchanged so quests, conversations, schedules, and saves keep working. */
+function setCharacterDisplayName(character,value){
+  const name=String(value??'').trim();
+  if(!name)throw new Error('Character display name cannot be blank.');
+  character.name=name;character.display_name=name;
+  return name;
+}
 /** Conversations and activities may be offered on several days. `day` remains
     the primary/legacy day so schedules and older project files keep working. */
 function contentDays(c){
@@ -1518,6 +1706,22 @@ function relationshipChapterQuest(character,chapter){
     (item.character===character.id||(item.cast||[]).includes(character.id)))||null;
 }
 
+/** A five-level relationship can carry any practical number of authored quests.
+    The first quest keeps the milestone id for backward compatibility; later parts
+    receive stable derived ids and are sequenced after the part before them. */
+function relationshipChapterQuestSlots(character,chapter){
+  if(!character||!chapter?.id)return [];
+  const plan=normalizeRelationshipChapterStory(character,chapter);
+  return Array.from({length:plan.quest_count},(_,slotIndex)=>({
+    level:+chapter.level||1,
+    id:slotIndex?chapter.id+'_part_'+(slotIndex+1):chapter.id,
+    title:slotIndex?(chapter.title||pretty(chapter.id))+' — Part '+(slotIndex+1):(chapter.title||pretty(chapter.id)),
+    route:chapter.route||'shared',story_plan:plan,
+    arc_chapter_id:chapter.id,slot_index:slotIndex,
+    after:slotIndex?(slotIndex===1?chapter.id:chapter.id+'_part_'+slotIndex):''
+  }));
+}
+
 /** Makes a writer-ready quest for a chapter. Its chapter requirement prevents
     the arc from being discovered before the runtime milestone is reached. */
 function ensureRelationshipChapterQuest(character,chapter){
@@ -1526,15 +1730,17 @@ function ensureRelationshipChapterQuest(character,chapter){
   const collision=P.content.find(item=>item.type==='quest'&&item.id===chapter.id);
   if(collision)throw new Error('Quest id "'+chapter.id+'" already belongs to '+
     (collision.title||'another quest')+'. Give this chapter a unique id first.');
-  const location=character.home?.location_id||P.locations[0]?.id||'';
+  const location=chapter.story_plan?.primary_location||character.home?.location_id||P.locations[0]?.id||'';
   const level=+chapter.level||1;
+  const part=Number.isFinite(+chapter.slot_index)?+chapter.slot_index+1:1;
   const quest={uid:'u'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),
     type:'quest',id:chapter.id,title:chapter.title||pretty(chapter.id),
     character:character.id,hook:'Write the relationship story for chapter '+level+'.',
-    location,day:'',block:'',cast:[],premise:'',
+    location,day:'',block:'',cast:[],premise:'',after:chapter.after||'',
     requires:[{type:'chapter',character:character.id,key:'',op:'gte',value:level}],
     stages:[{id:'objective_1',title:'Write the first story objective',location,nodes:[],flag:'',requires:[]}],
-    questPlan:{category:'relationship',summary:'Write the relationship story for chapter '+level+'.',
+    questPlan:{category:'relationship',summary:'Write part '+part+' of the relationship story for chapter '+level+'.',
+      relationshipArc:{character:character.id,level,part,chapter_id:chapter.arc_chapter_id||chapter.id},
       rewards:'',rewardRows:[{character:character.id,reward:'relationship:trust',value:1}],
       advancedRewards:'',participants:[],deadline:'',branchIdeas:'',event:null,eventDraft:null}};
   P.content.push(quest);
@@ -1638,16 +1844,88 @@ const save=()=>{P.districts=DISTRICTS;P.travel=TRAVEL;P.aliases=ALIASES;disk.set
 
 /* ---- 01-sheets.js ---- */
 /* ============ character sheet import ============ */
+function characterHomeLocation(character){
+  const id=character?.home?.location_id||character?.home?.residence_id||'';
+  return P.locations.find(location=>location.id===id)||null;
+}
+
+// Hale Home predates the registry-driven city residences. Its directional map
+// still lives in src/world/hale_home_navigation.gd, so mirror that read-only
+// runtime layout here until the game moves it into all_locations.json.
+const SPECIAL_RESIDENCE_LAYOUTS={
+  hale_home:{outside_room:'front_yard',source:'Godot runtime layout',navigation:{
+    player_bedroom:{down:'upstairs_landing'},
+    upstairs_landing:{up:'player_bedroom',left:'upstairs_hall',down:'entryway'},
+    upstairs_hall:{left:'lily_bedroom',up:'parents_bedroom',right:'upstairs_landing',down:'family_bathroom'},
+    lily_bedroom:{right:'upstairs_hall'},parents_bedroom:{down:'upstairs_hall'},
+    family_bathroom:{up:'upstairs_hall'},
+    entryway:{left:'living_room',up:'upstairs_landing',right:'front_yard'},
+    living_room:{right:'entryway',down:'dining_room'},
+    dining_room:{up:'living_room',right:'kitchen'},
+    kitchen:{left:'dining_room',right:'laundry_room',down:'backyard'},
+    backyard:{up:'kitchen'},laundry_room:{left:'kitchen',right:'garage'},
+    garage:{left:'laundry_room',down:'front_yard'},
+    front_yard:{left:'garage',up:'alder_heights_residential_street.hale_block',down:'entryway'}
+  }}
+};
+
+function residenceLayout(home){
+  return SPECIAL_RESIDENCE_LAYOUTS[home?.id]||null;
+}
+
+function residenceEntranceId(home){
+  return home?.outside_room||residenceLayout(home)?.outside_room||'';
+}
+
+function residenceRoomNavigation(home,room){
+  return room?.navigation||residenceLayout(home)?.navigation?.[room?.id]||{};
+}
+
+/** Keeps the character sheet and the location registry's resident list in sync. */
+function linkCharacterHome(character,previousHomeId=''){
+  const home=characterHomeLocation(character),nextId=home?.id||'';
+  if(previousHomeId&&previousHomeId!==nextId){
+    const previous=P.locations.find(location=>location.id===previousHomeId);
+    if(previous&&Array.isArray(previous.residents))
+      previous.residents=previous.residents.filter(id=>id!==character.id);
+  }
+  if(!home)return null;
+  if(!Array.isArray(home.residents))home.residents=[];
+  if(!home.residents.includes(character.id))home.residents.push(character.id);
+  character.home=character.home||{};
+  character.home.location_id=home.id;
+  if(character.home.residence_id!==undefined)character.home.residence_id=home.id;
+  character.home.district=home.district||'';
+  character.home.residence=home.name||pretty(home.id);
+  if(!Array.isArray(character.home.household))character.home.household=[];
+  return home;
+}
+
+function setCharacterHomeLocation(character,locationId){
+  const home=P.locations.find(location=>location.id===locationId);
+  if(!home)throw new Error('Choose a residence from the location registry.');
+  const oldId=character?.home?.location_id||character?.home?.residence_id||'';
+  character.home=character.home||{};character.home.location_id=home.id;
+  linkCharacterHome(character,oldId);
+  (character.schedule?.fixed_commitments||[]).forEach(commitment=>{
+    if(commitment.home_placement&&String(commitment.location||'').split('.')[0]===oldId)
+      commitment.location=home.id;
+  });
+  return home;
+}
+
 function importSheet(raw){
   const s=typeof raw==='string'?JSON.parse(raw):raw;
   const id=s.id||slug(s.display_name||'character');
   const at=P.characters.findIndex(c=>c.id===id);
+  const previousHomeId=at>=0?(P.characters[at].home?.location_id||P.characters[at].home?.residence_id||''):'';
   const rec={...s,id,name:s.display_name||s.name||id,
     color:(P.characters[at]?.color)||PAL[P.characters.length%PAL.length]};
   at>=0?P.characters[at]=rec:P.characters.push(rec);
   if(Array.isArray(P.dismissedBundledCharacters))
     P.dismissedBundledCharacters=P.dismissedBundledCharacters.filter(characterId=>characterId!==id);
   derivePlaces(rec);
+  linkCharacterHome(rec,previousHomeId);
   return rec.name;
 }
 
@@ -1831,7 +2109,10 @@ const locationPackageView=pkg=>({
     const out={...l};delete out.background;delete out.tags;delete out.notes;
     Object.assign(out,{id:l.id||'',name:l.name||'',district:l.district||'',type:l.type||'',
       travel_node:l.travel_node!==false,access:l.access||{},privacy:l.privacy||null,
-      residents:l.residents||[],services:l.services||[],housing:l.housing||null,
+      // Authored character sheets own their current home link, so their resident
+      // entries are intentionally excluded from canonical-registry equality.
+      residents:(l.residents||[]).filter(id=>!(P.characters||[]).some(character=>character.id===id)),
+      services:l.services||[],housing:l.housing||null,
       named_npcs:l.named_npcs||[],content_rules:l.content_rules||[]});
     out.rooms=(l.rooms||[]).map(r=>Object.assign({},r,{id:r.id||'',name:r.name||'',
       access:r.access||'',actions:r.actions||[]}));
@@ -1848,14 +2129,56 @@ const sameLocationPackage=pkg=>JSON.stringify(orderedJson(locationPackageView(pk
 function restoreProject(project,{refreshLocations=true}={}){
   const source=project&&typeof project==='object'?project:{};
   P=Object.assign({characters:[],locations:[],content:[],districts:[],travel:null,aliases:{},
-    dismissedBundledCharacters:[]},source);
+    dismissedBundledCharacters:[],residence_overrides:{}},source);
   if(!Array.isArray(P.characters))P.characters=[];
   if(!Array.isArray(P.locations))P.locations=[];
   if(!Array.isArray(P.content))P.content=[];
   if(!Array.isArray(P.dismissedBundledCharacters))P.dismissedBundledCharacters=[];
+  if(!P.residence_overrides||typeof P.residence_overrides!=='object'||Array.isArray(P.residence_overrides))
+    P.residence_overrides={};
   DISTRICTS=Array.isArray(P.districts)?P.districts:[];
   TRAVEL=P.travel||null;ALIASES=P.aliases||{};
   return refreshLocations?syncBundledLocations():null;
+}
+
+/** Per-project discovery/access decisions survive a refresh of the game-owned
+    location registry without copying the whole registry into the project. */
+function rememberResidenceOverride(location){
+  if(!location?.id||!location.tags?.includes('package'))return;
+  if(!P.residence_overrides||typeof P.residence_overrides!=='object')P.residence_overrides={};
+  P.residence_overrides[location.id]={
+    discovery:JSON.parse(JSON.stringify(location.discovery||{})),
+    access:JSON.parse(JSON.stringify(location.access||{})),
+    outside_room:location.outside_room||''
+  };
+}
+
+function applyResidenceOverrides(){
+  Object.entries(P.residence_overrides||{}).forEach(([id,override])=>{
+    const location=P.locations.find(item=>item.id===id);if(!location||!override)return;
+    if(override.discovery&&typeof override.discovery==='object')
+      location.discovery=JSON.parse(JSON.stringify(override.discovery));
+    if(override.access&&typeof override.access==='object')
+      location.access=JSON.parse(JSON.stringify(override.access));
+    if(Object.prototype.hasOwnProperty.call(override,'outside_room'))
+      location.outside_room=override.outside_room||'';
+  });
+}
+
+/** Character sheets own authored home assignments. Rebuild resident links after
+    a canonical registry refresh so moving an NPC remains stable across reloads. */
+function reconcileCharacterHomeResidents(){
+  (P.characters||[]).forEach(character=>{
+    P.locations.forEach(location=>{
+      if(Array.isArray(location.residents))location.residents=location.residents.filter(id=>id!==character.id);
+    });
+    const homeId=character?.home?.location_id||character?.home?.residence_id||'';
+    const home=P.locations.find(location=>location.id===homeId);if(!home)return;
+    if(!Array.isArray(home.residents))home.residents=[];
+    if(!home.residents.includes(character.id))home.residents.push(character.id);
+    character.home.location_id=home.id;character.home.district=home.district||'';
+    character.home.residence=home.name||pretty(home.id);
+  });
 }
 
 /** Bring saved/browser state up to the exact registry bundled from the game. */
@@ -1865,6 +2188,7 @@ function syncBundledLocations(){
     P.locationPackage={id:BUNDLED_LOCATION_PACKAGE.package_id||'',
       signature:typeof BUNDLED_LOCATION_SIGNATURE==='undefined'?'':BUNDLED_LOCATION_SIGNATURE,
       source:'bundled'};
+    applyResidenceOverrides();reconcileCharacterHomeResidents();
     return {updated:false,count:P.locations.length,districts:DISTRICTS.length,
       rooms:P.locations.reduce((n,l)=>n+(l.rooms||[]).length,0),moved:0,sched:0,
       deduped:0,unplaced:[],lost:[]};
@@ -1998,6 +2322,9 @@ function importLocations(pkg,{source='imported',signature=''}={}){
       if(to){c.home.location_id=locPart(to);c.home.residence_id=locPart(to);}
     }
   });
+
+  applyResidenceOverrides();
+  reconcileCharacterHomeResidents();
 
   return {count:P.locations.length,districts:DISTRICTS.length,moved,sched,
     deduped,
@@ -2139,8 +2466,10 @@ function customLocationsOut(){
   return {format_version:1,package_id:'scenewright_custom_locations',reference_format:'location_id.room_id',
     locations:P.locations.filter(l=>l.tags?.includes('custom')).map(l=>({id:l.id,name:l.name,
       district:l.district,type:l.type||'place',travel_node:l.travel_node!==false,
+      outside_room:l.outside_room||'',discovery:l.discovery||{},
       access:l.access||{always_open:true},residents:l.residents||[],services:l.services||[],
-      rooms:(l.rooms||[]).map(r=>({id:r.id,name:r.name,access:r.access||'shared',actions:r.actions||[]})),
+      rooms:(l.rooms||[]).map(r=>({id:r.id,name:r.name,access:r.access||'shared',
+        navigation:r.navigation||{},actions:r.actions||[]})),
       notes:l.notes||''}))};
 }
 
@@ -2205,7 +2534,8 @@ function scheduleGrid(c){
       ? locPart(f.location)+'.'+placedRoom:(f.location||'');
     (f.days||[]).forEach(d=>(f.blocks||[]).forEach(b=>{
       g[d+'|'+b]={activity:f.activity||'',location:shownLocation,
-        unavailable:!!f.unavailable,_meta:meta};
+        unavailable:!!f.unavailable,_meta:meta,
+        _original_location:shownLocation,_had_home_placement:!!placedRoom};
     }));
   });
   return g;
@@ -2232,8 +2562,14 @@ function gridToCommitments(g,c={}){
     const meta=scheduleCopy(v._meta||{}),home=c.home?.location_id||c.home?.residence_id||'';
     let location=v.location||'',room=roomPart(location);
     if(room&&locPart(location)===locPart(home)){
-      meta.home_placement=knownHomePlacement(c,room,meta.home_placement);
-      location=locPart(location);
+      // Preserve older sheets that deliberately use a fully qualified home-room
+      // location without home_placement. A newly chosen room still receives the
+      // placement metadata needed by the visual home runtime.
+      const changed=v._original_location===undefined||v._original_location!==location;
+      if(v._had_home_placement||changed){
+        meta.home_placement=knownHomePlacement(c,room,meta.home_placement);
+        location=locPart(location);
+      }else delete meta.home_placement;
     }else delete meta.home_placement;
     const id=[v.activity,location,v.unavailable?1:0,JSON.stringify(meta)].join('\u0001');
     const e=byKey[id]=byKey[id]||{activity:v.activity,location,
@@ -5654,10 +5990,94 @@ function milestoneRuleText(level){
     (rule.agreement_required?' · dating agreement on romantic routes':'');
 }
 
+function isResidenceLocation(location,currentId=''){
+  if(!location)return false;
+  if(location.id===currentId||location.housing||(location.residents||[]).length)return true;
+  return /(residence|residential|apartment|dorm|house|townhouse|condo|penthouse|studio)/.test(location.type||'');
+}
+
+function residenceOptions(character){
+  const current=character?.home?.location_id||character?.home?.residence_id||'',groups={};
+  P.locations.filter(location=>isResidenceLocation(location,current)).forEach(location=>{
+    const district=location.district||'other';(groups[district]=groups[district]||[]).push(location);
+  });
+  const districtName=id=>(DISTRICTS.find(district=>district.id===id)||{}).name||pretty(id);
+  const unknown=current&&!loc(current)?'<option value="'+esc(current)+'" selected>⚠ Unknown — '+esc(current)+'</option>':'';
+  return '<option value="">— choose a residence —</option>'+unknown+
+    Object.keys(groups).sort((a,b)=>districtName(a).localeCompare(districtName(b))).map(district=>
+      '<optgroup label="'+esc(districtName(district))+'">'+groups[district].sort((a,b)=>String(a.name||a.id).localeCompare(String(b.name||b.id))).map(location=>
+        '<option value="'+esc(location.id)+'"'+(location.id===current?' selected':'')+'>'+esc(location.name)+'</option>').join('')+'</optgroup>').join('');
+}
+
+function residenceRoomOptions(home,current){
+  const rooms=home?.rooms||[],known=rooms.some(room=>room.id===current);
+  return '<option value=""'+(!current?' selected':'')+'>— not placed at home —</option>'+
+    (current&&!known?'<option value="'+esc(current)+'" selected>⚠ Unknown room — '+esc(current)+'</option>':'')+
+    rooms.map(room=>'<option value="'+esc(room.id)+'"'+(room.id===current?' selected':'')+'>'+esc(room.name)+'</option>').join('');
+}
+
+function residenceRoomTarget(home,target){
+  if(!target)return '';
+  if(String(target).includes('.'))return placeName(target);
+  return (home?.rooms||[]).find(room=>room.id===target)?.name||pretty(target);
+}
+
+function residenceEditorHtml(character){
+  const home=characterHomeLocation(character),discovery=home?.discovery||{},access=home?.access||{};
+  const specialLayout=residenceLayout(home),entranceId=residenceEntranceId(home);
+  const district=home?(DISTRICTS.find(item=>item.id===home.district)?.name||pretty(home.district||'unassigned')):'No district';
+  const residents=(home?.residents||[]).map(id=>chr(id)?.name||pretty(id));
+  const accessRules=Object.entries(access).filter(([,value])=>value===true).map(([key])=>pretty(key));
+  const rooms=(home?.rooms||[]).map(room=>{
+    const navigation=Object.entries(residenceRoomNavigation(home,room)).map(([direction,target])=>
+      '<span><b>'+esc(direction==='up'?'↑':direction==='down'?'↓':direction==='left'?'←':'→')+'</b> '+esc(residenceRoomTarget(home,target))+'</span>').join('');
+    const actions=(room.actions||[]).map(pretty).join(', ');
+    return '<div class="residence-room'+(room.id===entranceId?' entrance':'')+'"><header><b>'+esc(room.name||pretty(room.id))+'</b><small>'+esc(room.id)+'</small></header>'+
+      '<div class="residence-room-badges">'+(room.id===entranceId?'<span>entrance</span>':'')+
+      (room.access?'<span>'+esc(pretty(room.access))+'</span>':'<span>shared access</span>')+'</div>'+
+      (navigation?'<div class="residence-room-nav">'+navigation+'</div>':'<p>No room exits mapped</p>')+
+      (actions?'<p class="residence-room-actions"><b>Actions:</b> '+esc(actions)+'</p>':'')+'</div>';
+  }).join('');
+  const routine=character.home_routine?.default_by_block||{};
+  const homePlacements=(character.schedule?.fixed_commitments||[]).filter(item=>item.home_placement?.room);
+  return '<div class="field edfull residence-editor"><p class="rubric">Residence</p>'+
+    '<div class="residence-link-grid"><div class="field"><label>Home location</label><select id="edHomeLocation">'+residenceOptions(character)+'</select></div>'+
+    '<div class="residence-fact"><span>District</span><b>'+esc(district)+'</b></div>'+
+    '<div class="residence-fact"><span>Registry residents</span><b>'+esc(residents.join(', ')||'None listed')+'</b></div>'+
+    '<div class="residence-fact"><span>Entrance</span><b>'+esc(entranceId?residenceRoomTarget(home,entranceId):'Not mapped')+'</b></div></div>'+
+    '<div class="field"><label>Character-sheet household</label>'+tagList('home.household',character.home?.household||[],'ok')+
+      '<p class="hint">Household describes who this character lives with. Registry residents above are synchronized automatically for authored NPC sheets.</p></div>'+
+    (!home?'<div class="guard">Choose a registered residence to see its access rules, rooms, and home routine.</div>':
+      '<div class="residence-policy"><label><input type="checkbox" id="edHomeDiscoverable"'+(discovery.discoverable!==false?' checked':'')+'> Discoverable</label>'+
+      '<label><input type="checkbox" id="edHomeHidden"'+(discovery.hidden_until_discovered?' checked':'')+'> Hidden until discovered</label>'+
+      '<label><input type="checkbox" id="edHomeInvitation"'+(access.requires_invitation?' checked':'')+'> Invitation required</label>'+
+      '<div class="field"><label>Discovery sources</label><input id="edHomeSources" value="'+esc((discovery.sources||[]).join(', '))+'" placeholder="quest, invitation, exploration"></div></div>'+
+      '<p class="residence-summary">'+esc(home.name)+' · '+esc(pretty(home.type||'residence'))+' · '+(home.rooms||[]).length+' rooms'+
+        (accessRules.length?' · '+esc(accessRules.join(', ')):'')+'. Changes to visibility and access are saved with the location registry.</p>'+
+      (specialLayout?'<p class="hint residence-runtime-note">Room arrows and the entrance below come from the '+esc(specialLayout.source)+
+        '. Room names, access, actions, residents, and discovery settings come from the location registry.</p>':'')+
+      '<div class="residence-section-head"><b>Room navigation</b><button class="btn quiet" id="edOpenHomeLocation">Open in Places</button></div>'+
+      '<div class="residence-room-map">'+(rooms||'<div class="guard">This residence has no rooms mapped yet.</div>')+'</div>'+
+      '<div class="residence-section-head"><b>Default home routine</b><button class="btn quiet" id="edHomeSchedule">Open weekly schedule</button></div>'+
+      '<div class="home-routine-grid"><div class="home-routine-head">Time</div><div class="home-routine-head">Room</div><div class="home-routine-head">Activity label</div><div class="home-routine-head">Activity id</div><div class="home-routine-head">Visible</div>'+
+      BLOCKS.map(block=>{const placement=routine[block]||{};return '<div class="home-routine-time">'+esc(pretty(block))+'</div>'+
+        '<select data-home-routine-room="'+block+'">'+residenceRoomOptions(home,placement.room||'')+'</select>'+
+        '<input data-home-routine-label="'+block+'" value="'+esc(placement.label||'')+'" placeholder="At home">'+
+        '<input data-home-routine-activity="'+block+'" value="'+esc(placement.activity||'')+'" placeholder="at_home">'+
+        '<label class="home-routine-visible"><input type="checkbox" data-home-routine-spawn="'+block+'"'+
+          (placement.room&&placement.spawn!==false?' checked':'')+'> show</label>';}).join('')+'</div>'+
+      (homePlacements.length?'<div class="scheduled-home-placements"><b>Weekly home placements</b>'+homePlacements.map(item=>
+        '<span>'+esc(item.label||pretty(item.activity))+' · '+esc((item.days||[]).map(day=>day.slice(0,3)).join(', '))+' · '+
+        esc((item.blocks||[]).map(pretty).join(', '))+' · '+esc(residenceRoomTarget(home,item.home_placement.room))+'</span>').join('')+'</div>':'')+
+      '<p class="hint">Room positions are optional. The game uses these room assignments to decide whether the NPC appears when the player enters.</p>')+'</div>';
+}
+
 function openRelationshipChapterQuest(character,index){
   const chapter=character.relationship_chapters[index];if(!chapter)return;
   try{
-    const result=ensureRelationshipChapterQuest(character,chapter);
+    const plan=normalizeRelationshipChapterStory(character,chapter);
+    if(plan.quest_count<1)plan.quest_count=1;
+    const result=ensureRelationshipChapterQuest(character,relationshipChapterQuestSlots(character,chapter)[0]);
     sel=result.quest.uid;focusPath=[];stageIx=0;save();paintAll();
     $('editor').close();openQuestBuilder();
     if(result.created)note('Created the story quest for '+esc(chapter.title)+'. Build its objectives and scenes here.');
@@ -5668,6 +6088,10 @@ function paintEditor(){
   const c=P.characters[edIx];if(!c)return;
   c.profile=c.profile||{};c.personality=c.personality||{};c.boundaries=c.boundaries||{};
   c.identity=c.identity||{};c.characteristics=c.characteristics||{};c.custom_stats=c.custom_stats||{};
+  c.home=c.home||{location_id:'',district:'',residence:'',household:[]};
+  if(!Array.isArray(c.home.household))c.home.household=[];
+  c.home_routine=c.home_routine||{actor_color:String(c.color||'').replace('#',''),default_by_block:{}};
+  c.home_routine.default_by_block=c.home_routine.default_by_block||{};
   c.private_profile=c.private_profile||{};
   c.private_profile.adult_preferences=c.private_profile.adult_preferences||{};
   c.relationship_defaults=c.relationship_defaults||{};
@@ -5682,6 +6106,8 @@ function paintEditor(){
       'stay locked and export as <code>false</code>. Set <code>profile.age</code> to 18 or over to unlock them.</div>':'')+
 
     '<div class="edgrid">'+
+      '<div class="field edfull"><label>Display name</label><input type="text" id="edDisplayName" value="'+esc(c.name||c.display_name||'')+'">'+
+        '<p class="hint">You can rename the character at any time. Their internal id <code>'+esc(c.id)+'</code> stays unchanged so existing quests and conversations remain connected.</p></div>'+
       '<div class="field"><label>Age</label><input type="text" id="edAge" value="'+esc(c.profile.age??'')+'"></div>'+
       '<div class="field"><label>Role</label><input type="text" id="edRole" value="'+esc(c.profile.role||'')+'"></div>'+
       '<div class="field"><label>Gender identity</label><input type="text" id="edGender" value="'+esc(c.profile.gender_identity||'')+'" placeholder="nonbinary, woman, man…"></div>'+
@@ -5698,6 +6124,8 @@ function paintEditor(){
         ? 'This is an old fixed Player sheet and will not export. Remove it from Cast when you no longer need it. '
         : 'This is an NPC sheet. ')+'The Player is created from each user’s choices when a new game starts '+
         'and never needs a character sheet here.</div></div>'+
+
+      residenceEditorHtml(c)+
 
       '<div class="field edfull"><p class="rubric" style="margin-top:6px">Limits</p></div>'+
 
@@ -5758,7 +6186,7 @@ function paintEditor(){
           (social.preferred_activities.includes(activity.id)?' checked':'')+'> '+esc(activity.name)+'</label>').join('')+
         '</div><p class="hint">Favorites improve acceptance. Hidden venues remain unavailable until the player discovers them.</p></div>'+
 
-      '<div class="field edfull"><p class="rubric">Five relationship story milestones</p>'+
+      '<div class="field edfull"><p class="rubric">Five relationship levels</p>'+
         c.relationship_chapters.map((ch,j)=>{
           const quest=relationshipChapterQuest(c,ch);
           return '<div class="chapline"><span class="lv">'+esc(ch.level||j+1)+'</span>'+
@@ -5770,7 +6198,7 @@ function paintEditor(){
         '</span></div>';}).join('')+
         (c.relationship_chapters.length<5?'<button class="btn" id="edAddChap">+ add missing milestone</button>':'')+
         '<p class="hint">The game advances these at the player’s pace using shared activities, bond, and trust. '+
-        'Levels 4–5 also require a dating agreement on romantic routes. A story quest with the same id starts when its milestone is reached.</p></div>'+
+        'Levels 4–5 also require a dating agreement on romantic routes. Open the Story arc workshop to choose how many quests happen at each level; the first quest keeps the level id.</p></div>'+
 
       '<div class="field edfull"><label>Conversation topics</label>'+
         tagList('conversation_topics',c.conversation_topics,'ok')+'</div>'+
@@ -5789,6 +6217,63 @@ function wireEditor(c,adult,romance){
     o[keys[keys.length-1]]=val;
   };
   const getPath=path=>path.split('.').reduce((o,k)=>o?.[k],c)||[];
+
+  $('edDisplayName').onchange=event=>{
+    try{
+      const name=setCharacterDisplayName(c,event.target.value);
+      event.target.value=name;$('edName').textContent=name;
+      save();paintCast();paintSheet();paintSetup();
+    }catch(error){
+      event.target.value=c.name||c.display_name||'';note(esc(error.message));
+    }
+  };
+
+  $('edHomeLocation').onchange=event=>{
+    try{
+      setCharacterHomeLocation(c,event.target.value);
+      save();paintCast();paintSheet();paintSetup();paintEditor();
+    }catch(error){event.target.value=c.home.location_id||'';note(esc(error.message));}
+  };
+  const home=characterHomeLocation(c);
+  if(home){
+    const discovery=()=>home.discovery=home.discovery&&typeof home.discovery==='object'?home.discovery:{};
+    const access=()=>home.access=home.access&&typeof home.access==='object'?home.access:{};
+    const saveResidence=()=>{rememberResidenceOverride(home);save();};
+    $('edHomeDiscoverable').onchange=event=>{discovery().discoverable=event.target.checked;saveResidence();};
+    $('edHomeHidden').onchange=event=>{discovery().hidden_until_discovered=event.target.checked;saveResidence();};
+    $('edHomeInvitation').onchange=event=>{access().requires_invitation=event.target.checked;saveResidence();};
+    $('edHomeSources').onchange=event=>{
+      discovery().sources=[...new Set(String(event.target.value||'').split(',').map(value=>slug(value)).filter(Boolean))];
+      event.target.value=discovery().sources.join(', ');saveResidence();
+    };
+    const routineEntry=block=>{
+      c.home_routine.default_by_block=c.home_routine.default_by_block||{};
+      return c.home_routine.default_by_block[block]=c.home_routine.default_by_block[block]||
+        {room:'',spawn:false,activity:'at_home',label:'At home'};
+    };
+    B.querySelectorAll('[data-home-routine-room]').forEach(select=>select.onchange=()=>{
+      const entry=routineEntry(select.dataset.homeRoutineRoom);entry.room=select.value;
+      entry.spawn=!!select.value;if(select.value&&!entry.activity)entry.activity='at_home';
+      if(select.value&&!entry.label)entry.label='At home';save();paintEditor();
+    });
+    B.querySelectorAll('[data-home-routine-label]').forEach(input=>input.oninput=()=>{
+      routineEntry(input.dataset.homeRoutineLabel).label=input.value;save();
+    });
+    B.querySelectorAll('[data-home-routine-activity]').forEach(input=>input.oninput=()=>{
+      routineEntry(input.dataset.homeRoutineActivity).activity=input.value.trim()?slug(input.value):'';save();
+    });
+    B.querySelectorAll('[data-home-routine-spawn]').forEach(input=>input.onchange=()=>{
+      const entry=routineEntry(input.dataset.homeRoutineSpawn);
+      if(input.checked&&!entry.room){input.checked=false;note('Choose a home room before showing this character there.');return;}
+      entry.spawn=input.checked;save();
+    });
+    $('edOpenHomeLocation').onclick=()=>{
+      selPlace=P.locations.indexOf(home);$('editor').close();
+      const placesTab=document.querySelector('.railtabs button[data-tab="places"]');if(placesTab)placesTab.click();
+      paintPlaces();paintPlaceForm();
+    };
+    $('edHomeSchedule').onclick=()=>{$('editor').close();openSchedule(edIx);};
+  }
 
   B.querySelectorAll('[data-add]').forEach(el=>el.onkeydown=e=>{
     if(e.key!=='Enter')return;e.preventDefault();
@@ -5837,16 +6322,34 @@ function wireEditor(c,adult,romance){
   });
   B.querySelectorAll('[data-chid]').forEach(el=>el.onchange=()=>{
     const index=+el.dataset.chid,chapter=c.relationship_chapters[index];
-    const old=chapter.id,next=slug(el.value),linked=relationshipChapterQuest(c,chapter);
+    const old=chapter.id,next=slug(el.value);
+    const linked=P.content.filter(item=>item.type==='quest'&&item.character===c.id&&(
+      item.id===old||item.id.startsWith(old+'_part_')||item.questPlan?.relationshipArc?.chapter_id===old));
     const duplicate=c.relationship_chapters.some((item,j)=>j!==index&&item.id===next);
-    const collision=P.content.find(item=>item.type==='quest'&&item.id===next&&item!==linked);
+    const partOf=quest=>+quest.questPlan?.relationshipArc?.part||
+      (quest.id===old?1:(parseInt(quest.id.slice((old+'_part_').length),10)||1));
+    const maxPart=Math.max(1,normalizeRelationshipChapterStory(c,chapter).quest_count,
+      ...linked.map(partOf));
+    const targets=new Set(Array.from({length:maxPart},(_,partIndex)=>partIndex?next+'_part_'+(partIndex+1):next));
+    const collision=P.content.find(item=>item.type==='quest'&&!linked.includes(item)&&targets.has(item.id));
     if(duplicate||collision){el.value=old;note(duplicate?'Every milestone needs a unique id.':'That id already belongs to another quest.');return;}
-    if(linked)renameContentId(linked,next);
+    linked.sort((a,b)=>partOf(b)-partOf(a)).forEach(quest=>{
+      const part=partOf(quest);renameContentId(quest,part>1?next+'_part_'+part:next);
+      if(quest.questPlan?.relationshipArc)quest.questPlan.relationshipArc.chapter_id=next;
+    });
     chapter.id=next;el.value=next;save();paintEditor();paintSetup();
   });
   B.querySelectorAll('[data-chtitle]').forEach(el=>el.oninput=()=>{
-    const chapter=c.relationship_chapters[+el.dataset.chtitle],linked=relationshipChapterQuest(c,chapter);
-    chapter.title=el.value;if(linked)linked.title=el.value;save();paintSetup();});
+    const chapter=c.relationship_chapters[+el.dataset.chtitle];
+    chapter.title=el.value;
+    P.content.filter(item=>item.type==='quest'&&item.character===c.id&&(
+      item.id===chapter.id||item.id.startsWith(chapter.id+'_part_')||
+      item.questPlan?.relationshipArc?.chapter_id===chapter.id)).forEach(quest=>{
+        const part=+quest.questPlan?.relationshipArc?.part||
+          (quest.id===chapter.id?1:(parseInt(quest.id.slice((chapter.id+'_part_').length),10)||1));
+        quest.title=part>1?el.value+' — Part '+part:el.value;
+      });
+    save();paintSetup();});
   B.querySelectorAll('[data-chquest]').forEach(button=>button.onclick=()=>
     openRelationshipChapterQuest(c,+button.dataset.chquest));
   B.querySelectorAll('[data-chx]').forEach(b=>b.onclick=()=>{
@@ -5901,7 +6404,8 @@ $('edSheetOut').onclick=()=>{
 
 /* ---- 11b-relationship-arc.js ---- */
 /* ============ relationship story arc workshop ============ */
-let relationshipArcCharacterIndex=null,relationshipArcDraggedStage=null;
+let relationshipArcCharacterIndex=null,relationshipArcDraggedStage=null,
+  characterArcSelection='relationship';
 
 function relationshipArcLineCount(nodes){
   return (nodes||[]).reduce((total,node)=>total+(node.type==='line'?1:
@@ -5923,22 +6427,34 @@ function relationshipArcConversations(quest){
     item._authored?.activation?.quest_active===quest.id));
 }
 
-function relationshipArcQuestMetrics(character,chapter){
-  const quest=relationshipChapterQuest(character,chapter);
+function relationshipArcQuestMetrics(character,slot){
+  const quest=relationshipChapterQuest(character,slot);
   const objectives=(quest?.stages||[]).map((stage,index)=>({stage,index})).filter(row=>row.stage.id!=='branch');
   const conversations=relationshipArcConversations(quest);
   const stageLines=(quest?.stages||[]).reduce((total,stage)=>total+relationshipArcLineCount(stage.nodes),0);
   const conversationLines=conversations.reduce((total,item)=>total+relationshipArcLineCount(item.nodes),0);
-  return {quest,objectives,conversations,lineCount:stageLines+conversationLines};
+  return {slot,quest,objectives,conversations,lineCount:stageLines+conversationLines};
 }
 
-function relationshipArcPlanIssues(character,chapter,metrics=relationshipArcQuestMetrics(character,chapter)){
+function relationshipArcChapterMetrics(character,chapter){
+  const questRows=relationshipChapterQuestSlots(character,chapter).map(slot=>relationshipArcQuestMetrics(character,slot));
+  return {questRows,planned:questRows.length,built:questRows.filter(row=>row.quest).length,
+    objectiveCount:questRows.reduce((total,row)=>total+row.objectives.length,0),
+    conversationCount:questRows.reduce((total,row)=>total+row.conversations.length,0),
+    lineCount:questRows.reduce((total,row)=>total+row.lineCount,0)};
+}
+
+function relationshipArcPlanIssues(character,chapter,metrics=relationshipArcChapterMetrics(character,chapter)){
   const plan=chapter.story_plan||{},issues=[];
-  if(!metrics.quest)issues.push('No matching story quest yet.');
-  else{
-    if(!metrics.objectives.length)issues.push('The quest has no objectives.');
-    if(!metrics.lineCount)issues.push('No quest scene or linked conversation has dialogue yet.');
-  }
+  if(!metrics.planned)return issues;
+  metrics.questRows.forEach((row,index)=>{
+    const label=metrics.planned>1?'Quest '+(index+1):'The quest';
+    if(!row.quest)issues.push(label+' has not been created yet.');
+    else{
+      if(!row.objectives.length)issues.push(label+' has no objectives.');
+      if(!row.lineCount)issues.push(label+' has no quest scene or linked conversation dialogue yet.');
+    }
+  });
   if(!String(plan.conflict||'').trim())issues.push('Add the central conflict.');
   if(!String(plan.important_choice||'').trim())issues.push('Add the player’s important choice.');
   if(!String(plan.consequence||'').trim())issues.push('Add a lasting consequence.');
@@ -5954,7 +6470,8 @@ function relationshipArcPlanIssues(character,chapter,metrics=relationshipArcQues
 }
 
 function relationshipArcStatus(character,chapter,metrics,issues){
-  if(!metrics.quest)return 'unwritten';
+  if(!metrics.planned)return 'skipped';
+  if(!metrics.built)return 'unwritten';
   if(chapter.story_plan?.status==='complete')return issues.length?'complete_needs_work':'complete';
   if(chapter.story_plan?.status==='ready')return issues.length?'ready_needs_work':'ready';
   return 'draft';
@@ -5975,13 +6492,34 @@ function relationshipArcList(value){
 
 function relationshipArcSummary(character){
   const rows=(character.relationship_chapters||[]).map(chapter=>{
-    const metrics=relationshipArcQuestMetrics(character,chapter);
+    const metrics=relationshipArcChapterMetrics(character,chapter);
     const issues=relationshipArcPlanIssues(character,chapter,metrics);
     return {chapter,metrics,issues,status:relationshipArcStatus(character,chapter,metrics,issues)};
   });
-  return {rows,quests:rows.filter(row=>row.metrics.quest).length,
+  return {rows,planned:rows.reduce((total,row)=>total+row.metrics.planned,0),
+    quests:rows.reduce((total,row)=>total+row.metrics.built,0),
     ready:rows.filter(row=>row.status==='ready').length,
     complete:rows.filter(row=>row.status==='complete').length};
+}
+
+function setRelationshipArcQuestTotal(character,value){
+  const chapters=character.relationship_chapters||[];if(!chapters.length)return;
+  const target=Math.max(0,Math.min(chapters.length*PA_RELATIONSHIP_QUESTS_PER_LEVEL_MAX,
+    parseInt(value,10)||0));
+  chapters.forEach(chapter=>normalizeRelationshipChapterStory(character,chapter));
+  let total=chapters.reduce((sum,chapter)=>sum+chapter.story_plan.quest_count,0);
+  while(total<target){
+    const available=chapters.filter(chapter=>chapter.story_plan.quest_count<PA_RELATIONSHIP_QUESTS_PER_LEVEL_MAX);
+    if(!available.length)break;
+    available.sort((a,b)=>a.story_plan.quest_count-b.story_plan.quest_count||a.level-b.level)[0].story_plan.quest_count++;
+    total++;
+  }
+  while(total>target){
+    const available=chapters.filter(chapter=>chapter.story_plan.quest_count>0);
+    if(!available.length)break;
+    available.sort((a,b)=>b.story_plan.quest_count-a.story_plan.quest_count||b.level-a.level)[0].story_plan.quest_count--;
+    total--;
+  }
 }
 
 function openRelationshipArcWorkshop(index=selChar){
@@ -5989,29 +6527,72 @@ function openRelationshipArcWorkshop(index=selChar){
   relationshipArcCharacterIndex=index;
   character.relationship_chapters=character.relationship_chapters||[];
   character.relationship_chapters.forEach(chapter=>normalizeRelationshipChapterStory(character,chapter));
+  normalizeCharacterStoryArcs(character);
+  if(characterArcSelection!=='relationship'&&
+    !character.story_arcs.some(arc=>arc.id===characterArcSelection))characterArcSelection='relationship';
   save();paintRelationshipArcWorkshop();
   const dialog=$('relationshipArcWorkshop');if(!dialog.open)dialog.showModal();
 }
 
+function characterArcTabsHtml(character){
+  return '<div class="character-arc-tabs"><button class="'+(characterArcSelection==='relationship'?'on':'')+'" data-character-arc="relationship">Relationship path</button>'+
+    normalizeCharacterStoryArcs(character).map(arc=>'<button class="'+(characterArcSelection===arc.id?'on':'')+'" data-character-arc="'+esc(arc.id)+'">'+esc(arc.title||pretty(arc.id))+'</button>').join('')+
+    '<button class="add" id="addCharacterStoryArc">+ New story arc</button></div>';
+}
+
+function wireCharacterArcTabs(character){
+  const body=$('relationshipArcBody');
+  body.querySelectorAll('[data-character-arc]').forEach(button=>button.onclick=()=>{
+    characterArcSelection=button.dataset.characterArc;paintRelationshipArcWorkshop();
+  });
+  const add=body.querySelector('#addCharacterStoryArc');if(add)add.onclick=()=>{
+    let number=character.story_arcs.length+1,arc=defaultCharacterStoryArc(character,number-1);
+    const used=new Set(character.story_arcs.map(item=>item.id));
+    while(used.has(arc.id)||P.content.some(item=>item.type==='quest'&&item.id===arc.id)){
+      number++;arc=defaultCharacterStoryArc(character,number-1);
+    }
+    character.story_arcs.push(arc);characterArcSelection=arc.id;
+    save();paintRelationshipArcWorkshop();
+  };
+}
+
 function paintRelationshipArcWorkshop(){
   const character=P.characters[relationshipArcCharacterIndex];if(!character)return;
+  normalizeCharacterStoryArcs(character);
+  if(characterArcSelection!=='relationship'){
+    const arc=character.story_arcs.find(item=>item.id===characterArcSelection);
+    if(arc){paintCharacterStoryArcWorkshop(character,arc);return;}
+    characterArcSelection='relationship';
+  }
   const summary=relationshipArcSummary(character);
-  $('relationshipArcName').textContent=character.name+' — story arc';
-  $('relationshipArcBody').innerHTML='<div class="arc-overview">'+
-      '<div><b>'+summary.quests+'/5</b><span>quests built</span></div>'+
-      '<div><b>'+summary.ready+'</b><span>ready for review</span></div>'+
-      '<div><b>'+summary.complete+'</b><span>complete</span></div>'+
+  $('relationshipArcName').textContent=character.name+' — character stories';
+  $('relationshipArcBody').innerHTML=characterArcTabsHtml(character)+'<div class="arc-length-bar"><div class="field"><label>Total planned quests</label>'+
+      '<select id="relationshipArcQuestTotal">'+Array.from({length:(character.relationship_chapters||[]).length*
+        PA_RELATIONSHIP_QUESTS_PER_LEVEL_MAX+1},(_,count)=>'<option value="'+count+'"'+
+          (summary.planned===count?' selected':'')+'>'+count+'</option>').join('')+'</select></div>'+
+      '<p>The five relationship levels stay fixed. Quests are distributed across those levels, and you can fine-tune each level below. Shortening an arc never deletes quests already written.</p></div>'+
+    '<div class="arc-overview">'+
+      '<div><b>'+summary.quests+'/'+summary.planned+'</b><span>quests built</span></div>'+
+      '<div><b>'+summary.ready+'</b><span>levels ready</span></div>'+
+      '<div><b>'+summary.complete+'</b><span>levels complete</span></div>'+
       '<p>'+esc(character.name)+' prefers '+esc((character.social_preferences?.preferred_activities||[]).map(pretty).join(', ')||'no hangouts yet')+
         '. Relationship progression remains player-paced.</p></div>'+
     '<div class="arc-card-list">'+summary.rows.map((row,index)=>{
       const chapter=row.chapter,plan=chapter.story_plan,metrics=row.metrics;
       const statusLabel=pretty(row.status).replace('needs work','· needs work');
-      const objectiveRows=metrics.objectives.map(objective=>'<div class="arc-objective" draggable="true" data-arc-stage="'+index+':'+objective.index+'">'+
-        '<span class="arc-drag" title="Drag to reorder">⋮⋮</span><span><b>'+esc(objective.stage.title||objective.stage.id)+'</b><small>'+relationshipArcLineCount(objective.stage.nodes)+' inline lines</small></span>'+
-        '<button data-arc-up="'+index+':'+objective.index+'" title="Move objective up">↑</button>'+
-        '<button data-arc-down="'+index+':'+objective.index+'" title="Move objective down">↓</button></div>').join('');
-      const conversationRows=metrics.conversations.map(conversation=>'<button class="arc-conversation" data-arc-conversation="'+esc(conversation.uid)+'">'+
-        esc(conversation.title||conversation.id)+' · '+relationshipArcLineCount(conversation.nodes)+' lines</button>').join('');
+      const questRows=metrics.questRows.map((questMetric,questIndex)=>{
+        const objectiveRows=questMetric.objectives.map(objective=>'<div class="arc-objective" draggable="true" data-arc-stage="'+index+':'+questIndex+':'+objective.index+'">'+
+          '<span class="arc-drag" title="Drag to reorder">⋮⋮</span><span><b>'+esc(objective.stage.title||objective.stage.id)+'</b><small>'+relationshipArcLineCount(objective.stage.nodes)+' inline lines</small></span>'+
+          '<button data-arc-up="'+index+':'+questIndex+':'+objective.index+'" title="Move objective up">↑</button>'+
+          '<button data-arc-down="'+index+':'+questIndex+':'+objective.index+'" title="Move objective down">↓</button></div>').join('');
+        const conversationRows=questMetric.conversations.map(conversation=>'<button class="arc-conversation" data-arc-conversation="'+esc(conversation.uid)+'">'+
+          esc(conversation.title||conversation.id)+' · '+relationshipArcLineCount(conversation.nodes)+' lines</button>').join('');
+        return '<div class="arc-quest-group"><div class="arc-quest-box"><div><b>'+esc(questMetric.slot.title)+'</b><small>'+esc(questMetric.slot.id)+'</small><span>'+questMetric.objectives.length+' objectives · '+questMetric.conversations.length+' linked conversations · '+questMetric.lineCount+' lines'+
+            (questMetric.slot.after?' · follows '+esc(questMetric.slot.after):'')+'</span></div>'+
+          '<button class="btn '+(questMetric.quest?'':'gold')+'" data-arc-quest="'+index+':'+questIndex+'">'+(questMetric.quest?'Edit quest':'Create quest')+'</button></div>'+
+          (objectiveRows?'<div class="arc-objectives"><p>Quest objectives · drag or use arrows to reorder</p>'+objectiveRows+'</div>':'')+
+          (conversationRows?'<div class="arc-conversations"><p>Linked conversations</p>'+conversationRows+'</div>':'')+'</div>';
+      }).join('');
       return '<section class="arc-card '+row.status+'">'+
         '<header><span class="arc-level">'+esc(chapter.level||index+1)+'</span><span><b>'+esc(chapter.title||pretty(chapter.id))+'</b><small>'+esc(chapter.id||'missing_id')+'</small></span>'+
           '<span class="arc-status '+row.status+'">'+esc(statusLabel)+'</span></header>'+
@@ -6020,6 +6601,8 @@ function paintRelationshipArcWorkshop(){
           PA_RELATIONSHIP_ROUTES.map(route=>'<option value="'+route.id+'"'+(chapter.route===route.id?' selected':'')+'>'+esc(route.name)+'</option>').join('')+
           '</select></div><div class="field"><label>Writing status</label><select data-arc-status="'+index+'">'+
           PA_STORY_STATUSES.map(status=>'<option value="'+status+'"'+(plan.status===status?' selected':'')+'>'+esc(pretty(status))+'</option>').join('')+
+          '</select></div><div class="field"><label>Quests at this level</label><select data-arc-quest-count="'+index+'">'+
+          Array.from({length:PA_RELATIONSHIP_QUESTS_PER_LEVEL_MAX+1},(_,count)=>'<option value="'+count+'"'+(plan.quest_count===count?' selected':'')+'>'+count+(count===0?' — none':'')+'</option>').join('')+
           '</select></div><div class="field"><label>Primary location</label><select data-arc-location="'+index+'">'+placeOptions(plan.primary_location)+'</select></div></div>'+
         '<div class="arc-story-grid">'+
           '<div class="field"><label>Central conflict</label><textarea data-arc-field="'+index+':conflict" placeholder="What pressure or problem drives this chapter?">'+esc(plan.conflict)+'</textarea></div>'+
@@ -6031,15 +6614,185 @@ function paintRelationshipArcWorkshop(){
           '<div class="field"><label>Required memories</label><input value="'+esc(plan.required_memories.join(', '))+'" data-arc-list="'+index+':required_memories" placeholder="shared_a_secret"></div>'+
           '<div class="field"><label>Prerequisite quest ids</label><input value="'+esc(plan.prerequisite_quests.join(', '))+'" data-arc-list="'+index+':prerequisite_quests" placeholder="earlier_quest"></div></div>'+
         '<div class="field"><label>Writer notes</label><textarea data-arc-field="'+index+':notes" placeholder="Tone, scene ideas, alternate outcomes…">'+esc(plan.notes)+'</textarea></div>'+
-        '<div class="arc-quest-box"><div><b>'+(metrics.quest?esc(metrics.quest.title):'No quest')+'</b><span>'+metrics.objectives.length+' objectives · '+metrics.conversations.length+' linked conversations · '+metrics.lineCount+' lines</span></div>'+
-          '<button class="btn '+(metrics.quest?'':'gold')+'" data-arc-quest="'+index+'">'+(metrics.quest?'Edit quest':'Create quest')+'</button></div>'+
-        (objectiveRows?'<div class="arc-objectives"><p>Quest objectives · drag or use arrows to reorder</p>'+objectiveRows+'</div>':'')+
-        (conversationRows?'<div class="arc-conversations"><p>Linked conversations</p>'+conversationRows+'</div>':'')+
+        (questRows||'<div class="arc-no-quests">No quest is planned at this relationship level.</div>')+
         (row.issues.length?'<ul class="arc-issues">'+row.issues.map(issue=>'<li>'+esc(issue)+'</li>').join('')+'</ul>':
-          '<div class="arc-clean">This milestone has a complete writing plan and playable content.</div>')+
+          (row.status==='skipped'?'<div class="arc-clean">This relationship level is intentionally story-light.</div>':
+            '<div class="arc-clean">This milestone has a complete writing plan and playable content.</div>'))+
       '</section>';
     }).join('')+'</div>';
-  wireRelationshipArcWorkshop(character);
+  wireRelationshipArcWorkshop(character);wireCharacterArcTabs(character);
+}
+
+function characterStoryArcMetrics(character,arc){
+  const questRows=characterStoryArcQuestSlots(character,arc).map(slot=>{
+    const quest=characterStoryArcQuest(character,slot);
+    const objectives=(quest?.stages||[]).map((stage,index)=>({stage,index})).filter(row=>row.stage.id!=='branch');
+    const conversations=relationshipArcConversations(quest);
+    const stageLines=(quest?.stages||[]).reduce((total,stage)=>total+relationshipArcLineCount(stage.nodes),0);
+    const conversationLines=conversations.reduce((total,item)=>total+relationshipArcLineCount(item.nodes),0);
+    return {slot,quest,objectives,conversations,lineCount:stageLines+conversationLines};
+  });
+  return {questRows,planned:questRows.length,built:questRows.filter(row=>row.quest).length,
+    objectiveCount:questRows.reduce((total,row)=>total+row.objectives.length,0),
+    conversationCount:questRows.reduce((total,row)=>total+row.conversations.length,0),
+    lineCount:questRows.reduce((total,row)=>total+row.lineCount,0)};
+}
+
+function characterStoryArcIssues(character,arc,metrics=characterStoryArcMetrics(character,arc)){
+  const issues=[];
+  metrics.questRows.forEach((row,index)=>{
+    if(!row.quest)issues.push('Quest '+(index+1)+' has not been created yet.');
+    else{
+      if(!row.objectives.length)issues.push('Quest '+(index+1)+' has no objectives.');
+      if(!row.lineCount)issues.push('Quest '+(index+1)+' has no quest scene or linked conversation dialogue yet.');
+    }
+  });
+  if(!String(arc.summary||'').trim())issues.push('Add an arc summary.');
+  if(!String(arc.conflict||'').trim())issues.push('Add the central conflict.');
+  if(!String(arc.important_choice||'').trim())issues.push('Add the player’s important choice.');
+  if(!String(arc.consequence||'').trim())issues.push('Add a lasting consequence.');
+  if(!String(arc.callback||'').trim())issues.push('Add a future callback.');
+  if(!String(arc.primary_location||'').trim())issues.push('Choose a primary location.');
+  if(arc.entry_policy==='optional'&&!String(arc.decline_outcome||'').trim())
+    issues.push('Explain what happens when the player declines or defers.');
+  (arc.supporting_characters||[]).filter(id=>!chr(id)||isPlayer(chr(id))).forEach(id=>
+    issues.push('Supporting character "'+id+'" has no NPC sheet.'));
+  (arc.prerequisite_quests||[]).filter(id=>!P.content.some(item=>item.type==='quest'&&item.id===id)).forEach(id=>
+    issues.push('Prerequisite quest "'+id+'" does not exist.'));
+  return issues;
+}
+
+function characterStoryArcStatus(arc,metrics,issues){
+  if(!metrics.built)return 'unwritten';
+  if(arc.status==='complete')return issues.length?'complete_needs_work':'complete';
+  if(arc.status==='ready')return issues.length?'ready_needs_work':'ready';
+  return 'draft';
+}
+
+function renameCharacterStoryArc(character,arc,raw){
+  const old=arc.id,next=slug(raw);
+  if(next===old)return next;
+  const linked=P.content.filter(item=>item.type==='quest'&&item.character===character.id&&(
+    item.id===old||item.id.startsWith(old+'_part_')||item.questPlan?.characterArc?.arc_id===old));
+  const duplicate=character.story_arcs.some(item=>item!==arc&&item.id===next)||
+    (character.relationship_chapters||[]).some(chapter=>chapter.id===next);
+  const partOf=quest=>+quest.questPlan?.characterArc?.part||
+    (quest.id===old?1:(parseInt(quest.id.slice((old+'_part_').length),10)||1));
+  const maxPart=Math.max(arc.quest_count,...linked.map(partOf));
+  const targets=new Set(Array.from({length:maxPart},(_,index)=>index?next+'_part_'+(index+1):next));
+  const collision=P.content.find(item=>item.type==='quest'&&!linked.includes(item)&&targets.has(item.id));
+  if(duplicate||collision)throw new Error(duplicate?'Every character story needs a unique id.':
+    'That id already belongs to another quest.');
+  linked.sort((a,b)=>partOf(b)-partOf(a)).forEach(quest=>{
+    const part=partOf(quest);renameContentId(quest,part>1?next+'_part_'+part:next);
+    if(quest.questPlan?.characterArc)quest.questPlan.characterArc.arc_id=next;
+  });
+  arc.id=next;characterArcSelection=next;
+  return next;
+}
+
+function paintCharacterStoryArcWorkshop(character,arc){
+  normalizeCharacterStoryArc(character,arc,character.story_arcs.indexOf(arc));
+  const metrics=characterStoryArcMetrics(character,arc),issues=characterStoryArcIssues(character,arc,metrics);
+  const status=characterStoryArcStatus(arc,metrics,issues),optional=arc.entry_policy==='optional';
+  const questRows=metrics.questRows.map((row,index)=>{
+    const conversations=row.conversations.map(conversation=>'<button class="arc-conversation" data-character-arc-conversation="'+esc(conversation.uid)+'">'+
+      esc(conversation.title||conversation.id)+' · '+relationshipArcLineCount(conversation.nodes)+' lines</button>').join('');
+    return '<div class="arc-quest-group"><div class="arc-quest-box"><div><b>'+esc(row.slot.title)+'</b><small>'+esc(row.slot.id)+'</small><span>'+
+      row.objectives.length+' objectives · '+row.conversations.length+' linked conversations · '+row.lineCount+' lines'+
+      (row.slot.after?' · follows '+esc(row.slot.after):'')+'</span></div><button class="btn '+(row.quest?'':'gold')+
+      '" data-character-arc-quest="'+index+'">'+(row.quest?'Edit quest':'Create quest')+'</button></div>'+
+      (conversations?'<div class="arc-conversations"><p>Linked conversations</p>'+conversations+'</div>':'')+'</div>';
+  }).join('');
+  $('relationshipArcName').textContent=character.name+' — character stories';
+  $('relationshipArcBody').innerHTML=characterArcTabsHtml(character)+
+    '<div class="character-arc-intro"><b>Independent character story</b><span>This arc is not a love level. It can unlock from work, friendship, another meter, a world-state value, or earlier quests.</span></div>'+
+    '<section class="arc-card '+status+' character-story-card"><header><span class="arc-level">◆</span><span><b>'+esc(arc.title||pretty(arc.id))+
+      '</b><small>'+esc(arc.id)+'</small></span><span class="arc-status '+status+'">'+esc(pretty(status).replace('needs work','· needs work'))+'</span></header>'+
+      '<div class="arc-controls character-story-identity"><div class="field"><label>Story title</label><input id="characterArcTitle" value="'+esc(arc.title)+'"></div>'+
+      '<div class="field"><label>Story id</label><input id="characterArcId" value="'+esc(arc.id)+'"></div>'+
+      '<div class="field"><label>Category</label><select id="characterArcCategory">'+PA_CHARACTER_ARC_CATEGORIES.map(category=>'<option value="'+category.id+'"'+
+        (arc.category===category.id?' selected':'')+'>'+esc(category.name)+'</option>').join('')+'</select></div>'+
+      '<div class="field"><label>Writing status</label><select id="characterArcStatus">'+PA_STORY_STATUSES.map(value=>'<option value="'+value+'"'+
+        (arc.status===value?' selected':'')+'>'+esc(pretty(value))+'</option>').join('')+'</select></div></div>'+
+      '<div class="field"><label>Arc summary</label><textarea id="characterArcSummary" placeholder="What is this character story about?">'+esc(arc.summary)+'</textarea></div>'+
+      '<div class="arc-controls"><div class="field"><label>Number of quests</label><select id="characterArcQuestCount">'+
+        Array.from({length:PA_CHARACTER_ARC_QUEST_MAX},(_,index)=>index+1).map(count=>'<option value="'+count+'"'+(arc.quest_count===count?' selected':'')+'>'+count+'</option>').join('')+'</select></div>'+
+      '<div class="field"><label>Entry</label><select id="characterArcEntry">'+PA_CHARACTER_ARC_ENTRY_POLICIES.map(value=>'<option value="'+value+'"'+
+        (arc.entry_policy===value?' selected':'')+'>'+esc(pretty(value))+'</option>').join('')+'</select></div>'+
+      '<div class="field"><label>On decline</label><select id="characterArcDecline"'+(optional?'':' disabled')+'>'+PA_CHARACTER_ARC_DECLINE_POLICIES.map(value=>'<option value="'+value+'"'+
+        (arc.decline_policy===value?' selected':'')+'>'+esc(pretty(value))+'</option>').join('')+'</select></div>'+
+      '<div class="field"><label>Primary location</label><select id="characterArcLocation">'+placeOptions(arc.primary_location)+'</select></div></div>'+
+      (optional?'<div class="character-arc-choice"><b>Player freedom is required</b><span>The opening quest should offer accept, defer, and decline paths. Declining this arc must not lock unrelated stories with '+esc(character.name)+'.</span></div>':'')+
+      '<div class="arc-controls character-story-gates"><div class="field"><label>Relationship gate</label><select id="characterArcGateMeter"><option value=""'+(!arc.gate_meter?' selected':'')+'>No meter required</option>'+PA_CHARACTER_ARC_METERS.map(value=>'<option value="'+value+'"'+
+        (arc.gate_meter===value?' selected':'')+'>'+esc(pretty(value))+'</option>').join('')+'</select></div>'+
+      '<div class="field"><label>Minimum (0–100)</label><input type="number" min="0" max="100" id="characterArcGateValue" value="'+esc(arc.gate_value)+'"'+(!arc.gate_meter?' disabled':'')+'></div>'+
+      '<div class="field"><label>Required flag or state value</label><input id="characterArcRequiredState" value="'+esc(arc.required_state)+'" placeholder="player.employment.job=restaurant_server"></div>'+
+      '<div class="field"><label>Prerequisite quest ids</label><input id="characterArcPrerequisites" value="'+esc(arc.prerequisite_quests.join(', '))+'" placeholder="restaurant_orientation"></div></div>'+
+      '<div class="arc-story-grid"><div class="field"><label>Central conflict</label><textarea data-character-arc-field="conflict">'+esc(arc.conflict)+'</textarea></div>'+
+      '<div class="field"><label>Important player choice</label><textarea data-character-arc-field="important_choice">'+esc(arc.important_choice)+'</textarea></div>'+
+      '<div class="field"><label>Lasting consequence</label><textarea data-character-arc-field="consequence">'+esc(arc.consequence)+'</textarea></div>'+
+      '<div class="field"><label>Future callback</label><textarea data-character-arc-field="callback">'+esc(arc.callback)+'</textarea></div></div>'+
+      '<div class="arc-detail-grid"><div class="field"><label>Supporting NPC ids</label><input id="characterArcSupporting" value="'+esc(arc.supporting_characters.join(', '))+'"></div>'+
+      '<div class="field"><label>Required memories</label><input id="characterArcMemories" value="'+esc(arc.required_memories.join(', '))+'"></div>'+
+      '<div class="field"><label>Decline / defer outcome</label><input id="characterArcDeclineOutcome" value="'+esc(arc.decline_outcome)+'"'+(optional?'':' disabled')+' placeholder="Arc stays available; other stories continue"></div></div>'+
+      '<div class="field"><label>Writer notes</label><textarea data-character-arc-field="notes">'+esc(arc.notes)+'</textarea></div>'+questRows+
+      (issues.length?'<ul class="arc-issues">'+issues.map(issue=>'<li>'+esc(issue)+'</li>').join('')+'</ul>':
+        '<div class="arc-clean">This independent story has a complete plan and playable content.</div>')+'</section>';
+  wireCharacterStoryArcWorkshop(character,arc);wireCharacterArcTabs(character);
+}
+
+function openCharacterStoryArcQuest(character,arc,index){
+  const slot=characterStoryArcQuestSlots(character,arc)[index];if(!slot)return;
+  try{
+    const result=ensureCharacterStoryArcQuest(character,slot);
+    sel=result.quest.uid;focusPath=[];stageIx=0;save();paintAll();
+    $('relationshipArcWorkshop').close();openQuestBuilder();
+    if(result.created)note('Created '+esc(slot.title)+'. Build its objectives, scenes, and player choices in the quest builder.');
+  }catch(error){note(esc(error.message));}
+}
+
+function wireCharacterStoryArcWorkshop(character,arc){
+  const body=$('relationshipArcBody'),saveField=(key,value)=>{arc[key]=value;save();};
+  $('characterArcTitle').onchange=event=>{
+    arc.title=event.target.value.trim()||pretty(arc.id);
+    characterStoryArcQuestSlots(character,arc).forEach(slot=>{
+      const quest=characterStoryArcQuest(character,slot);if(quest)quest.title=slot.title;
+    });
+    save();paintSetup();paintRelationshipArcWorkshop();
+  };
+  $('characterArcId').onchange=event=>{
+    try{event.target.value=renameCharacterStoryArc(character,arc,event.target.value);save();paintSetup();paintRelationshipArcWorkshop();}
+    catch(error){event.target.value=arc.id;note(esc(error.message));}
+  };
+  $('characterArcCategory').onchange=event=>{saveField('category',event.target.value);paintRelationshipArcWorkshop();};
+  $('characterArcStatus').onchange=event=>{saveField('status',event.target.value);paintRelationshipArcWorkshop();};
+  $('characterArcSummary').oninput=event=>saveField('summary',event.target.value);
+  $('characterArcQuestCount').onchange=event=>{
+    const before=arc.quest_count;arc.quest_count=Math.max(1,Math.min(PA_CHARACTER_ARC_QUEST_MAX,+event.target.value||1));
+    save();paintRelationshipArcWorkshop();
+    if(arc.quest_count<before)note('Arc shortened. Existing quest content was kept and can be restored by raising the count again.');
+  };
+  $('characterArcEntry').onchange=event=>{saveField('entry_policy',event.target.value);paintRelationshipArcWorkshop();};
+  $('characterArcDecline').onchange=event=>saveField('decline_policy',event.target.value);
+  $('characterArcLocation').onchange=event=>saveField('primary_location',event.target.value);
+  $('characterArcGateMeter').onchange=event=>{saveField('gate_meter',event.target.value);paintRelationshipArcWorkshop();};
+  $('characterArcGateValue').onchange=event=>{
+    event.target.value=arc.gate_value=Math.max(0,Math.min(100,parseInt(event.target.value,10)||0));save();};
+  $('characterArcRequiredState').onchange=event=>{event.target.value=arc.required_state=event.target.value.trim();save();};
+  const listInput=(id,key)=>$(id).onchange=event=>{
+    arc[key]=relationshipArcList(event.target.value);event.target.value=arc[key].join(', ');save();paintRelationshipArcWorkshop();};
+  listInput('characterArcPrerequisites','prerequisite_quests');
+  listInput('characterArcSupporting','supporting_characters');
+  listInput('characterArcMemories','required_memories');
+  $('characterArcDeclineOutcome').oninput=event=>saveField('decline_outcome',event.target.value);
+  body.querySelectorAll('[data-character-arc-field]').forEach(field=>field.oninput=()=>
+    saveField(field.dataset.characterArcField,field.value));
+  body.querySelectorAll('[data-character-arc-quest]').forEach(button=>button.onclick=()=>
+    openCharacterStoryArcQuest(character,arc,+button.dataset.characterArcQuest));
+  body.querySelectorAll('[data-character-arc-conversation]').forEach(button=>button.onclick=()=>{
+    sel=button.dataset.characterArcConversation;focusPath=[];stageIx=0;save();$('relationshipArcWorkshop').close();paintAll();
+  });
 }
 
 function moveRelationshipArcStage(quest,stageIndex,direction){
@@ -6050,23 +6803,42 @@ function moveRelationshipArcStage(quest,stageIndex,direction){
   save();paintRelationshipArcWorkshop();
 }
 
-function openRelationshipArcQuest(character,index){
-  const chapter=character.relationship_chapters[index];if(!chapter)return;
+function relationshipArcQuestSlot(character,chapterIndex,questIndex){
+  const chapter=character.relationship_chapters[chapterIndex];if(!chapter)return null;
+  return relationshipChapterQuestSlots(character,chapter)[questIndex]||null;
+}
+
+function openRelationshipArcQuest(character,index,questIndex=0){
+  const chapter=character.relationship_chapters[index],slot=relationshipArcQuestSlot(character,index,questIndex);
+  if(!chapter||!slot)return;
   try{
-    const result=ensureRelationshipChapterQuest(character,chapter);
+    const result=ensureRelationshipChapterQuest(character,slot);
     normalizeRelationshipChapterStory(character,chapter);
     sel=result.quest.uid;focusPath=[];stageIx=0;save();paintAll();
     $('relationshipArcWorkshop').close();openQuestBuilder();
-    if(result.created)note('Created '+esc(chapter.title)+'. Build its objectives and scenes in the quest builder.');
+    if(result.created)note('Created '+esc(slot.title)+'. Build its objectives and scenes in the quest builder.');
   }catch(error){note(esc(error.message));}
 }
 
 function wireRelationshipArcWorkshop(character){
   const body=$('relationshipArcBody');
+  $('relationshipArcQuestTotal').onchange=event=>{
+    const before=relationshipArcSummary(character).planned;
+    setRelationshipArcQuestTotal(character,event.target.value);save();paintRelationshipArcWorkshop();
+    if(relationshipArcSummary(character).planned<before)
+      note('Arc shortened. Existing quest content was kept and can be restored by raising the count again.');
+  };
   body.querySelectorAll('[data-arc-route]').forEach(select=>select.onchange=()=>{
     character.relationship_chapters[+select.dataset.arcRoute].route=select.value;save();paintRelationshipArcWorkshop();});
   body.querySelectorAll('[data-arc-status]').forEach(select=>select.onchange=()=>{
     character.relationship_chapters[+select.dataset.arcStatus].story_plan.status=select.value;save();paintRelationshipArcWorkshop();});
+  body.querySelectorAll('[data-arc-quest-count]').forEach(select=>select.onchange=()=>{
+    const chapter=character.relationship_chapters[+select.dataset.arcQuestCount];
+    const before=chapter.story_plan.quest_count;chapter.story_plan.quest_count=+select.value;
+    save();paintRelationshipArcWorkshop();
+    if(chapter.story_plan.quest_count<before)
+      note('Level shortened. Existing quest content was kept and can be restored by raising its quest count again.');
+  });
   body.querySelectorAll('[data-arc-location]').forEach(select=>select.onchange=()=>{
     character.relationship_chapters[+select.dataset.arcLocation].story_plan.primary_location=select.value;save();});
   body.querySelectorAll('[data-arc-field]').forEach(field=>field.oninput=()=>{
@@ -6074,24 +6846,31 @@ function wireRelationshipArcWorkshop(character){
   body.querySelectorAll('[data-arc-list]').forEach(field=>field.onchange=()=>{
     const [index,key]=field.dataset.arcList.split(':');character.relationship_chapters[+index].story_plan[key]=relationshipArcList(field.value);
     field.value=character.relationship_chapters[+index].story_plan[key].join(', ');save();paintRelationshipArcWorkshop();});
-  body.querySelectorAll('[data-arc-quest]').forEach(button=>button.onclick=()=>openRelationshipArcQuest(character,+button.dataset.arcQuest));
+  body.querySelectorAll('[data-arc-quest]').forEach(button=>button.onclick=()=>{
+    const [chapterIndex,questIndex]=button.dataset.arcQuest.split(':').map(Number);
+    openRelationshipArcQuest(character,chapterIndex,questIndex);
+  });
   body.querySelectorAll('[data-arc-conversation]').forEach(button=>button.onclick=()=>{
     sel=button.dataset.arcConversation;focusPath=[];stageIx=0;save();$('relationshipArcWorkshop').close();paintAll();});
   body.querySelectorAll('[data-arc-up]').forEach(button=>button.onclick=()=>{
-    const [chapterIndex,stageIndex]=button.dataset.arcUp.split(':').map(Number);
-    moveRelationshipArcStage(relationshipArcQuestMetrics(character,character.relationship_chapters[chapterIndex]).quest,stageIndex,-1);});
+    const [chapterIndex,questIndex,stageIndex]=button.dataset.arcUp.split(':').map(Number);
+    moveRelationshipArcStage(relationshipArcQuestMetrics(character,
+      relationshipArcQuestSlot(character,chapterIndex,questIndex)).quest,stageIndex,-1);});
   body.querySelectorAll('[data-arc-down]').forEach(button=>button.onclick=()=>{
-    const [chapterIndex,stageIndex]=button.dataset.arcDown.split(':').map(Number);
-    moveRelationshipArcStage(relationshipArcQuestMetrics(character,character.relationship_chapters[chapterIndex]).quest,stageIndex,1);});
+    const [chapterIndex,questIndex,stageIndex]=button.dataset.arcDown.split(':').map(Number);
+    moveRelationshipArcStage(relationshipArcQuestMetrics(character,
+      relationshipArcQuestSlot(character,chapterIndex,questIndex)).quest,stageIndex,1);});
   body.querySelectorAll('[data-arc-stage]').forEach(row=>{
     row.ondragstart=()=>{relationshipArcDraggedStage=row.dataset.arcStage;};
     row.ondragover=event=>event.preventDefault();
     row.ondrop=event=>{
       event.preventDefault();if(!relationshipArcDraggedStage)return;
-      const [fromChapter,fromStage]=relationshipArcDraggedStage.split(':').map(Number);
-      const [toChapter,toStage]=row.dataset.arcStage.split(':').map(Number);
-      relationshipArcDraggedStage=null;if(fromChapter!==toChapter||fromStage===toStage)return;
-      const quest=relationshipArcQuestMetrics(character,character.relationship_chapters[fromChapter]).quest;
+      const [fromChapter,fromQuest,fromStage]=relationshipArcDraggedStage.split(':').map(Number);
+      const [toChapter,toQuest,toStage]=row.dataset.arcStage.split(':').map(Number);
+      relationshipArcDraggedStage=null;
+      if(fromChapter!==toChapter||fromQuest!==toQuest||fromStage===toStage)return;
+      const quest=relationshipArcQuestMetrics(character,
+        relationshipArcQuestSlot(character,fromChapter,fromQuest)).quest;
       const item=quest.stages.splice(fromStage,1)[0],adjusted=fromStage<toStage?toStage-1:toStage;
       quest.stages.splice(adjusted,0,item);save();paintRelationshipArcWorkshop();
     };
@@ -6101,13 +6880,24 @@ function wireRelationshipArcWorkshop(character){
 function scaffoldRelationshipArcQuests(){
   const character=P.characters[relationshipArcCharacterIndex];if(!character)return;
   let created=0;const errors=[];
-  (character.relationship_chapters||[]).forEach(chapter=>{
-    normalizeRelationshipChapterStory(character,chapter);
-    try{if(ensureRelationshipChapterQuest(character,chapter).created)created++;}
-    catch(error){errors.push(error.message);}
-  });
+  if(characterArcSelection==='relationship'){
+    (character.relationship_chapters||[]).forEach(chapter=>{
+      normalizeRelationshipChapterStory(character,chapter);
+      relationshipChapterQuestSlots(character,chapter).forEach(slot=>{
+        try{if(ensureRelationshipChapterQuest(character,slot).created)created++;}
+        catch(error){errors.push(error.message);}
+      });
+    });
+  }else{
+    const arc=normalizeCharacterStoryArcs(character).find(item=>item.id===characterArcSelection);
+    if(!arc){characterArcSelection='relationship';paintRelationshipArcWorkshop();return;}
+    characterStoryArcQuestSlots(character,arc).forEach(slot=>{
+      try{if(ensureCharacterStoryArcQuest(character,slot).created)created++;}
+      catch(error){errors.push(error.message);}
+    });
+  }
   save();paintAll();paintRelationshipArcWorkshop();
-  note(created+' relationship quest'+(created===1?'':'s')+' scaffolded.'+(errors.length?' '+esc(errors[0]):''));
+  note(created+' story quest'+(created===1?'':'s')+' scaffolded.'+(errors.length?' '+esc(errors[0]):''));
 }
 
 if(typeof document!=='undefined'){
@@ -6901,7 +7691,7 @@ function validatePhoneAuthoring(add){
 function validate(){
   const out=[],add=(sev,msg,where,fix)=>out.push({sev,msg,where,fix});
   const districts=typeof DISTRICTS==='undefined'?(P.districts||[]):DISTRICTS;
-  const ids=new Set(),cids=new Set(),chapterArcIds=new Map();
+  const ids=new Set(),cids=new Set(),chapterArcIds=new Map(),characterStoryArcIds=new Map();
   const impossibleStats=reqs=>{
     const limits={};
     (reqs||[]).filter(r=>r.type==='stat').forEach(r=>{
@@ -6919,6 +7709,31 @@ function validate(){
     cids.add(c.id);
     if(isPlayer(c))return;
     const where=c.name||c.id||'Cast',chapters=Array.isArray(c.relationship_chapters)?c.relationship_chapters:[];
+    if(!String(c.name||c.display_name||'').trim())add('err','Character "'+(c.id||'?')+'" needs a display name.',where);
+    const homeId=c.home?.location_id||c.home?.residence_id||'',home=loc(homeId);
+    if(!homeId)add('err',where+' needs a home residence.',where);
+    else if(!home)add('err',where+' home "'+homeId+'" is not in the location registry.',where);
+    else{
+      if(!(home.residents||[]).includes(c.id))add('err',where+' is not listed as a resident of '+home.name+'.',where);
+      if(home.outside_room&&!(home.rooms||[]).some(room=>room.id===home.outside_room))
+        add('err',home.name+' entrance room "'+home.outside_room+'" does not exist.',where);
+      if(/^(npc_residence|npc_and_rentable_apartment)$/.test(home.type||'')){
+        if(!home.discovery||home.discovery.discoverable!==true)
+          add('err',home.name+' must be explicitly discoverable.',where);
+        if(!Object.prototype.hasOwnProperty.call(home.discovery||{},'hidden_until_discovered'))
+          add('err',home.name+' must say whether it is hidden until discovered.',where);
+      }
+      const checkHomeRoom=(placement,label)=>{
+        if(placement?.room&&!(home.rooms||[]).some(room=>room.id===placement.room))
+          add('err',label+' uses room "'+placement.room+'", which is not mapped in '+home.name+'.',where);
+      };
+      Object.entries(c.home_routine?.default_by_block||{}).forEach(([block,placement])=>
+        checkHomeRoom(placement,pretty(block)+' home routine'));
+      (c.home_routine?.overrides||[]).forEach((placement,index)=>
+        checkHomeRoom(placement,'Home-routine override '+(index+1)));
+      (c.schedule?.fixed_commitments||[]).forEach((commitment,index)=>
+        checkHomeRoom(commitment.home_placement,'Schedule home placement '+(index+1)));
+    }
     if(chapters.length!==5)add('err',where+' needs exactly five relationship story milestones; found '+chapters.length+'.',where);
     const levels=chapters.map(ch=>+ch.level);
     if(levels.join(',')!=='1,2,3,4,5')add('err',where+' relationship milestones must be ordered as levels 1 through 5.',where);
@@ -6943,6 +7758,10 @@ function validate(){
         else{
           if(!PA_STORY_STATUSES.includes(plan.status))add('err','Relationship milestone "'+(id||'?')+
             '" has unknown writing status "'+plan.status+'".',where);
+          if(plan.quest_count!==undefined&&(!Number.isInteger(+plan.quest_count)||+plan.quest_count<0||
+            +plan.quest_count>PA_RELATIONSHIP_QUESTS_PER_LEVEL_MAX))
+            add('err','Relationship milestone "'+(id||'?')+'" quest count must be a whole number from 0 to '+
+              PA_RELATIONSHIP_QUESTS_PER_LEVEL_MAX+'.',where);
           ['supporting_characters','required_memories','prerequisite_quests'].forEach(key=>{
             if(!Array.isArray(plan[key]))add('err','Story plan field "'+key+'" must be a list.',where);
           });
@@ -6953,6 +7772,46 @@ function validate(){
             if(issues.length)add('err','Milestone "'+(ch.title||id)+'" is marked complete but still needs: '+issues.join(' '),where);
           }
         }
+      }
+    });
+    const storyArcs=Array.isArray(c.story_arcs)?c.story_arcs:[];
+    const localStoryArcIds=new Set();
+    storyArcs.forEach(arc=>{
+      const id=String(arc?.id||'');
+      if(!id)add('err','An independent character story has no id.',where);
+      else if(slug(id)!==id)add('err','Character story id "'+id+'" must use lowercase words joined by underscores.',where);
+      if(id&&localStoryArcIds.has(id))add('err','Two independent character stories share id "'+id+'".',where);
+      localStoryArcIds.add(id);
+      if(id&&chapterArcIds.has(id))add('err','Character story id "'+id+'" is also used by a relationship milestone.',where);
+      if(id&&characterStoryArcIds.has(id)&&characterStoryArcIds.get(id)!==c.id)
+        add('err','Character story id "'+id+'" is also used by '+
+          (chr(characterStoryArcIds.get(id))?.name||characterStoryArcIds.get(id))+'.',where);
+      else if(id)characterStoryArcIds.set(id,c.id);
+      if(!String(arc?.title||'').trim())add('err','Character story "'+(id||'?')+'" needs a title.',where);
+      if(!PA_CHARACTER_ARC_CATEGORIES.some(category=>category.id===arc.category))
+        add('err','Character story "'+(id||'?')+'" has unknown category "'+arc.category+'".',where);
+      if(!PA_STORY_STATUSES.includes(arc.status))add('err','Character story "'+(id||'?')+
+        '" has unknown writing status "'+arc.status+'".',where);
+      if(!Number.isInteger(+arc.quest_count)||+arc.quest_count<1||+arc.quest_count>PA_CHARACTER_ARC_QUEST_MAX)
+        add('err','Character story "'+(id||'?')+'" quest count must be a whole number from 1 to '+
+          PA_CHARACTER_ARC_QUEST_MAX+'.',where);
+      if(!PA_CHARACTER_ARC_ENTRY_POLICIES.includes(arc.entry_policy))
+        add('err','Character story "'+(id||'?')+'" has unknown entry policy.',where);
+      if(!PA_CHARACTER_ARC_DECLINE_POLICIES.includes(arc.decline_policy))
+        add('err','Character story "'+(id||'?')+'" has unknown decline policy.',where);
+      if(arc.gate_meter&&!PA_CHARACTER_ARC_METERS.includes(arc.gate_meter))
+        add('err','Character story "'+(id||'?')+'" has unknown relationship gate "'+arc.gate_meter+'".',where);
+      if(!Number.isFinite(+arc.gate_value)||+arc.gate_value<0||+arc.gate_value>100)
+        add('err','Character story "'+(id||'?')+'" meter minimum must be from 0 to 100.',where);
+      ['supporting_characters','required_memories','prerequisite_quests','custom_requirements'].forEach(key=>{
+        if(!Array.isArray(arc[key]))add('err','Character story field "'+key+'" must be a list.',where);
+      });
+      if(arc.primary_location&&!loc(locPart(arc.primary_location)))
+        add('err','Character story location "'+arc.primary_location+'" is not in the registry.',where);
+      if(arc.status==='complete'&&typeof characterStoryArcIssues==='function'){
+        const issues=characterStoryArcIssues(c,arc);
+        if(issues.length)add('err','Character story "'+(arc.title||id)+'" is marked complete but still needs: '+
+          issues.join(' '),where);
       }
     });
     const social=c.social_preferences;
@@ -9174,8 +10033,10 @@ function toJSON(){
         family_only:!!g.boundaries.family_only,
         hard_limits:g.boundaries.hard_limits||[],
         adult_hard_limits:g.private_profile?.adult_preferences?.hard_limits||[],
+        home:g.home||{},home_routine:g.home_routine||{},
         chapters:(c.relationship_chapters||[]).map(x=>({level:x.level,id:x.id,title:x.title,
           route:x.route||'shared',story_plan:x.story_plan||undefined,requires:x.requires||[]})),
+        story_arcs:g.story_arcs||[],
         social_preferences:g.social_preferences||{},
         stat_caps:c.stat_caps||{},
         relationship_defaults:c.relationship_defaults||{}};
@@ -9184,7 +10045,10 @@ function toJSON(){
     // the runtime needs the room table to resolve one.
     locations:P.locations.map(l=>({id:l.id,name:l.name,background:l.background,
       district:l.district,type:l.type||'',
-      rooms:(l.rooms||[]).map(r=>({id:r.id,name:r.name,access:r.access||''})),
+      outside_room:l.outside_room||'',discovery:l.discovery||{},access:l.access||{},
+      residents:l.residents||[],housing:l.housing||null,
+      rooms:(l.rooms||[]).map(r=>({id:r.id,name:r.name,access:r.access||'',
+        navigation:r.navigation||{},actions:r.actions||[]})),
       travel_node:l.travel_node!==false})),
     // The declared state contract — types, starting values and ceilings.
     registry:stateRegistry(),
@@ -9195,7 +10059,8 @@ function toJSON(){
        replayable:!!c.replayable,sets_flag:c.flag||'',
        days:contentDays(c),nodes:clean(c.nodes||[])})).concat(acts.conversations),
     quests:pick('quest').map(c=>({id:c.id,title:c.title,giver:c.character||'',hook:c.hook||'',
-      cast:c.cast||[],requires:c.requires||[],
+      cast:c.cast||[],requires:c.requires||[],after:c.after||'',
+      character_arc:c.questPlan?.characterArc||null,relationship_arc:c.questPlan?.relationshipArc||null,
       stages:(c.stages||[]).map(s=>Object.assign({id:s.id,title:s.title},place(s.location),
         {sets_flag:s.flag||'',effects:compileEffects(s.flag),
          requires:s.requires||[],

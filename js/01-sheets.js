@@ -1,14 +1,86 @@
 /* ============ character sheet import ============ */
+function characterHomeLocation(character){
+  const id=character?.home?.location_id||character?.home?.residence_id||'';
+  return P.locations.find(location=>location.id===id)||null;
+}
+
+// Hale Home predates the registry-driven city residences. Its directional map
+// still lives in src/world/hale_home_navigation.gd, so mirror that read-only
+// runtime layout here until the game moves it into all_locations.json.
+const SPECIAL_RESIDENCE_LAYOUTS={
+  hale_home:{outside_room:'front_yard',source:'Godot runtime layout',navigation:{
+    player_bedroom:{down:'upstairs_landing'},
+    upstairs_landing:{up:'player_bedroom',left:'upstairs_hall',down:'entryway'},
+    upstairs_hall:{left:'lily_bedroom',up:'parents_bedroom',right:'upstairs_landing',down:'family_bathroom'},
+    lily_bedroom:{right:'upstairs_hall'},parents_bedroom:{down:'upstairs_hall'},
+    family_bathroom:{up:'upstairs_hall'},
+    entryway:{left:'living_room',up:'upstairs_landing',right:'front_yard'},
+    living_room:{right:'entryway',down:'dining_room'},
+    dining_room:{up:'living_room',right:'kitchen'},
+    kitchen:{left:'dining_room',right:'laundry_room',down:'backyard'},
+    backyard:{up:'kitchen'},laundry_room:{left:'kitchen',right:'garage'},
+    garage:{left:'laundry_room',down:'front_yard'},
+    front_yard:{left:'garage',up:'alder_heights_residential_street.hale_block',down:'entryway'}
+  }}
+};
+
+function residenceLayout(home){
+  return SPECIAL_RESIDENCE_LAYOUTS[home?.id]||null;
+}
+
+function residenceEntranceId(home){
+  return home?.outside_room||residenceLayout(home)?.outside_room||'';
+}
+
+function residenceRoomNavigation(home,room){
+  return room?.navigation||residenceLayout(home)?.navigation?.[room?.id]||{};
+}
+
+/** Keeps the character sheet and the location registry's resident list in sync. */
+function linkCharacterHome(character,previousHomeId=''){
+  const home=characterHomeLocation(character),nextId=home?.id||'';
+  if(previousHomeId&&previousHomeId!==nextId){
+    const previous=P.locations.find(location=>location.id===previousHomeId);
+    if(previous&&Array.isArray(previous.residents))
+      previous.residents=previous.residents.filter(id=>id!==character.id);
+  }
+  if(!home)return null;
+  if(!Array.isArray(home.residents))home.residents=[];
+  if(!home.residents.includes(character.id))home.residents.push(character.id);
+  character.home=character.home||{};
+  character.home.location_id=home.id;
+  if(character.home.residence_id!==undefined)character.home.residence_id=home.id;
+  character.home.district=home.district||'';
+  character.home.residence=home.name||pretty(home.id);
+  if(!Array.isArray(character.home.household))character.home.household=[];
+  return home;
+}
+
+function setCharacterHomeLocation(character,locationId){
+  const home=P.locations.find(location=>location.id===locationId);
+  if(!home)throw new Error('Choose a residence from the location registry.');
+  const oldId=character?.home?.location_id||character?.home?.residence_id||'';
+  character.home=character.home||{};character.home.location_id=home.id;
+  linkCharacterHome(character,oldId);
+  (character.schedule?.fixed_commitments||[]).forEach(commitment=>{
+    if(commitment.home_placement&&String(commitment.location||'').split('.')[0]===oldId)
+      commitment.location=home.id;
+  });
+  return home;
+}
+
 function importSheet(raw){
   const s=typeof raw==='string'?JSON.parse(raw):raw;
   const id=s.id||slug(s.display_name||'character');
   const at=P.characters.findIndex(c=>c.id===id);
+  const previousHomeId=at>=0?(P.characters[at].home?.location_id||P.characters[at].home?.residence_id||''):'';
   const rec={...s,id,name:s.display_name||s.name||id,
     color:(P.characters[at]?.color)||PAL[P.characters.length%PAL.length]};
   at>=0?P.characters[at]=rec:P.characters.push(rec);
   if(Array.isArray(P.dismissedBundledCharacters))
     P.dismissedBundledCharacters=P.dismissedBundledCharacters.filter(characterId=>characterId!==id);
   derivePlaces(rec);
+  linkCharacterHome(rec,previousHomeId);
   return rec.name;
 }
 

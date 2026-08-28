@@ -78,12 +78,13 @@ editor's scene structure automatically, so the model does not need to write JSON
    deliberately replacing one character from a separate checkout. Or choose
    **New character** to make a complete Port Alder NPC sheet from a
    guided form. It starts with every required field, the 12 relationship meters,
-   five relationship story milestones, preferred non-romantic hangouts, an
+   five relationship levels with flexible quest counts, preferred non-romantic hangouts, an
    invitation threshold, and a weekday schedule you can edit afterward.
    **World builder** adds reusable custom stats (such as Confidence or Stress) and
    creates a location with its rooms in one step. Open a character's sheet to set
-   their identity, pronouns, presentation, traits, likes, dislikes, fears, strengths,
-   and starting values for those custom stats. Use **Download game locations** after
+   their display name, identity, pronouns, presentation, traits, likes, dislikes, fears, strengths,
+   residence, home routine, and starting values for those custom stats. Use
+   **Download game locations** after
    creating places, then put that file in the game's `content/world` folder.
 3. **Inspect → Missing characters → Add all as stubs** creates referenced NPCs
    who have no sheet yet. The Player is built in: every new game creates them from
@@ -95,20 +96,58 @@ editor's scene structure automatically, so the model does not need to write JSON
 ## Lasting relationship consequences
 
 Open a character’s sheet to edit their **Social activity preferences** and five
-**Relationship story milestones**. The milestone rows show the game’s shared-activity,
+**Relationship levels**. The level rows show the game’s shared-activity,
 bond, trust, and dating-agreement requirements. **Build story arc** creates the
 matching quest and opens it in the Quest builder; **Edit story arc** opens an existing
 one. The quest uses the milestone id, so Port Alder can start it when that level is
 earned. Renaming a linked milestone also renames its quest references safely.
 
 Use **Story arc workshop** from the selected character’s Cast panel or sheet header
-to plan all five milestones together. Each milestone records its shared, platonic,
+to plan all of that character’s stories. The **Relationship path** tab sets the total
+planned quest count or zero to ten quests at each of the five relationship levels. Short arcs can skip levels;
+long arcs can contain several sequential quests at a level. Reducing the count never
+deletes quest content already written. Each level records its shared, platonic,
 or romantic route; central conflict; important player choice; lasting consequence;
 future callback; primary location; supporting cast; required memories; prerequisites;
 and writer notes. The workshop reports missing objectives and dialogue, links the
 conversations that complete quest objectives, and lets you reorder objectives by
 dragging them or using the arrow buttons. **Scaffold missing quests** creates every
-same-id milestone quest that has not been written yet without replacing existing work.
+planned quest that has not been written yet without replacing existing work.
+
+Choose **+ New story arc** for stories that are about the character but are not a
+relationship-meter level. These independent arcs can be friendship, workplace,
+career, family, personal, transformation, mystery, slice-of-life, or custom stories,
+and can contain 1–50 quests. Their entry can require friendship, trust, respect, love,
+or another supported meter; a state such as
+`player.employment.job=restaurant_kitchen`; a memory; or earlier quests. Set an arc
+to **Optional** to plan explicit accept, defer, and decline choices. The decline
+outcome should leave unrelated content with that character available. This is the
+right place for a long optional story such as Emma offering a restaurant employee a
+different presentation and uniform path toward a waitress job.
+
+Changing a character’s **Display name** does not change their internal id or exported
+filename. Existing schedules, conversations, messages, and quests therefore continue
+to point at the same character.
+
+## Character homes and routines
+
+Open **Cast → Edit sheet & limits → Residence** to inspect or change where a character
+lives. The home selector uses the full Port Alder registry, including family homes,
+dorms, apartments, townhouses, condos, and other residential listings. Moving a
+character updates both the `.character` home link and the residence’s writer-facing
+resident list. The link is rebuilt after registry refreshes, so it does not drift.
+
+The room map shows the entrance, private/shared access, room actions, and every
+directional exit. Hale Home’s arrows currently come from its older Godot runtime map;
+the editor labels that exception. All newer NPC homes use `all_locations.json`.
+Discovery controls set whether a home is visible before it is found, whether an
+invitation is required, and which events can discover it. These per-project choices
+survive a later refresh of the bundled game registry.
+
+Use **Default home routine** to choose the character’s room, activity, and visibility
+for each of the seven daily blocks. **Open weekly schedule** handles specific work,
+school, and day-of-week exceptions. If a scheduled commitment has a home placement,
+the Residence section lists that placement alongside the default routine.
 
 In **Plan scene**, use **Lasting consequence** to unlock a character's next
 relationship chapter and/or create a named memory when that scene finishes. The
