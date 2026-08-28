@@ -68,7 +68,7 @@ $('scApply').onclick=()=>{
   const location=$('scLoc').value,activity=$('scAct').value.trim()||location;
   scSel.forEach(k=>{
     if(!location&&!activity)delete g[k];
-    else g[k]={activity,location,unavailable:$('scBusy').checked};
+    else g[k]={activity,location,unavailable:$('scBusy').checked,_meta:g[k]?._meta||{}};
   });
   setSchedule(c,g);paintSchedule();paintPresence();paintBody();
 };

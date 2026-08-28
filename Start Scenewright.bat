@@ -2,9 +2,33 @@
 setlocal
 cd /d "%~dp0"
 
-if not exist "%~dp0scenewright.html" (
-  echo Scenewright could not start because scenewright.html is missing.
-  echo Run build.py, then try this launcher again.
+rem Rebuild first so the bundled Port Alder registry follows the current game files.
+where py.exe >nul 2>&1
+if not errorlevel 1 (
+  set "SCENEWRIGHT_PYTHON=py.exe"
+  set "SCENEWRIGHT_PY_ARGS=-3"
+  goto build_app
+)
+where python.exe >nul 2>&1
+if not errorlevel 1 (
+  set "SCENEWRIGHT_PYTHON=python.exe"
+  set "SCENEWRIGHT_PY_ARGS="
+  goto build_app
+)
+
+echo Scenewright needs Python, but neither py.exe nor python.exe was found.
+echo Install Python from python.org and enable "Add Python to PATH".
+pause
+exit /b 1
+
+:build_app
+if defined SCENEWRIGHT_PY_ARGS (
+  "%SCENEWRIGHT_PYTHON%" %SCENEWRIGHT_PY_ARGS% "%~dp0build.py"
+) else (
+  "%SCENEWRIGHT_PYTHON%" "%~dp0build.py"
+)
+if errorlevel 1 (
+  echo Scenewright could not update its files.
   pause
   exit /b 1
 )
@@ -23,30 +47,11 @@ for /L %%P in (8765,1,8774) do (
   call :is_listening %%P
   if errorlevel 1 (
     set "SCENEWRIGHT_PORT=%%P"
-    goto find_python
+    goto start_server
   )
 )
 
 echo Scenewright could not find a free local port between 8765 and 8774.
-pause
-exit /b 1
-
-:find_python
-where py.exe >nul 2>&1
-if not errorlevel 1 (
-  set "SCENEWRIGHT_PYTHON=py.exe"
-  set "SCENEWRIGHT_PY_ARGS=-3"
-  goto start_server
-)
-where python.exe >nul 2>&1
-if not errorlevel 1 (
-  set "SCENEWRIGHT_PYTHON=python.exe"
-  set "SCENEWRIGHT_PY_ARGS="
-  goto start_server
-)
-
-echo Scenewright needs Python, but neither py.exe nor python.exe was found.
-echo Install Python from python.org and enable "Add Python to PATH".
 pause
 exit /b 1
 

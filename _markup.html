@@ -17,6 +17,7 @@
       <button class="btn" id="openCharacterCreator" title="Create a new character">+ Character</button>
       <button class="btn" id="openWorld" title="Create stats, locations, and rooms">+ World</button>
       <button class="btn" id="openQuestBuilder" title="Create a quest and follow-up event">+ Quest</button>
+      <button class="btn" id="openPhoneBuilder" title="Write NPC and player text messages">+ Text</button>
       <button class="btn quiet" id="pasteChars" title="Paste character JSON">Paste</button>
     </div>
     <div class="mast-group mast-tools" aria-label="Project tools">
@@ -64,6 +65,8 @@
       <p class="hint" style="margin-top:5px">Things the player repeats. Milestones fire on the Nth time.</p>
       <p class="rubric later">Repeatables <button data-new="repeatable">+</button></p>
       <div class="chip-list" id="repList"></div>
+      <p class="rubric later">Text messages <button id="openPhoneBuilderRail" title="Write a text message">+</button></p>
+      <div class="text-rail-card"><span id="textMessageSummary">No authored texts yet</span><button class="btn quiet" id="manageTextMessages">Open builder</button></div>
       <p class="rubric later">Characters</p>
       <div class="row"><button class="btn" id="exportSheets">Export all sheets</button></div>
       <p class="hint" style="margin-top:6px">Writes every sheet back out with your edits applied.</p>
@@ -356,6 +359,18 @@
       <div class="field edfull"><label for="qbBranchIdeas">Branch ideas <span class="hint">planning notes</span></label><textarea id="qbBranchIdeas" rows="3" placeholder="If Emma's Trust is 50 or higher, she shares the secret. Otherwise, she asks for more proof."></textarea><p class="hint">Keep possible outcomes here while planning. Turn them into a stat branch when you write the scene where the choice happens.</p></div>
       <div class="field edfull"><label>Completion rewards / consequences</label><div class="reward-builder" id="qbRewardRows"></div><button class="btn reward-add" id="qbAddReward">+ Add another reward</button><p class="hint">Choose who changes, what changes, and an amount from −5 to +5. Add as many rewards as the quest needs.</p></div>
       <div class="field edfull"><label for="qbRewards">Other effects <span class="hint">advanced, optional</span></label><input id="qbRewards" placeholder="marina_favor_done; unlocked_calendar"><p class="hint">Use this only for flags, unlocks, memories, or effects not covered by the reward menus.</p></div>
+      <div class="field edfull quest-phone-offer">
+        <p class="rubric">Phone quest offer <span class="hint">optional</span></p>
+        <label class="checkline"><input type="checkbox" id="qbPhoneOffer"> Have the quest giver offer this quest by text</label>
+        <div id="qbPhoneOfferFields">
+          <label for="qbPhoneText">Message from the quest giver</label>
+          <textarea id="qbPhoneText" rows="4" placeholder="Hey, could you help me with something when you have a minute?"></textarea>
+          <label for="qbPhoneAccept">Player's accept reply</label>
+          <input id="qbPhoneAccept" placeholder="Sure. What do you need?">
+          <label class="checkline"><input type="checkbox" id="qbPhoneCompleteFirst"> The accept reply also completes the first objective</label>
+          <p class="hint" id="qbPhoneStatus">The reply starts this quest. You can add more replies and effects in the Text Message Builder.</p>
+        </div>
+      </div>
       <div class="field edfull"><p class="rubric">Completion event <span class="hint">optional</span></p></div>
       <div class="field"><label for="qbEventTitle">Event title</label><input id="qbEventTitle" placeholder="Meet at the marina"></div>
       <div class="field"><label for="qbEventDate">Game date</label><input id="qbEventDate" placeholder="Y1-08-23"></div>
@@ -364,6 +379,59 @@
     </div>
     <div id="qbObjectives"></div>
     <div class="row dialog-actions" style="margin-top:14px"><button class="btn" id="qbAddObjective">+ objective</button><span class="sp"></span><button class="btn gold" id="saveQuestBuilder">Save quest plan</button></div>
+  </div>
+</dialog>
+
+<dialog id="phoneBuilder" aria-labelledby="pbTitle">
+  <div class="sheet-head phone-builder-head">
+    <div><span class="phone-builder-kicker">Phone story authoring</span><h3 id="pbTitle">Text Message Builder</h3></div>
+    <span class="sp"></span>
+    <button class="btn" id="closePhoneBuilder">Done</button>
+  </div>
+  <div class="sheet-body phone-builder-body">
+    <div class="phone-builder-layout">
+      <aside class="phone-contacts-panel">
+        <p class="rubric">Contact</p>
+        <p class="hint">Messages live directly on the selected NPC's character sheet.</p>
+        <div id="pbContacts" class="phone-contact-list"></div>
+      </aside>
+      <section class="phone-message-panel">
+        <div class="phone-panel-title"><div><p class="rubric">Messages</p><span id="pbContactSummary" class="hint"></span></div><button class="btn gold" id="pbNewBlank">+ Blank</button></div>
+        <div class="phone-template-grid" aria-label="Message templates">
+          <button data-pb-template="checkin">Check-in</button>
+          <button data-pb-template="quest_offer">Quest offer</button>
+          <button data-pb-template="reminder">Reminder</button>
+          <button data-pb-template="followup">Follow-up</button>
+          <button data-pb-template="player_text">Player text</button>
+        </div>
+        <div id="pbMessages" class="phone-message-list"></div>
+      </section>
+      <section class="phone-editor-panel">
+        <div id="pbEmpty" class="phone-empty-state"><b>Choose a message</b><span>or start from one of the templates.</span></div>
+        <div id="pbEditor" hidden>
+          <div class="phone-editor-toolbar"><span class="tag" id="pbDirectionBadge">Incoming</span><button class="btn quiet" id="pbDuplicate">Duplicate</button><button class="btn danger" id="pbDelete">Delete</button></div>
+          <div class="phone-preview" aria-label="Live phone preview"><div class="phone-preview-bar"><span id="pbPreviewContact">Contact</span><small>Messages</small></div><div id="pbPreviewBubble" class="phone-preview-bubble incoming"></div></div>
+          <div class="phone-form-grid">
+            <div class="field"><label for="pbMessageId">Message ID</label><input id="pbMessageId" spellcheck="false"></div>
+            <div class="field"><label for="pbDirection">Direction</label><select id="pbDirection"><option value="incoming">NPC → Player</option><option value="outgoing">Player → NPC</option></select></div>
+            <div class="field edfull"><label for="pbText">Exact text shown in the game</label><textarea id="pbText" rows="6" placeholder="Write the text message exactly as the player should see it."></textarea><p class="hint">This is authored text—not an AI prompt. The preview updates as you type.</p></div>
+            <div class="field"><label for="pbTriggerType">When it becomes available</label><select id="pbTriggerType"><option value="sandbox_activated">Sandbox begins</option><option value="quest_started">Quest starts</option><option value="objective_completed">Objective completes</option><option value="hours_after_quest">Hours after quest</option><option value="hours_before_calendar_event">Hours before event</option><option value="message_sent">After a text is sent</option><option value="message_replied">After any reply to a text</option><option value="reply_selected">After a specific reply</option><option value="always">Always available (player text)</option></select></div>
+            <div class="field"><label for="pbTriggerRef" id="pbTriggerRefLabel">Reference</label><select id="pbTriggerRef"></select></div>
+            <div class="field" id="pbTriggerDetailField"><label for="pbTriggerDetail" id="pbTriggerDetailLabel">Objective / hours</label><input id="pbTriggerDetail" list="pbTriggerDetailChoices"><datalist id="pbTriggerDetailChoices"></datalist></div>
+            <div class="field"><label>Only on these days <span class="hint">optional</span></label><div id="pbDay" class="phone-gate-checks"><label><input type="checkbox" value="monday">Mon</label><label><input type="checkbox" value="tuesday">Tue</label><label><input type="checkbox" value="wednesday">Wed</label><label><input type="checkbox" value="thursday">Thu</label><label><input type="checkbox" value="friday">Fri</label><label><input type="checkbox" value="saturday">Sat</label><label><input type="checkbox" value="sunday">Sun</label></div><p class="hint">Leave every day clear to allow any day.</p></div>
+            <div class="field"><label>Only at these times <span class="hint">optional</span></label><div id="pbBlock" class="phone-gate-checks"><label><input type="checkbox" value="early_morning">Early</label><label><input type="checkbox" value="morning">Morning</label><label><input type="checkbox" value="lunch">Lunch</label><label><input type="checkbox" value="afternoon">Afternoon</label><label><input type="checkbox" value="evening">Evening</label><label><input type="checkbox" value="late_evening">Late</label><label><input type="checkbox" value="night">Night</label></div><p class="hint">Leave every time clear to allow any time.</p></div>
+            <div class="field"><label for="pbFlagGate">Required flag <span class="hint">optional</span></label><input id="pbFlagGate" placeholder="story.ready"></div>
+            <div class="field"><label for="pbFlagMode">Flag must be</label><select id="pbFlagMode"><option value="set">Set / true</option><option value="not">Not set / false</option></select></div>
+            <div class="field"><label for="pbMeterGate">Relationship gate <span class="hint">optional</span></label><select id="pbMeterGate"><option value="">No meter gate</option><option>friendship</option><option>trust</option><option>love</option><option>respect</option><option>comfort</option><option>attraction</option><option>commitment</option><option>compatibility</option><option>satisfaction</option><option>resentment</option><option>jealousy</option><option>lust</option></select></div>
+            <div class="field phone-meter-gate"><label for="pbMeterOp">Comparison</label><select id="pbMeterOp"><option value="at_least">At least</option><option value="at_most">At most</option></select><input id="pbMeterValue" type="number" value="50" aria-label="Relationship value"></div>
+            <div class="field edfull"><label class="checkline"><input type="checkbox" id="pbIntroduces"> Introduce this NPC as a new phone contact when the incoming text arrives</label></div>
+          </div>
+          <section class="phone-reply-section"><div class="phone-section-title"><div><p class="rubric">Additional message conditions</p><span class="hint">Optional advanced gates. Every row must pass.</span></div><button class="btn" id="pbAddCondition">+ Condition</button></div><div id="pbConditions" class="phone-conditions"></div></section>
+          <section id="pbOutgoingEffectsSection" class="phone-reply-section"><div class="phone-section-title"><div><p class="rubric">Effects when sent</p><span class="hint">For a player-authored outgoing text.</span></div><button class="btn" id="pbAddOutgoingEffect">+ Effect</button></div><div id="pbOutgoingEffects"></div></section>
+          <section id="pbRepliesSection" class="phone-reply-section"><div class="phone-section-title"><div><p class="rubric">Player quick replies</p><span class="hint">Add as many reply choices as this message needs.</span></div><button class="btn" id="pbAddReply">+ Reply</button></div><div id="pbReplies"></div></section>
+        </div>
+      </section>
+    </div>
   </div>
 </dialog>
 

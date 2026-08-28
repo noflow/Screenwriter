@@ -63,8 +63,8 @@ function putPlanOnScene(){
   const c=newPlannedScene(),p=plannerFields();
   const target=scenePlanTarget(c);
   p.brief=plannerBrief(p);target.scenePlan=p;target.premise=p.brief;
-  const place=P.locations.find(l=>l.id===p.setting||l.name.toLowerCase()===p.setting.toLowerCase());
-  if(place)c.location=place.id;
+  const place=resolvePlaceRef(p.setting);
+  if(place)c.location=place;
   if(p.goal&&c.type==='activity'&&(!target.title||/^New milestone$/i.test(target.title)))target.title=p.goal.slice(0,60);
   else if(p.goal&&(!c.title||c.title==='Planned scene'))c.title=p.goal.slice(0,60);
   save();paintSetup();paintContent();

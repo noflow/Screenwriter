@@ -38,7 +38,7 @@ function flagRegistry(){
       {kind:r.type==='custom_stat'?'character_stat':'meter',character:r.character,key:r.key});
     if(r.type==='met')touch('met_'+r.character,'reads',where,{kind:'flag',state_key:'met_'+r.character});
   });
-  const writeEffects=(raw,where)=>compileEffects(raw).forEach(e=>{
+  const writeEffect=(e,where)=>{
     if(e.operation==='add_meter')
       touch(e.character+'.'+e.meter,'sets',where,{kind:'meter',character:e.character,key:e.meter});
     else if(e.operation==='add_character_stat')
@@ -51,7 +51,36 @@ function flagRegistry(){
       touch(e.key,'sets',where,{kind:'counter',state_key:e.key,value:+e.value||0});
     else if(e.operation==='set_flag')
       touch(e.key,'sets',where,{kind:'flag',state_key:e.key,value:e.value!==false});
-  });
+  };
+  const writeEffects=(raw,where)=>compileEffects(raw).forEach(e=>writeEffect(e,where));
+  const readPhoneState=(raw,where,negated=false)=>{
+    if(Array.isArray(raw))touch(raw[0],'reads',where,
+      {kind:raw.length>1?'value':'flag',state_key:raw[0],value:raw.length>1?raw[1]:!negated});
+    else if(raw)touch(raw,'reads',where,{kind:'flag',state_key:raw,value:!negated});
+  };
+  const readPhoneMeter=(raw,owner,where)=>{
+    if(!Array.isArray(raw))return;
+    const character=raw.length===2?owner?.id:raw[0];
+    const key=raw.length===2?raw[0]:raw[1];
+    if(character&&key)touch(character+'.'+key,'reads',where,{kind:'meter',character,key});
+  };
+  const readPhoneRules=(rules,where,owner)=>{
+    if(!Array.isArray(rules))return;
+    rules.forEach(rule=>{
+      if(rule?.flag)readPhoneState(rule.flag,where);
+      if(rule?.flag_not)readPhoneState(rule.flag_not,where,true);
+      if(Array.isArray(rule?.value_equals))touch(rule.value_equals[0],'reads',where,
+        {kind:'value',state_key:rule.value_equals[0],value:rule.value_equals[1]});
+      readPhoneMeter(rule?.meter_at_least||rule?.meter_at_most,owner,where);
+    });
+  };
+  const readPhoneTrigger=(trigger,where,owner)=>{
+    if(!trigger)return;
+    readPhoneState(trigger.flag,where);
+    readPhoneState(trigger.flag_not,where,true);
+    readPhoneMeter(trigger.meter_at_least,owner,where);
+    readPhoneMeter(trigger.meter_at_most,owner,where);
+  };
 
   P.content.forEach(c=>{
     const w=c.title||c.id;
@@ -71,6 +100,15 @@ function flagRegistry(){
       writeEffects(n.flag,w);
       readReqs(n.requires,w);}
   });
+  allTextMessages().forEach(({owner,message})=>{
+    const w='Text · '+owner.name+' · '+(message.id||'untitled');
+    readPhoneTrigger(message.trigger,w,owner);readPhoneRules(message.conditions,w,owner);
+    (message.effects||[]).forEach(effect=>writeEffect(effect,w));
+    (message.quick_replies||[]).forEach((reply,index)=>{
+      const rw=w+' · reply '+(index+1);readPhoneRules(reply.conditions,rw,owner);
+      (reply.effects||[]).forEach(effect=>writeEffect(effect,rw));
+    });
+  });
   return reg;
 }
 
@@ -87,7 +125,7 @@ function emotionRegistry(){
 
 function coverage(){
   const per={};
-  const bump=(id,k,n)=>{per[id]=per[id]||{conv:0,quest:0,rep:0,routes:0};per[id][k]+=n;};
+  const bump=(id,k,n)=>{per[id]=per[id]||{conv:0,quest:0,rep:0,routes:0,texts:0};per[id][k]+=n;};
   npcs().forEach(c=>bump(c.id,'conv',0));
   walkAll((n,c)=>{if(n.type==='line')bump(n.speaker,c.type==='quest'?'quest':'conv',1);});
   P.content.forEach(c=>{
@@ -95,6 +133,7 @@ function coverage(){
     if(c.type==='conversation')routes(c.nodes||[],[]).forEach(()=>
       (c.cast||[]).forEach(id=>bump(id,'routes',1)));
   });
+  allTextMessages().forEach(({owner})=>bump(owner.id,'texts',1));
   return per;
 }
 

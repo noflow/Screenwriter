@@ -210,18 +210,20 @@ function paintInspect(){
 
   if(insTab==='cov'){
     const cov=coverage();
-    const max=Math.max(1,...Object.values(cov).map(c=>c.conv+c.quest+c.rep));
+    const max=Math.max(1,...Object.values(cov).map(c=>c.conv+c.quest+c.rep+c.texts));
     B.innerHTML='<div class="legend"><span><i style="background:var(--brass)"></i>conversation</span>'+
       '<span><i style="background:var(--sky)"></i>quest</span>'+
-      '<span><i style="background:var(--sage)"></i>repeatable</span></div>'+
+      '<span><i style="background:var(--sage)"></i>repeatable</span>'+
+      '<span><i style="background:var(--rose)"></i>phone text</span></div>'+
       P.characters.map(c=>{
-        const v=cov[c.id]||{conv:0,quest:0,rep:0,routes:0},t=v.conv+v.quest+v.rep;
+        const v=cov[c.id]||{conv:0,quest:0,rep:0,routes:0,texts:0},t=v.conv+v.quest+v.rep;
         const pc=x=>(x/max*100).toFixed(1)+'%';
         return '<div class="bar"><span class="nm">'+esc(c.name)+'</span>'+
           '<span class="track"><span class="fill" style="width:'+pc(v.conv)+';background:var(--brass)"></span>'+
           '<span class="fill" style="width:'+pc(v.quest)+';background:var(--sky)"></span>'+
-          '<span class="fill" style="width:'+pc(v.rep)+';background:var(--sage)"></span></span>'+
-          '<span class="num">'+t+' lines</span></div>';
+          '<span class="fill" style="width:'+pc(v.rep)+';background:var(--sage)"></span>'+
+          '<span class="fill" style="width:'+pc(v.texts)+';background:var(--rose)"></span></span>'+
+          '<span class="num">'+t+' lines · '+v.texts+' texts</span></div>';
       }).join('')+
       '<p class="rubric later">By location</p>'+
       P.locations.map(l=>{

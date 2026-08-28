@@ -20,8 +20,11 @@ $('railToggle').onclick=()=>$('rail').classList.toggle('open');
 function paintAll(){paintCast();paintSheet();paintPlaces();paintPlaceForm();paintContent();paintSetup();paintBody();paintSayAs();}
 
 const stored=disk.get();
-if(stored&&stored.characters){P=stored;
-  DISTRICTS=P.districts||[];TRAVEL=P.travel||null;ALIASES=P.aliases||{};}
+const locationRefresh=stored&&typeof stored==='object'
+  ? restoreProject(stored)
+  : syncBundledLocations();
+const characterRefresh=syncBundledCharacters();
+if(locationRefresh||characterRefresh?.updated)save();
 document.addEventListener('keydown',e=>{
   if(e.key!=='Escape')return;
   document.querySelectorAll('dialog[open]').forEach(d=>d.close());

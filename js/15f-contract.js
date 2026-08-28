@@ -234,6 +234,9 @@ function godotCheck(){
   const out=[],add=(sev,msg,where)=>out.push({sev,msg,where});
   const R=stateRegistry();
 
+  if(typeof validatePhoneAuthoring==='function')validatePhoneAuthoring((sev,msg,where)=>
+    add(sev==='err'?'fatal':sev,msg,where));
+
   R.conflicts.forEach(c=>add('fatal','"'+c.key+'" is used with incompatible types: '+
     c.types.map(t=>t.type+' in '+t.where.join(', ')).join('; ')+'. Use one state type for this key.',
     'Flags'));
@@ -273,6 +276,24 @@ function godotCheck(){
     const w=c.title||c.id;
     placeCheck(c.location,w,'This item');
     (c.stages||[]).forEach((s,i)=>placeCheck(s.location,w,'Stage '+(i+1)));
+    const event=c.type==='quest'&&(c.questPlan?.eventDraft||c.questPlan?.event);
+    if(event)placeCheck(event.location,w,'The follow-up event');
+  });
+  P.characters.filter(c=>!isPlayer(c)).forEach(c=>{
+    const w=c.name||c.id;
+    const home=c.home?.location_id||c.home?.residence_id;
+    placeCheck(home,w,'The home');
+    const placementCheck=(placement,what)=>{
+      if(placement?.room)placeCheck(locPart(home)+'.'+placement.room,w,what);
+    };
+    (c.schedule?.fixed_commitments||[]).forEach((f,i)=>{
+      placeCheck(f.location,w,'Schedule commitment '+(i+1));
+      placementCheck(f.home_placement,'Schedule commitment '+(i+1)+' home placement');
+    });
+    Object.values(c.home_routine?.default_by_block||{}).forEach((p,i)=>
+      placementCheck(p,'Home-routine placement '+(i+1)));
+    (c.home_routine?.overrides||[]).forEach((p,i)=>
+      placementCheck(p,'Home-routine override '+(i+1)));
   });
 
   R.stats.filter(s=>s.max===null).forEach(s=>{

@@ -151,7 +151,8 @@ async function run(){
         if(d.title)c.title=String(d.title).slice(0,60);
         if(!c.id||/^scene_\d+$/.test(c.id))c.id=slug(d.title||c.title||c.id);
       }
-      if(d.location&&loc(d.location))c.location=d.location;
+      const generatedLocation=resolvePlaceRef(d.location);
+      if(generatedLocation)c.location=generatedLocation;
       if(d.block&&BLOCKS.includes(d.block))c.block=d.block;
       const found=[...new Set(nodes.flatMap(function pick(n){
         return n.type==='line'?[n.speaker]

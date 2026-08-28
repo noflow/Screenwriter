@@ -31,6 +31,18 @@ vm.runInContext(`
   var DISTRICTS=[],TRAVEL=null,ALIASES={};
   function customStatDefs(){ return [{id:'courage',label:'Courage',minimum:0,maximum:100,default:10}]; }
   function placeName(ref){ return ref; }
+  function resolvePlaceRef(value){
+    const wanted=slug(String(value||'').replace(/[—–>-]+/g,' '));
+    const matches=[];
+    P.locations.forEach(place=>{
+      if([place.id,place.name].map(slug).includes(wanted))matches.push(place.id);
+      (place.rooms||[]).forEach(room=>{
+        const ref=place.id+'.'+room.id;
+        if([ref,room.id,room.name,place.name+' '+room.name].map(slug).includes(wanted))matches.push(ref);
+      });
+    });
+    const unique=[...new Set(matches)];return unique.length===1?unique[0]:null;
+  }
   function paintAll(){}
   function openQuestBuilder(){}
   function updateQuestFromBuilder(){ return qbQuest; }

@@ -6,6 +6,9 @@ const COMPLETIONS=[
   ['list_size_at_least','when a list reaches a size',['key','value']],
   ['meter_at_least','when a meter reaches a level',['character','meter','value']],
   ['activity_count_at_least','after an activity succeeds N times',['activity','value']],
+  ['text_received','when an NPC text arrives',['character','message']],
+  ['text_replied','after the player replies to a text',['thread']],
+  ['text_sent','after the player sends a text',['character','message']],
   ['quest_completed','after another quest',['quest']],
   ['item_acquired','when an item is obtained',['item']],
   ['days_elapsed','after N in-game days',['value']]
@@ -28,6 +31,16 @@ function completionEditor(s,owner){
       '<option value="">— pick activity —</option>'+P.content.filter(x=>x.type==='activity').map(x=>
       '<option value="'+esc(x.id)+'"'+(x.id===c.activity?' selected':'')+'>'+esc(x.title||x.id)+'</option>'
       ).join('')+'</select>';
+    if(f==='thread'||f==='message'){
+      const wanted=c.event==='text_sent'?'outgoing':'incoming';
+      const messages=allTextMessages().filter(entry=>textMessageDirection(entry.message)===wanted);
+      const current=c[f]||'',known=messages.some(entry=>entry.message.id===current);
+      return '<select data-cp="'+owner+':'+f+'"><option value="">— pick text —</option>'+
+        (!known&&current?'<option value="'+esc(current)+'" selected>⚠ Missing — '+esc(current)+'</option>':'')+
+        messages.map(entry=>'<option value="'+esc(entry.message.id)+'"'+
+          (entry.message.id===current?' selected':'')+'>'+esc(entry.owner.name)+' — '+
+          esc(String(entry.message.text||entry.message.id).slice(0,48))+'</option>').join('')+'</select>';
+    }
     if(f==='character')return '<select data-cp="'+owner+':character">'+P.characters.map(x=>
       '<option value="'+esc(x.id)+'"'+(x.id===c.character?' selected':'')+'>'+esc(x.name)+'</option>'
       ).join('')+'</select>';
@@ -52,7 +65,10 @@ function wireCompletion(root){
       if(f==='event'){s.completion={event:el.value};}
       else if(f==='allowed_values')s.completion[f]=el.value.split(',').map(x=>x.trim()).filter(Boolean);
       else if(f==='value')s.completion[f]=parseInt(el.value,10)||0;
-      else s.completion[f]=el.value;
+      else if(f==='message'){
+        s.completion[f]=el.value;
+        const entry=textMessageById(el.value);if(entry)s.completion.character=entry.owner.id;
+      }else s.completion[f]=el.value;
       save();paintBody();
     };
     el.tagName==='SELECT'?el.onchange=h2:el.onblur=h2;

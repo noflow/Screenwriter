@@ -1,8 +1,10 @@
 [
  "js/00-state.js",
  "js/01-sheets.js",
+ "js/01a-game-characters.js",
  "js/01b-character-creator.js",
  "js/02-places.js",
+ "js/02a-game-locations.js",
  "js/02b-world-builder.js",
  "js/03-schedule.js",
  "js/04-ollama.js",
@@ -18,6 +20,7 @@
  "js/08g-quest.js",
  "js/08h-quest-builder.js",
  "js/08i-quest-workshop.js",
+ "js/08j-phone-builder.js",
  "js/09-modes.js",
  "js/10-brief.js",
  "js/10b-speakers.js",

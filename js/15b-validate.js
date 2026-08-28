@@ -7,8 +7,237 @@ const lev=(a,b)=>{
   return m[b.length][a.length];
 };
 
+function validatePhoneAuthoring(add){
+  const seen=new Map(),entries=allTextMessages();
+  const quests=new Map(P.content.filter(c=>c.type==='quest').map(c=>[c.id,c]));
+  const eventKeys=['sandbox_activated','quest_started','objective_completed',
+    'hours_after_quest','hours_before_calendar_event','message_sent','message_replied','reply_selected'];
+  const triggerKeys=new Set([...eventKeys,'days','blocks','flag','flag_not','meter_at_least','meter_at_most']);
+  const meters=new Set(['friendship','love','attraction','lust','trust','respect','resentment',
+    'jealousy','comfort','commitment','compatibility','satisfaction']);
+  const metricKnown=key=>meters.has(key);
+  const conditionList=(raw,where)=>{
+    if(raw===undefined)return [];
+    if(Array.isArray(raw))return raw;
+    if(raw&&typeof raw==='object'){
+      add('err','Phone conditions must be a list of gates.',where);return [raw];
+    }
+    add('err','Phone conditions must be a list of gates.',where);return [];
+  };
+  const conditionCheck=(rule,where,owner)=>{
+    if(!rule||typeof rule!=='object')return add('err','A phone condition is malformed.',where);
+    if(Object.keys(rule).length!==1)return add('err','Each phone condition must contain one gate.',where);
+    const stat=rule.meter_at_least||rule.meter_at_most;
+    if(stat){
+      if(!Array.isArray(stat)||![2,3].includes(stat.length))return add('err','A phone meter condition needs a meter, value, and optional character.',where);
+      const character=stat.length===2?owner.id:stat[0],meter=stat.at(-2),value=stat.at(-1);
+      if(!authoredChr(character))add('err','Phone condition refers to missing character "'+character+'".',where);
+      if(!metricKnown(meter))add('err','Phone condition uses unknown meter "'+meter+'".',where);
+      if(!Number.isFinite(+value))add('err','Phone condition meter value must be a number.',where);
+      return;
+    }
+    const flag=rule.flag||rule.flag_not;
+    if(flag){
+      if(!(typeof flag==='string'&&flag.trim())&&
+         !(Array.isArray(flag)&&flag.length===2&&String(flag[0]||'').trim()))
+        add('err','A phone flag condition needs a flag key.',where);
+      return;
+    }
+    if(rule.value_equals){
+      if(!Array.isArray(rule.value_equals)||rule.value_equals.length!==2||!String(rule.value_equals[0]||'').trim())
+        add('err','A phone value condition needs a state key and expected value.',where);
+      return;
+    }
+    add('err','Phone condition uses an unsupported rule.',where);
+  };
+  const questRef=(effect)=>String(effect.quest||
+    (['start_quest','complete_quest'].includes(effect.operation)?effect.value||'':'')||'');
+  const effectCheck=(effect,where,strict=true,owner=null)=>{
+    if(!effect||typeof effect!=='object')return add('err','A phone effect is malformed.',where);
+    const operation=String(effect.operation||'');
+    const supported=['add_meter','start_quest','complete_objective','complete_quest','set_quest_state',
+      'set_flag','set_value','open_calendar_scheduler','open_calendar_rescheduler'];
+    if(!supported.includes(operation))return add('err','Phone effect "'+(operation||'?')+'" is not supported by the game.',where);
+    if(operation==='add_meter'){
+      const character=effect.character||owner?.id;
+      if(!authoredChr(character))add('err','Phone reward refers to missing character "'+character+'".',where);
+      if(!metricKnown(effect.meter))add('err','Phone reward uses unknown meter "'+effect.meter+'".',where);
+      if(!Number.isFinite(+effect.value))add('err','Phone reward amount must be a number.',where);
+    }
+    if(['start_quest','complete_objective','complete_quest','set_quest_state'].includes(operation)){
+      const questId=questRef(effect),quest=quests.get(questId);
+      if(!quest)add(strict?'err':'warn','Phone effect refers to quest "'+questId+
+        '", which is not loaded in this Screenwriter project.',where);
+      const objective=effect.objective||effect.value;
+      if(operation==='complete_objective'&&quest&&!(quest.stages||[]).some(s=>s.id===objective))
+        add('err','Phone effect refers to missing objective "'+objective+'" in '+questId+'.',where);
+      if(operation==='set_quest_state'&&!['deferred','failed'].includes(effect.value))
+        add('err','Phone quest state must be deferred or failed.',where);
+    }
+    if(operation==='set_flag'&&!String(effect.key||'').trim())add('err','Phone flag effect needs a flag key.',where);
+    if(operation==='set_value'&&!String(effect.key||'').trim())add('err','Phone value effect needs a state key.',where);
+    if(operation==='open_calendar_scheduler'&&effect.participant&&!authoredChr(effect.participant))
+      add('err','Phone scheduler refers to missing character "'+effect.participant+'".',where);
+    if(operation==='open_calendar_scheduler'&&effect.valid_quest&&!quests.has(effect.valid_quest))
+      add(strict?'err':'warn','Phone scheduler refers to quest "'+effect.valid_quest+
+        '", which is not loaded in this Screenwriter project.',where);
+    if(operation==='open_calendar_rescheduler'&&!String(effect.event||effect.value||'').trim())
+      add('err','Phone rescheduler effect needs a calendar event id.',where);
+  };
+
+  entries.forEach(({owner,message})=>{
+    const where='Text · '+owner.name+' · '+(message.id||'untitled'),id=String(message.id||'');
+    const strict=Object.prototype.hasOwnProperty.call(message,'direction');
+    if(!id)add('err','A phone message has no id.',where);
+    else if(slug(id)!==id)add('err','Phone message id "'+id+'" must use lowercase words joined by underscores.',where);
+    if(id.startsWith('reply-'))add('err','Phone message ids cannot start with "reply-"; the runtime reserves that prefix.',where);
+    if(id&&seen.has(id))add('err','Phone message id "'+id+'" is also used by '+seen.get(id)+'. Message ids must be unique across every contact.',where);
+    if(id)seen.set(id,owner.name);
+    const direction=textMessageDirection(message);
+    if(!['incoming','outgoing'].includes(direction))add('err','Phone message direction must be incoming or outgoing.',where);
+    if(direction==='incoming'&&message.sender&&message.sender!==owner.id)
+      add('err','Incoming sender must be the owning contact "'+owner.id+'".',where);
+    if(direction==='outgoing'&&message.sender!=='player')add('err','Outgoing messages must be sent by the runtime Player.',where);
+    if(!String(message.text||'').trim())add('err','Phone message text is empty.',where);
+    if(direction==='outgoing'&&message.introduces_contact)add('err','Only an incoming message can introduce a new phone contact.',where);
+    const trigger=message.trigger&&typeof message.trigger==='object'&&!Array.isArray(message.trigger)?message.trigger:{};
+    if(trigger!==message.trigger)add('err','Phone message trigger must be an object.',where);
+    Object.keys(trigger).filter(key=>!triggerKeys.has(key)).forEach(key=>
+      add('err','Phone message uses unsupported trigger "'+key+'".',where));
+    const active=eventKeys.filter(key=>Object.prototype.hasOwnProperty.call(trigger,key));
+    if(direction==='incoming'&&active.length!==1)
+      add('err','An incoming phone message needs exactly one arrival trigger.',where);
+    if(direction==='outgoing'&&active.length>1)
+      add('err','An outgoing phone message can have only one availability trigger.',where);
+    if(Object.prototype.hasOwnProperty.call(trigger,'sandbox_activated')&&typeof trigger.sandbox_activated!=='boolean')
+      add('err','Sandbox arrival trigger must be true or false.',where);
+    if(Object.prototype.hasOwnProperty.call(trigger,'quest_started')){
+      if(!String(trigger.quest_started||'').trim())add('err','Quest-started trigger needs a quest.',where);
+      else if(!quests.has(trigger.quest_started))add(strict?'err':'warn',
+        'Phone trigger refers to quest "'+trigger.quest_started+'", which is not loaded in this Screenwriter project.',where);
+    }
+    if(trigger.objective_completed){
+      const ref=trigger.objective_completed,quest=Array.isArray(ref)?quests.get(ref[0]):null;
+      if(!quest)add(strict?'err':'warn','Phone objective trigger refers to a quest that is not loaded in this Screenwriter project.',where);
+      else if(ref.length!==2||!(quest.stages||[]).some(s=>s.id===ref[1]))add('err','Phone objective trigger refers to a missing objective.',where);
+    }
+    if(trigger.hours_after_quest){
+      const ref=trigger.hours_after_quest;
+      if(!Array.isArray(ref)||ref.length!==2||+ref[1]<0)
+        add('err','Hours-after-quest trigger needs a quest id and a nonnegative hour count.',where);
+      else if(!quests.has(ref[0]))add(strict?'err':'warn','Hours-after-quest trigger refers to quest "'+
+        ref[0]+'", which is not loaded in this Screenwriter project.',where);
+    }
+    if(trigger.hours_before_calendar_event){
+      const ref=trigger.hours_before_calendar_event;
+      if(!Array.isArray(ref)||ref.length!==2||!String(ref[0]||'').trim()||+ref[1]<0)
+        add('err','Calendar reminder trigger needs an event id and nonnegative hour count.',where);
+    }
+    if(trigger.message_sent){
+      const sourceId=Array.isArray(trigger.message_sent)?trigger.message_sent[1]:trigger.message_sent;
+      const source=entries.find(entry=>entry.message.id===sourceId);
+      if(!source)add('err','Phone follow-up waits for missing message "'+sourceId+'".',where);
+      else if(textMessageDirection(source.message)!=='outgoing')add('err','message_sent must point to a player-to-NPC text.',where);
+      else if(!Array.isArray(trigger.message_sent)&&source.owner.id!==owner.id)
+        add('err','A cross-contact message_sent trigger must include the contact and message id.',where);
+      else if(Array.isArray(trigger.message_sent)&&trigger.message_sent[0]!==source.owner.id)
+        add('err','message_sent names the wrong contact for "'+sourceId+'".',where);
+    }
+    if(trigger.message_replied){
+      const sourceId=Array.isArray(trigger.message_replied)?trigger.message_replied[1]:trigger.message_replied;
+      const source=entries.find(entry=>entry.message.id===sourceId);
+      if(!source)add('err','Phone follow-up waits for missing message "'+sourceId+'".',where);
+      else if(textMessageDirection(source.message)!=='incoming')add('err','message_replied must point to an NPC-to-player text.',where);
+      else if(!Array.isArray(trigger.message_replied)&&source.owner.id!==owner.id)
+        add('err','A cross-contact message_replied trigger must include the contact and message id.',where);
+      else if(Array.isArray(trigger.message_replied)&&trigger.message_replied[0]!==source.owner.id)
+        add('err','message_replied names the wrong contact for "'+sourceId+'".',where);
+    }
+    if(trigger.reply_selected){
+      const ref=trigger.reply_selected,source=Array.isArray(ref)?entries.find(entry=>entry.message.id===ref[0]):null;
+      if(!source||ref.length!==2)add('err','Specific-reply trigger needs an incoming message id and reply id.',where);
+      else if(textMessageDirection(source.message)!=='incoming')add('err','reply_selected must point to an NPC-to-player text.',where);
+      else if(source.owner.id!==owner.id)add('err','reply_selected must point to a message in the same contact thread.',where);
+      else if(!(source.message.quick_replies||[]).some((reply,index)=>(reply.id||'reply_'+index)===ref[1]))
+        add('err','Specific-reply trigger refers to missing reply "'+ref[1]+'".',where);
+    }
+    const days=trigger.days===undefined?[]:(Array.isArray(trigger.days)?trigger.days:[trigger.days]);
+    const blocks=trigger.blocks===undefined?[]:(Array.isArray(trigger.blocks)?trigger.blocks:[trigger.blocks]);
+    if(trigger.days!==undefined&&(!days.length||days.some(day=>!DAYS.includes(day))))add('err','Phone trigger contains an unknown weekday.',where);
+    if(trigger.blocks!==undefined&&(!blocks.length||blocks.some(block=>!BLOCKS.includes(block))))add('err','Phone trigger contains an unknown time block.',where);
+    const triggerRules=[];
+    if(trigger.flag)triggerRules.push({flag:trigger.flag});
+    if(trigger.flag_not)triggerRules.push({flag_not:trigger.flag_not});
+    if(trigger.meter_at_least)triggerRules.push({meter_at_least:trigger.meter_at_least.length===2?
+      [owner.id,...trigger.meter_at_least]:trigger.meter_at_least});
+    if(trigger.meter_at_most)triggerRules.push({meter_at_most:trigger.meter_at_most.length===2?
+      [owner.id,...trigger.meter_at_most]:trigger.meter_at_most});
+    [...triggerRules,...conditionList(message.conditions,where)].forEach(rule=>conditionCheck(rule,where,owner));
+    if(message.effects!==undefined&&!Array.isArray(message.effects))add('err','Phone message effects must be a list.',where);
+    if(direction==='incoming'&&Object.prototype.hasOwnProperty.call(message,'effects'))
+      add('err','Incoming phone effects belong on a player reply, not on the incoming message.',where);
+    (Array.isArray(message.effects)?message.effects:[]).forEach(effect=>effectCheck(effect,where,strict,owner));
+    if(message.quick_replies!==undefined&&!Array.isArray(message.quick_replies))
+      add('err','Phone quick replies must be a list.',where);
+    if(direction==='outgoing'&&Array.isArray(message.quick_replies)&&message.quick_replies.length)
+      add('err','Player-to-NPC texts cannot contain quick replies.',where);
+    const replyIds=new Set();
+    (Array.isArray(message.quick_replies)?message.quick_replies:[]).forEach((reply,index)=>{
+      const replyWhere=where+' · reply '+(index+1);
+      if(!String(reply?.text||'').trim())add('err','A phone reply has no text.',replyWhere);
+      if(!reply?.id&&strict)add('err','New phone replies need a stable reply id.',replyWhere);
+      if(reply?.id){
+        if(slug(reply.id)!==reply.id)add('err','Phone reply id "'+reply.id+'" must use lowercase words joined by underscores.',replyWhere);
+        if(replyIds.has(reply.id))add('err','Two replies share id "'+reply.id+'" in this message.',replyWhere);
+        replyIds.add(reply.id);
+      }
+      if(reply?.tone!==undefined&&!Array.isArray(reply.tone))add('err','Phone reply tone must be a list.',replyWhere);
+      conditionList(reply?.conditions,replyWhere).forEach(rule=>conditionCheck(rule,replyWhere,owner));
+      if(reply?.effects!==undefined&&!Array.isArray(reply.effects))add('err','Phone reply effects must be a list.',replyWhere);
+      (Array.isArray(reply?.effects)?reply.effects:[]).forEach(effect=>effectCheck(effect,replyWhere,strict,owner));
+    });
+  });
+  // A contact-introducing text cannot depend on activity inside the same
+  // undiscovered thread. Cross-contact phone events are reachable once their
+  // source contact is reachable, so resolve those chains to a fixed point.
+  const reachableContacts=new Set(INITIAL_PHONE_CONTACTS);
+  const introductionSourceOwner=(owner,message)=>{
+    if(textMessageDirection(message)!=='incoming'||message.introduces_contact!==true)return null;
+    const trigger=message.trigger||{};
+    if(trigger.reply_selected)return owner.id;
+    for(const key of ['message_sent','message_replied']){
+      if(!Object.prototype.hasOwnProperty.call(trigger,key))continue;
+      const ref=trigger[key];
+      return Array.isArray(ref)?ref[0]:owner.id;
+    }
+    return '';
+  };
+  let changed=true;
+  while(changed){
+    changed=false;
+    npcs().forEach(owner=>{
+      if(reachableContacts.has(owner.id))return;
+      const canIntroduce=(owner.text_messages||[]).some(message=>{
+        const sourceOwner=introductionSourceOwner(owner,message);
+        return sourceOwner!==null&&(sourceOwner===''||sourceOwner!==owner.id&&reachableContacts.has(sourceOwner));
+      });
+      if(canIntroduce){reachableContacts.add(owner.id);changed=true;}
+    });
+  }
+  npcs().forEach(owner=>{
+    if(!(owner.text_messages||[]).length||reachableContacts.has(owner.id))return;
+    const sameThreadIntro=(owner.text_messages||[]).some(message=>introductionSourceOwner(owner,message)===owner.id);
+    add('err',sameThreadIntro?
+      owner.name+' cannot be introduced by a text that waits for activity in the same undiscovered thread.':
+      owner.name+' has authored texts but no reachable incoming text introduces this contact.',
+      'Phone contacts');
+  });
+  return new Map(entries.filter(entry=>entry.message.id).map(entry=>[entry.message.id,entry]));
+}
+
 function validate(){
   const out=[],add=(sev,msg,where,fix)=>out.push({sev,msg,where,fix});
+  const districts=typeof DISTRICTS==='undefined'?(P.districts||[]):DISTRICTS;
   const ids=new Set(),cids=new Set();
   const impossibleStats=reqs=>{
     const limits={};
@@ -25,6 +254,32 @@ function validate(){
   P.characters.forEach(c=>{
     if(cids.has(c.id))add('err','Two characters share the id "'+c.id+'".','Cast');
     cids.add(c.id);
+  });
+  const phoneMessages=validatePhoneAuthoring(add);
+  const locationIds=new Set();
+  P.locations.forEach(l=>{
+    const where=l.name||l.id||'Places',id=String(l.id||'');
+    if(!id)add('err','A location has no id.','Places');
+    else if(slug(id)!==id)add('err','Location id "'+id+'" must use lowercase words joined by underscores.',where);
+    if(id&&locationIds.has(id))add('err','Two locations share the id "'+id+'".',where);
+    locationIds.add(id);
+    if(!String(l.name||'').trim())add('err','Location "'+(id||'?')+'" has no display name.',where);
+    if(districts.length&&!l.district)
+      add('err','Location "'+(id||'?')+'" needs a game district.',where);
+    else if(l.district&&districts.length&&!districts.some(d=>d.id===l.district))
+      add('err','Location "'+(id||'?')+'" uses unknown district "'+l.district+'".',where);
+    const roomIds=new Set();
+    (l.rooms||[]).forEach(r=>{
+      const roomId=String(r.id||'');
+      if(!roomId)add('err','A room in '+(l.name||id||'a location')+' has no id.',where);
+      else if(slug(roomId)!==roomId)add('err','Room id "'+roomId+'" in '+(l.name||id)+
+        ' must use lowercase words joined by underscores.',where);
+      if(roomId&&roomIds.has(roomId))add('err','Two rooms in '+(l.name||id)+
+        ' share the id "'+roomId+'".',where);
+      roomIds.add(roomId);
+      if(!String(r.name||'').trim())add('err','Room "'+(roomId||'?')+'" in '+
+        (l.name||id)+' has no display name.',where);
+    });
   });
   const fixedPlayers=P.characters.filter(isPlayer);
   if(fixedPlayers.length)add('warn','Fixed player sheet'+(fixedPlayers.length===1?'':'s')+' ('+
@@ -97,15 +352,39 @@ function validate(){
       const completion=s.completion||(s._authored&&s._authored.completion);
       const hidden=s.hiddenUntil||(s._authored&&s._authored.hidden_until);
       [[completion,'waits for'],[hidden,'is hidden until']].forEach(([rule,verb])=>{
-        if(rule?.event!=='activity_count_at_least')return;
-        const activity=P.content.find(x=>x.type==='activity'&&x.id===rule.activity);
-        if(!activity)add('err','Stage '+(i+1)+' '+verb+' activity "'+(rule.activity||'')+
-          '", but that activity does not exist.',w);
-        if((+rule.value||0)<1)add('err','Stage '+(i+1)+' needs a positive activity completion count.',w);
+        if(rule?.event==='activity_count_at_least'){
+          const activity=P.content.find(x=>x.type==='activity'&&x.id===rule.activity);
+          if(!activity)add('err','Stage '+(i+1)+' '+verb+' activity "'+(rule.activity||'')+
+            '", but that activity does not exist.',w);
+          if((+rule.value||0)<1)add('err','Stage '+(i+1)+' needs a positive activity completion count.',w);
+          return;
+        }
+        if(!['text_received','text_replied','text_sent'].includes(rule?.event))return;
+        const messageId=rule.event==='text_replied'?(rule.thread||rule.message):rule.message;
+        const entry=phoneMessages.get(messageId);
+        if(!entry)return add('err','Stage '+(i+1)+' '+verb+' missing phone message "'+
+          (messageId||'')+'".',w);
+        const expected=rule.event==='text_sent'?'outgoing':'incoming';
+        if(textMessageDirection(entry.message)!==expected)add('err','Stage '+(i+1)+' uses a '+
+          rule.event+' rule with a '+textMessageDirection(entry.message)+' message.',w);
+        if(rule.character&&rule.character!==entry.owner.id)add('err','Stage '+(i+1)+
+          ' names the wrong contact for phone message "'+messageId+'".',w);
       });
       if(s.location&&!loc(locPart(s.location)))
         add('err','Stage '+(i+1)+' points at a location not in the registry.',w);
+      else if(s.location&&roomPart(s.location)&&!roomOf(s.location))
+        add('err','Stage '+(i+1)+' points at room "'+roomPart(s.location)+
+          '", which does not exist in '+(loc(locPart(s.location))?.name||'that location')+'.',w);
     });
+    if(c.type==='quest'){
+      const event=c.questPlan?.eventDraft||c.questPlan?.event;
+      if(event?.location&&!loc(locPart(event.location)))
+        add('err','The follow-up event points at location "'+locPart(event.location)+
+          '", which is not in the registry.',w);
+      else if(event?.location&&roomPart(event.location)&&!roomOf(event.location))
+        add('err','The follow-up event points at room "'+roomPart(event.location)+
+          '", which does not exist in '+(loc(locPart(event.location))?.name||'that location')+'.',w);
+    }
     if(c.type==='conversation'&&!countLines(c.nodes||[]))add('info','Conversation is empty.',w);
   });
 
@@ -162,12 +441,30 @@ function validate(){
 
   if(P.locations.some(l=>l.tags?.includes('package')))
     P.characters.filter(c=>!isPlayer(c)).forEach(c=>{
+      const home=c.home?.location_id||c.home?.residence_id;
+      if(home&&!loc(locPart(home)))add('warn',c.name+' has home location "'+home+
+        '", which is not in the game registry.','Schedules');
+      const checkHomePlacement=(placement,label)=>{
+        const room=placement?.room;if(!room)return;
+        if(!home||!loc(locPart(home)))return add('warn',c.name+' has '+label+
+          ' room "'+room+'" but no valid home location.','Schedules');
+        if(!roomOf(locPart(home)+'.'+room))add('err',c.name+' has '+label+' room "'+room+
+          '", which does not exist in '+loc(locPart(home)).name+'.','Schedules');
+      };
       (c.schedule?.fixed_commitments||[]).forEach(f=>{
-        if(f.location&&loc(locPart(f.location)))return;
-        add('warn',c.name+"'s \""+pretty(f.activity||'commitment')+
-          '" has no real location, so the tool cannot say where they are. '+
-          'Set it in Edit schedule.','Schedules');
+        checkHomePlacement(f.home_placement,'a schedule placement');
+        if(!f.location||!loc(locPart(f.location)))
+          return add('warn',c.name+"'s \""+pretty(f.activity||'commitment')+
+            '" has no real location, so the tool cannot say where they are. '+
+            'Set it in Edit schedule.','Schedules');
+        if(roomPart(f.location)&&!roomOf(f.location))
+          add('err',c.name+"'s \""+pretty(f.activity||'commitment')+
+            '" points at room "'+roomPart(f.location)+'", which does not exist in '+
+            (loc(locPart(f.location))?.name||'that location')+'.','Schedules');
       });
+      Object.values(c.home_routine?.default_by_block||{}).forEach(p=>
+        checkHomePlacement(p,'a home-routine placement'));
+      (c.home_routine?.overrides||[]).forEach(p=>checkHomePlacement(p,'a home-routine override'));
     });
 
   const lk=links(),inb={};

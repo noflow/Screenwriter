@@ -279,18 +279,10 @@ function resolveQuestWorkshopCharacter(value,allowPlayer=false){
 }
 
 function resolveQuestWorkshopLocation(value){
-  const normalized=slug(String(value||'').replace(/\([^)]*\)/g,''));
+  const cleaned=String(value||'').replace(/\([^)]*\)/g,'');
+  const normalized=slug(cleaned);
   if(!normalized||['none','not_chosen','n_a'].includes(normalized))return '';
-  const candidates=[];
-  P.locations.forEach(place=>{
-    [place.id,place.name].forEach(alias=>candidates.push({ref:place.id,alias:slug(alias)}));
-    (place.rooms||[]).forEach(room=>{
-      const ref=place.id+'.'+room.id;
-      [ref,room.id,room.name,place.name+' '+room.name].forEach(alias=>candidates.push({ref,alias:slug(alias)}));
-    });
-  });
-  const matches=[...new Set(candidates.filter(x=>x.alias===normalized).map(x=>x.ref))];
-  return matches.length===1?matches[0]:null;
+  return resolvePlaceRef(cleaned);
 }
 
 function parseQuestWorkshopReward(text){

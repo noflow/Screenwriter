@@ -67,11 +67,16 @@ editor's scene structure automatically, so the model does not need to write JSON
 
 ## First run
 
-1. Drop `all_locations.json` on the window. You should see
-   "61 locations, 306 rooms, 10 districts".
-2. Drop your `.character` sheets on. Quests and conversations already in them are
-   imported and become editable.
-   Or choose **New character** to make a complete Port Alder NPC sheet from a
+1. All 15 Port Alder NPCs and all game locations are already loaded. The bundled
+   character sheets include their existing quests, conversations, social activities,
+   schedules, and text messages. Open **Cast** and **Places** to browse them. The
+   launcher rebuilds Scenewright first, so changes in the sibling game's
+   `characters` folder and `all_locations.json` are included in the distributable.
+   Missing bundled NPCs are added to an existing authoring project without replacing
+   characters or same-id story content you already edited.
+2. Drop another `.character` sheet on the window only when adding a custom NPC or
+   deliberately replacing one character from a separate checkout. Or choose
+   **New character** to make a complete Port Alder NPC sheet from a
    guided form. It starts with every required field, the 12 relationship meters,
    five relationship chapters, and a weekday schedule you can edit afterward.
    **World builder** adds reusable custom stats (such as Confidence or Stress) and
@@ -134,6 +139,30 @@ the game phone calendar.
 
 ---
 
+## Text messages and phone quests
+
+Choose **+ Text** to open the phone-message builder. Pick the NPC contact, then build
+either an incoming message from that NPC or a player-initiated text that appears as a
+send option in the game. Each message has a stable ID, a large writing area, a phone
+preview, an arrival trigger, optional weekday/time and stat or flag gates, and any
+number of reply choices.
+
+Replies can change relationship meters, start or advance a quest, complete a quest,
+defer or fail it, set game state, or open the calendar. Use a player-to-NPC text plus
+an NPC follow-up triggered by that sent message to build a longer exchange. New NPCs
+can also introduce their contact through their first incoming message.
+
+The **Quest builder** includes a **Phone quest offer** section. Write the NPC's offer
+in ordinary text, choose the accept reply, and Scenewright creates the linked phone
+message and starts the quest only when the player accepts. The first objective can be
+completed by that reply, and later objectives can use **text received**, **text
+replied**, or **text sent** as their completion rule.
+
+These are authored choices rather than unrestricted player typing, so quest logic,
+stat branches, saves, and testing remain deterministic.
+
+---
+
 ## Planning a stronger first draft
 
 Choose **Plan scene** beside Whole scene. Add whatever you know about the setting,
@@ -170,7 +199,7 @@ the value is kept in the save game and respects the range set in World builder.
 
     scenewright.html    the tool — this is the one to open
     index.html          same tool, loading js/ separately, for editing sources
-    js/  css/           the 40 source modules
+    js/  css/           the 44 source modules
     build.py            rebuilds scenewright.html from those sources
     README.md           what each module does
     godot/

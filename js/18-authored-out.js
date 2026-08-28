@@ -395,6 +395,16 @@ function activityConversations(c){
 }
 
 /** Full .character file for one character, with authored blocks rebuilt from the editor. */
+function phoneMessageOut(message){
+  const clean=value=>{
+    if(Array.isArray(value))return value.map(clean);
+    if(value&&typeof value==='object')return Object.fromEntries(Object.entries(value)
+      .filter(([key])=>!key.startsWith('_')).map(([key,item])=>[key,clean(item)]));
+    return value;
+  };
+  return clean(message);
+}
+
 function sheetOut(c){
   const base=gameReady(c);
   const quests=P.content.filter(x=>x.type==='quest'&&
@@ -406,6 +416,7 @@ function sheetOut(c){
 
   if(quests.length)base.quests=quests;
   if(convs.length)base.conversations=convs;
+  base.text_messages=ensureTextMessages(c).map(phoneMessageOut);
 
   // Repeatables have no home in the authored schema, so they ride alongside.
   const reps=P.content.filter(x=>x.type==='repeatable'&&x.character===c.id);

@@ -144,7 +144,7 @@ function paintMap(){
       'style="left:'+(c.x||0)+'px;top:'+(c.y||0)+'px">'+
       (c.start?'<span class="start">START</span>':'')+
       '<div class="ttl">'+esc(c.title||c.id)+'</div>'+
-      '<div class="meta">'+esc(loc(c.location)?.name||'no location')+'<br>'+esc(n)+'</div>'+
+      '<div class="meta">'+esc(c.location?placeName(c.location):'no location')+'<br>'+esc(n)+'</div>'+
       (c.requires?.length?'<span class="gate">if '+esc(c.requires.map(condLabel).join(' · '))+'</span>':'')+
       '<button class="port" data-port="'+c.uid+'">→</button></div>';
   }).join('');
@@ -299,13 +299,14 @@ function paintEdgesOnly(){
 }
 
 function authoredNote(d){
-  if(!(d.quests||[]).length&&!(d.conversations||[]).length&&!(d.activities||[]).length)return '';
+  if(!(d.quests||[]).length&&!(d.conversations||[]).length&&!(d.activities||[]).length&&
+     !(d.text_messages||[]).length)return '';
   const r=importAuthored(d);
   const bits=[];
   if(r.quests.length)bits.push(r.quests.length+' quest'+(r.quests.length===1?'':'s'));
   if(r.activities.length)bits.push(r.activities.length+' activit'+(r.activities.length===1?'y':'ies'));
   if(r.conversations.length)bits.push(r.conversations.length+' conversation'+(r.conversations.length===1?'':'s'));
-  if(r.messages)bits.push(r.messages+' text message'+(r.messages===1?'':'s')+' kept');
+  if(r.messages)bits.push(r.messages+' text message'+(r.messages===1?'':'s')+' ready to edit');
   if(r.skipped.length)bits.push(r.skipped.length+' skipped');
   return bits.length?' — with '+bits.join(', '):'';
 }

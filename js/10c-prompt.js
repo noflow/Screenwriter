@@ -83,7 +83,7 @@ function buildPrompt(input){
     const who=chr(c.character);
     return head+'\n\n# Task\nWrite '+Math.max(3,Math.min(12,n*3))+' interchangeable idle lines for '+
       (who?who.name:'the character')+' — what they say when the player approaches with nothing specific going on'+
-      (c.location?' at '+(loc(c.location)?.name||''):'')+'. '+
+      (c.location?' at '+placeName(c.location):'')+'. '+
       (input?'Situation: '+input+'. ':'')+
       'Each must stand alone, need no reply, and sound like a different day. Vary length. No greetings repeated.\n\n'+
       'Reply with ONLY this JSON object: {"lines":[{"text":"...","emotion":"..."}]}. '+

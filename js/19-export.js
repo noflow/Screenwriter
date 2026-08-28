@@ -45,6 +45,8 @@ function toJSON(){
            ?{hidden_until:s.hiddenUntil||(s._authored&&s._authored.hidden_until)}:{}),
          nodes:clean(s.nodes||[])}))})),
     activities:acts.activities,
+    text_messages:allTextMessages().map(({owner,message})=>Object.assign(
+      {character:owner.id},phoneMessageOut(message))),
     repeatables:pick('repeatable').map(c=>Object.assign({id:c.id,character:c.character},
       place(c.location),
       {days:c.days||(c.day?[c.day]:[]),blocks:c.blocks||(c.block?[c.block]:[]),
@@ -55,8 +57,24 @@ function plain(l,pad){return l.map(n=>n.type==='line'
   ?pad+(chr(n.speaker)?.name||n.speaker).toUpperCase()+'\n'+pad+n.text
   :n.type==='jump'?pad+'→ '+(n.target||'(unset)')
   :n.options.map((o,i)=>pad+'['+(i+1)+'] '+o.text+'\n'+plain(o.nodes,pad+'    ')).join('\n')).join('\n\n');}
+function phoneScript(){
+  return allTextMessages().map(({owner,message})=>{
+    const outgoing=textMessageDirection(message)==='outgoing';
+    const trigger=Object.entries(message.trigger||{}).map(([key,value])=>
+      key.replace(/_/g,' ')+' '+(Array.isArray(value)?value.join(' · '):value)).join(', ')||'manual';
+    const lines=['== '+owner.name+' · '+(outgoing?'Player sends':'NPC sends')+' ('+message.id+') ==',
+      'Trigger: '+trigger,'',outgoing?'PLAYER':'NPC',String(message.text||'')];
+    (message.quick_replies||[]).forEach((reply,index)=>{
+      lines.push('',`[${index+1}] PLAYER — ${reply.text||''}`);
+      if((reply.effects||[]).length)lines.push('    Effects: '+reply.effects.map(effect=>
+        effect.operation+' '+[effect.quest,effect.objective,effect.character&&effect.meter?
+          effect.character+'.'+effect.meter:null,effect.key,effect.value].filter(x=>x!==undefined&&x!==null&&x!=='').join(' ')).join('; '));
+    });
+    return lines.join('\n');
+  }).join('\n\n\n');
+}
 function toScript(){
-  return P.content.map(c=>{
+  const scenes=P.content.map(c=>{
     const h='== '+(c.title||c.id)+' ('+c.type+') ==\n';
     if(c.type==='repeatable')return h+'\n'+(c.lines||[]).map(l=>'· '+l.text).join('\n');
     if(c.type==='quest')return h+'\n'+(c.stages||[]).map((s,i)=>
@@ -66,6 +84,7 @@ function toScript(){
       plain(s.nodes||[],'')).join('\n\n');
     return h+'\n'+plain(c.nodes||[],'');
   }).join('\n\n\n');
+  return [phoneScript(),scenes].filter(Boolean).join('\n\n\n');
 }
 function toSheets(){
   if(!npcs().length)return '// No NPC characters imported. The runtime Player needs no sheet.';
@@ -120,6 +139,11 @@ document.querySelectorAll('[data-new]').forEach(b=>b.onclick=()=>{
 });
 
 /* ============ import ============ */
+function customLocationImportSummary(r){
+  return r.added+' custom location'+(r.added===1?'':'s')+' added or updated'+
+    (r.collisions?.length?'; skipped game-owned '+r.collisions.join(', '):'')+
+    (r.duplicates?.length?'; duplicate entries resolved: '+r.duplicates.join(', '):'');
+}
 async function pickFiles(){
   const i=Object.assign(document.createElement('input'),{type:'file',multiple:true});
   i.onchange=async()=>{
@@ -127,8 +151,9 @@ async function pickFiles(){
     for(const f of i.files){
       try{
         const txt=await f.text(),d=JSON.parse(txt);
-        if(d.format==='scenewright.project'){P=d.project;ok.push(f.name+' (project)');continue;}
+        if(d.format==='scenewright.project'){restoreProject(d.project);ok.push(f.name+' (project)');continue;}
         if(isLocationPackage(d)){const r=importLocations(d);
+          if(r.custom){ok.push(f.name+' — '+customLocationImportSummary(r));continue;}
           ok.push(f.name+' — '+r.count+' locations, '+r.rooms+' rooms, '+r.districts+' districts'+
             (r.moved?', '+r.moved+' scenes remapped':'')+
             (r.sched?', '+r.sched+' schedule slots remapped':'')+
@@ -183,8 +208,9 @@ $('pasteGo').onclick=()=>{
   blocks.forEach((b,i)=>{
     try{
       const d=JSON.parse(b);
-      if(d.format==='scenewright.project'){P=d.project;ok.push('project file');return;}
+      if(d.format==='scenewright.project'){restoreProject(d.project);ok.push('project file');return;}
       if(isLocationPackage(d)){const r=importLocations(d);
+        if(r.custom){ok.push(customLocationImportSummary(r));return;}
         ok.push(r.count+' locations, '+r.rooms+' rooms');return;}
       if(!d.id&&!d.display_name){bad.push('block '+(i+1)+' has no id or display_name');return;}
       ok.push(importSheet(d)+authoredNote(d));
@@ -205,8 +231,9 @@ document.addEventListener('drop',async e=>{
   for(const f of files){
     try{
       const d=JSON.parse(await f.text());
-      if(d.format==='scenewright.project'){P=d.project;ok.push(f.name+' (project)');continue;}
+      if(d.format==='scenewright.project'){restoreProject(d.project);ok.push(f.name+' (project)');continue;}
       if(isLocationPackage(d)){const r=importLocations(d);
+        if(r.custom){ok.push(f.name+' — '+customLocationImportSummary(r));continue;}
         ok.push(f.name+' — '+r.count+' locations, '+r.rooms+' rooms'+
           (r.moved?', '+r.moved+' scenes remapped':''));
         continue;}
@@ -238,5 +265,5 @@ $('exportSheets').onclick=()=>{
 };
 
 $('addPlace').onclick=()=>{P.locations.push({id:'place_'+(P.locations.length+1),name:'New location',
-  district:'',background:'',rooms:[],residents:[],services:[],tags:['custom'],notes:''});
+  district:DISTRICTS[0]?.id||'',background:'',rooms:[],residents:[],services:[],tags:['custom'],notes:''});
   selPlace=P.locations.length-1;save();paintAll()};

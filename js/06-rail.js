@@ -20,7 +20,12 @@ function paintCast(){
     if(e.target.dataset.cx!==undefined)return;
     selChar=selChar===+el.dataset.c?null:+el.dataset.c;paintCast();paintSheet();});
   $('castList').querySelectorAll('[data-cx]').forEach(b=>b.onclick=e=>{
-    e.stopPropagation();P.characters.splice(+b.dataset.cx,1);selChar=null;save();paintAll();});
+    e.stopPropagation();const removed=P.characters[+b.dataset.cx];
+    if(removed&&bundledCharacterIds().includes(removed.id)){
+      P.dismissedBundledCharacters=Array.isArray(P.dismissedBundledCharacters)?P.dismissedBundledCharacters:[];
+      if(!P.dismissedBundledCharacters.includes(removed.id))P.dismissedBundledCharacters.push(removed.id);
+    }
+    P.characters.splice(+b.dataset.cx,1);selChar=null;save();paintAll();});
 }
 
 function paintSheet(){
@@ -59,12 +64,16 @@ function paintSheet(){
 }
 
 function paintPlaces(){
-  $('placeList').innerHTML=P.locations.length?P.locations.map((l,i)=>
+  const gamePlaces=P.locations.filter(l=>l.tags?.includes('package'));
+  const gameRooms=gamePlaces.reduce((n,l)=>n+(l.rooms||[]).length,0);
+  const status=gamePlaces.length?'<p class="hint" style="margin:2px 0 8px">Port Alder game registry · '+
+    gamePlaces.length+' locations · '+gameRooms+' rooms · '+DISTRICTS.length+' districts</p>':'';
+  $('placeList').innerHTML=P.locations.length?status+P.locations.map((l,i)=>
     '<div class="chip'+(selPlace===i?' on':'')+'" data-l="'+i+'">'+esc(l.name)+
     '<span class="tag">'+((l.rooms||[]).length?l.rooms.length+' rooms':esc(l.background||''))+
-    '</span><button class="x" data-lx="'+i+'">×</button></div>').join('')
-    :'<p class="empty">Drop your all_locations.json on the window to load the real registry. '+
-     'Until then, placeholder locations get derived from each character sheet.</p>';
+    '</span>'+(l.tags?.includes('package')?'':'<button class="x" data-lx="'+i+'">×</button>')+
+    '</div>').join('')
+    :'<p class="empty">The Port Alder game registry did not load. Rebuild Scenewright and reopen it.</p>';
   $('placeList').querySelectorAll('.chip').forEach(el=>el.onclick=e=>{
     if(e.target.dataset.lx!==undefined)return;
     selPlace=selPlace===+el.dataset.l?null:+el.dataset.l;paintPlaces();paintPlaceForm();});
@@ -76,9 +85,11 @@ function paintPlaceForm(){
   if(selPlace===null||!P.locations[selPlace]){box.innerHTML='';return;}
   const l=P.locations[selPlace];
   const d=DISTRICTS.find(x=>x.id===l.district);
+  const packaged=l.tags?.includes('package');
   box.innerHTML=
-    (l.tags?.includes('package')
+    (packaged
       ? '<div class="sheetinfo" style="margin-top:12px">'+
+        '<b>Synced from the game</b> · stable ID and name are locked<br>'+
         (d?'<b>'+esc(d.name)+'</b> — '+esc(d.character)+'<br>':'')+
         (l.type?esc(pretty(l.type))+'<br>':'')+
         (l.residents?.length?'lives here: '+esc(l.residents.map(id=>chr(id)?.name||pretty(id)).join(', '))+'<br>':'')+
@@ -94,13 +105,23 @@ function paintPlaceForm(){
             ).join('')+'</div>'
           : '')
       : '')+
-    '<div class="field" style="margin-top:12px"><label>Name</label><input type="text" id="lName" value="'+esc(l.name)+'"></div>'+
-    '<div class="two"><div class="field"><label>ID</label><input type="text" id="lId" value="'+esc(l.id)+'"></div>'+
+    '<div class="field" style="margin-top:12px"><label>Name</label><input type="text" id="lName" value="'+esc(l.name)+'"'+(packaged?' readonly':'')+'></div>'+
+    '<div class="two"><div class="field"><label>ID</label><input type="text" id="lId" value="'+esc(l.id)+'"'+(packaged?' readonly':'')+'></div>'+
     '<div class="field"><label>Background</label><input type="text" id="lBg" value="'+esc(l.background||'')+'"></div></div>'+
+    (!packaged?'<div class="field"><label>District</label><select id="lDistrict">'+
+      DISTRICTS.map(x=>'<option value="'+esc(x.id)+'"'+(x.id===l.district?' selected':'')+'>'+esc(x.name)+'</option>').join('')+
+      '</select></div>':'')+
     '<div class="field"><label>What it\'s like</label><textarea id="lNotes">'+esc(l.notes||'')+'</textarea>'+
     '<p class="hint">Sent to the model so dialogue references the real space — sound, light, who else is around.</p></div>';
-  $('lName').oninput=e=>{l.name=e.target.value;paintPlaces();save()};
-  $('lId').oninput=e=>{l.id=slug(e.target.value);paintPlaces();save()};
+  if(!packaged){
+    $('lName').oninput=e=>{l.name=e.target.value;paintPlaces();save()};
+    $('lId').onchange=e=>{
+      const wanted=slug(e.target.value),actual=renameLocationId(l,wanted);
+      if(actual!==wanted)note('That location id is already in use. The old id was kept.',true);
+      e.target.value=actual;paintPlaces();save();
+    };
+    $('lDistrict').onchange=e=>{l.district=e.target.value;save();};
+  }
   $('lBg').oninput=e=>{l.background=e.target.value;paintPlaces();save()};
   $('lNotes').oninput=e=>{l.notes=e.target.value;save()};
 }

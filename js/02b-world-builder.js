@@ -56,14 +56,18 @@ $('addWorldLocation').onclick=()=>{
   if(!id){$('worldMessage').textContent='Give the location a name first.';return;}
   if(loc(id)){ $('worldMessage').textContent='A location with that id already exists.';return;}
 	const roomNames=String($('wlRooms').value||'').split(/\r?\n|,/).map(x=>x.trim()).filter(Boolean);
+	const roomIds=new Set(),rooms=[];let skippedRooms=0;
+	roomNames.forEach(room=>{const roomId=slug(room);if(roomIds.has(roomId)){skippedRooms++;return;}
+	  roomIds.add(roomId);rooms.push({id:roomId,name:room,access:'shared',actions:[]});});
 	const district=slug($('wlDistrict').value||'')||(DISTRICTS[0]?.id||'');
 	if(!district){$('worldMessage').textContent='Import the Port Alder locations first, then choose a district.';return;}
 	P.locations.push({id,name,district,type:slug($('wlType').value||'place'),
-    background:'',rooms:roomNames.map(room=>({id:slug(room),name:room,access:'shared',actions:[]})),
+    background:'',rooms,
     residents:[],services:[],tags:['custom'],notes:String($('wlNotes').value||'').trim()});
   selPlace=P.locations.length-1;
   ['wlName','wlDistrict','wlType','wlRooms','wlNotes'].forEach(x=>$(x).value='');
-  $('worldMessage').textContent='Created '+name+' with '+roomNames.length+' room'+(roomNames.length===1?'':'s')+'.';
+  $('worldMessage').textContent='Created '+name+' with '+rooms.length+' room'+(rooms.length===1?'':'s')+
+    (skippedRooms?' ('+skippedRooms+' duplicate '+(skippedRooms===1?'name':'names')+' skipped)':'')+'.';
 	save();paintAll();
 };
 $('downloadWorldLocations').onclick=()=>{

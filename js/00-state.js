@@ -3,7 +3,7 @@ const PAL=['#C9A227','#C4778E','#8FB08A','#7FA3C4','#C98F5B','#A98FC4','#C4B27F'
 const DAYS=['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
 const BLOCKS=['early_morning','morning','lunch','afternoon','evening','late_evening','night'];
 
-let P={characters:[],locations:[],content:[],districts:[],travel:null,aliases:{}};
+let P={characters:[],locations:[],content:[],districts:[],travel:null,aliases:{},dismissedBundledCharacters:[]};
 let sel=null, selChar=null, selPlace=null, focusPath=[], stageIx=0;
 let mode='play', busy=false, abort=null, fmt='sheets';
 
@@ -49,7 +49,26 @@ function renameContentId(c,raw){
     if(item.type==='quest'||item.type==='activity')(item.stages||[]).forEach(s=>scan(s.nodes));
     else scan(item.nodes);
   });
-  if(c.type==='quest')P.content.filter(x=>x.type==='quest'&&x.after===old).forEach(x=>x.after=next);
+  if(c.type==='quest'){
+    P.content.filter(x=>x.type==='quest'&&x.after===old).forEach(x=>x.after=next);
+    allTextMessages().forEach(({message})=>{
+      const trigger=message.trigger||{};
+      if(trigger.quest_started===old)trigger.quest_started=next;
+      if(trigger.quest_completed===old)trigger.quest_completed=next;
+      ['objective_completed','hours_after_quest'].forEach(key=>{
+        if(Array.isArray(trigger[key])&&trigger[key][0]===old)trigger[key][0]=next;
+      });
+      const rewriteEffect=effect=>{
+        if(!effect||typeof effect!=='object')return;
+        if(effect.quest===old)effect.quest=next;
+        if(effect.valid_quest===old)effect.valid_quest=next;
+        if(['start_quest','complete_quest'].includes(effect.operation)&&effect.value===old)effect.value=next;
+      };
+      (message.effects||[]).forEach(rewriteEffect);
+      (message.quick_replies||[]).forEach(reply=>(reply.effects||[]).forEach(rewriteEffect));
+      if(message._quest_id===old)message._quest_id=next;
+    });
+  }
   if(c.type!=='activity')return next;
   const oldDefault='activity.'+old+'.count';
   if(!c.counterKey||c.counterKey===oldDefault)c.counterKey='activity.'+next+'.count';
@@ -85,9 +104,60 @@ const isRuntimePlayerId=id=>id==='player'||id==='__player__';
 function isPlayer(c){return !!c&&(c._runtime_player===true||isRuntimePlayerId(c.id)||c.profile?.is_player===true);}
 function playerChar(){return RUNTIME_PLAYER;}
 const npcs=()=>P.characters.filter(c=>!isPlayer(c));
+const INITIAL_PHONE_CONTACTS=Object.freeze([
+  'elena_reyes_hale','daniel_hale','lily_hale','emma_rowan','marcus_lee'
+]);
 const authoredChr=id=>P.characters.find(c=>c.id===id)||null;
 const chr=id=>id==='__narrator__'?NARRATOR:isRuntimePlayerId(id)?RUNTIME_PLAYER:authoredChr(id);
 const loc=id=>P.locations.find(l=>l.id===id);
+
+/** Phone messages live on their owning NPC sheet, not in the scene tree. */
+function allTextMessages(){
+  const out=[];
+  npcs().forEach(owner=>(Array.isArray(owner.text_messages)?owner.text_messages:[]).forEach((message,index)=>{
+    if(message&&typeof message==='object')out.push({owner,message,index});
+  }));
+  return out;
+}
+const textMessageById=id=>allTextMessages().find(entry=>entry.message.id===id)||null;
+const textMessageDirection=message=>message?.direction||
+  (message?.sender==='player'?'outgoing':'incoming');
+function ensureTextMessages(owner){
+  if(owner&&!Array.isArray(owner.text_messages))owner.text_messages=[];
+  return owner?.text_messages||[];
+}
+
+/** Renames a message without stranding quest objectives or follow-up triggers. */
+function renameTextMessageId(owner,message,raw){
+  if(!owner||!message)return '';
+  const old=String(message.id||''),next=slug(raw);
+  if(!next||next===old)return old;
+  if(allTextMessages().some(entry=>entry.message!==message&&entry.message.id===next))return old;
+  message.id=next;
+  allTextMessages().forEach(({message:other})=>{
+    const trigger=other.trigger||{};
+    ['message_sent','message_replied','text_sent','text_replied'].forEach(key=>{
+      if(trigger[key]===old)trigger[key]=next;
+      else if(Array.isArray(trigger[key])&&trigger[key][1]===old)trigger[key][1]=next;
+    });
+    if(Array.isArray(trigger.reply_selected)&&trigger.reply_selected[0]===old)
+      trigger.reply_selected[0]=next;
+  });
+  P.content.filter(c=>c.type==='quest').forEach(q=>{
+    (q.stages||[]).forEach(stage=>{
+      const rules=[stage.completion,stage.hiddenUntil,stage._authored?.completion,
+        stage._authored?.hidden_until].filter(Boolean);
+      rules.forEach(rule=>{
+        if(rule.event==='text_replied'&&rule.thread===old)rule.thread=next;
+        if(rule.event==='text_replied'&&rule.message===old)rule.message=next;
+        if(rule.event==='text_sent'&&rule.message===old)rule.message=next;
+        if(rule.event==='text_received'&&rule.message===old)rule.message=next;
+      });
+    });
+    if(q.questPlan?.phoneOfferMessageId===old)q.questPlan.phoneOfferMessageId=next;
+  });
+  return next;
+}
 
 /** State-value shorthand used by imported Port Alder content: player.life_path=college. */
 function stateScalar(raw){

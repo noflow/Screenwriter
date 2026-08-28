@@ -188,6 +188,17 @@ function openQuestBuilder(){
   $('qbEventTitle').value=eventDraft.title||'';$('qbEventDate').value=eventDraft.date||'';
   $('qbEventBlock').value=eventDraft.block||'';
   $('qbEventLocation').value=eventDraft.location||c.location||'';
+  const linkedPhoneOfferId=p.phoneOfferMessageId||p.phoneOffer?.messageId||'';
+  const linkedPhoneOffer=linkedPhoneOfferId&&typeof phoneMessageById==='function'?phoneMessageById(c.character,linkedPhoneOfferId):null;
+  const linkedReply=linkedPhoneOffer?.quick_replies?.find(reply=>(reply.effects||[]).some(effect=>effect.operation==='start_quest'&&(effect.quest===c.id||effect.value===c.id)));
+  const legacyPhoneOffer=linkedPhoneOffer?{enabled:true,messageId:linkedPhoneOffer.id,ownerId:c.character,text:linkedPhoneOffer.text,
+    replyId:linkedReply?.id,acceptText:linkedReply?.text,completeFirst:!!linkedReply?.effects?.some(effect=>effect.operation==='complete_objective'&&effect.quest===c.id)}:{};
+  const phoneOffer=Object.assign({enabled:false,text:'',acceptText:'Sure. What do you need?',completeFirst:false},p.phoneOffer||{},legacyPhoneOffer);
+  $('qbPhoneOffer').checked=!!phoneOffer.enabled;
+  $('qbPhoneText').value=phoneOffer.text||'';$('qbPhoneAccept').value=phoneOffer.acceptText||'Sure. What do you need?';
+  $('qbPhoneCompleteFirst').checked=!!phoneOffer.completeFirst;
+  $('qbPhoneOfferFields').classList.toggle('off',!phoneOffer.enabled);
+  $('qbPhoneStatus').textContent=phoneOffer.error||'The reply starts this quest. You can add more replies and effects in the Text Message Builder.';
   qbRewardRows=(Array.isArray(p.rewardRows)?p.rewardRows:parsed.rows).map(x=>Object.assign({},x));
   const rewardCharacters=qbRewardRows.map(x=>x.character).filter(id=>id&&id!=='player'&&id!==c.character&&chr(id));
   qbParticipants=[...new Set([...(Array.isArray(p.participants)?p.participants:(c.cast||[])),...rewardCharacters])];
@@ -216,11 +227,20 @@ function updateQuestFromBuilder(){
     advancedRewards:advanced,participants:qbParticipants.slice(),deadline:$('qbDeadline').value.trim(),
     branchIdeas:$('qbBranchIdeas').value.trim(),event,eventDraft});
   normalizeQuestObjectiveIds(c);
+  const previousOffer=c.questPlan.phoneOffer||{};
+  const phoneOffer=Object.assign({},previousOffer,{enabled:$('qbPhoneOffer').checked,
+    text:$('qbPhoneText').value.trim(),acceptText:$('qbPhoneAccept').value.trim(),
+    completeFirst:$('qbPhoneCompleteFirst').checked});
+  c.questPlan.phoneOffer=typeof syncQuestPhoneOffer==='function'?syncQuestPhoneOffer(c,phoneOffer):phoneOffer;
+  if(c.questPlan.phoneOffer.enabled&&c.questPlan.phoneOffer.messageId)c.questPlan.phoneOfferMessageId=c.questPlan.phoneOffer.messageId;
+  else delete c.questPlan.phoneOfferMessageId;
+  $('qbPhoneStatus').textContent=c.questPlan.phoneOffer.error||'The reply starts this quest. You can add more replies and effects in the Text Message Builder.';
   return c;
 }
 
 function saveQuestPlan(){
   const c=updateQuestFromBuilder();if(!c)return;
+  if(c.questPlan?.phoneOffer?.error){save();note(c.questPlan.phoneOffer.error);return;}
   save();paintAll();$('questBuilder').close();note('Quest plan saved. Write each objective in its stage, then export the character sheet.');
 }
 
@@ -230,6 +250,10 @@ $('qbHelpButton').onclick=()=>{
   const help=$('qbHelp'),show=help.hidden;help.hidden=!show;$('qbHelpButton').setAttribute('aria-expanded',String(show));
 };
 $('qbGiver').onchange=()=>{paintQuestCast();paintQuestRewards();};
+$('qbPhoneOffer').onchange=()=>{
+  const enabled=$('qbPhoneOffer').checked;$('qbPhoneOfferFields').classList.toggle('off',!enabled);
+  if(enabled&&!$('qbPhoneText').value.trim())$('qbPhoneText').value='Hey, could you help me with '+(($('qbTitle').value||'something').trim())+'?';
+};
 $('qbAddCast').onclick=()=>{
   const id=$('qbCastAdd').value;if(!id)return;qbParticipants.push(id);paintQuestCast();paintQuestRewards();
 };

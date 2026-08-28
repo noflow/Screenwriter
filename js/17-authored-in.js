@@ -74,7 +74,21 @@ function toRequires(cond,charId){
 function locFromRef(ref){
   if(!ref)return '';
   const s=String(ref);
+  const resolved=typeof resolvePlaceRef==='function'?resolvePlaceRef(s):null;
+  if(resolved)return resolved;
   if(loc(locPart(s)))return s;
+  // With the canonical registry loaded, keep an unresolved authored reference
+  // intact for Validate. Never invent a top-level place from its room suffix.
+  if(P.locations.some(l=>l.tags?.includes('package')))return s;
+  // Before the registry arrives, a qualified ref still tells us its parent.
+  // Preserve the whole ref so a later registry import can resolve it safely.
+  if(s.includes('.')){
+    const parent=slug(s.split('.')[0]);
+    if(parent&&!loc(parent))P.locations.push({id:parent,
+      name:pretty(parent).replace(/\b\w/g,m=>m.toUpperCase()),district:'',
+      background:'bg_'+parent,rooms:[],residents:[],services:[],tags:['derived'],notes:''});
+    return s;
+  }
   const base=slug(s.split('.')[0]);
   if(loc(base))return roomPart(s)?base+'.'+roomPart(s):base;
   const id=slug(s.split('.').pop());

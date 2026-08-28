@@ -20,10 +20,20 @@ a copy of, back up, or hand to someone else.
 The Player is a built-in runtime role, not a `.character` package. Port Alder
 creates the user's identity and game-state sheet separately for every new game.
 
+The 15 Port Alder NPC sheets and the location registry are built in. When the sibling
+`testgodot` project is present, `build.py` refreshes `js/01a-game-characters.js` from
+`testgodot/characters/*.character` and `js/02a-game-locations.js` from
+`testgodot/content/world/all_locations.json` before creating the one-page build.
+Set `SCENEWRIGHT_GAME_CHARACTERS` to the character directory and
+`SCENEWRIGHT_GAME_LOCATIONS` to the location file when the repositories are not siblings.
+
 Run the focused state/player and quest-workshop regression checks with:
 
     node tests/player-runtime.test.js
     node tests/quest-workshop.test.js
+    node tests/character-registry.test.js
+    node tests/location-registry.test.js
+    node tests/phone-authoring.test.js
 
 ## Layout
 
@@ -33,7 +43,7 @@ Run the focused state/player and quest-workshop regression checks with:
     manifest.json       load order (regenerate by sorting js/ filenames)
     _markup.html        shared markup template with @@CSS@@ / @@JS@@ slots
     css/app.css         all styles
-    js/                 41 modules, loaded in filename order
+    js/                 44 modules, loaded in filename order
 
 ## The modules
 
@@ -41,8 +51,10 @@ Numeric prefixes are load order, not importance.
 
     00-state            globals, helpers, localStorage
     01-sheets           .character import, location derivation
+    01a-game-characters generated snapshot of all 15 canonical Port Alder NPC sheets
     01b-character-creator  guided Port Alder NPC-sheet creator
-    02-places           location package, rooms, district grouping
+    02-places           location package, rooms, district grouping, safe project refresh
+    02a-game-locations  generated snapshot of the canonical Port Alder registry
     02b-world-builder   custom stats plus a location-and-rooms creator
     03-schedule         grid <-> fixed_commitments, availability
     04-ollama           engines (Ollama, Pawan.Krd, any OpenAI-compatible), model list
@@ -58,6 +70,7 @@ Numeric prefixes are load order, not importance.
     08g-quest           quest stages
     08h-quest-builder   story arcs, rewards, and follow-up calendar events
     08i-quest-workshop  conversational quest planning and plain-text conversion
+    08j-phone-builder   inbound/outbound texts, replies, triggers, and phone quests
     09-modes            mode bar, placeholders
     10-brief            charBrief, boundsBrief — what the model is told
     10b-speakers        who may speak, player rules

@@ -46,23 +46,24 @@ async function draftHook(c,hook){
     t=t.trim().replace(/^```(?:json)?/i,'').replace(/```$/,'').trim();
     const a=t.indexOf('{'),b=t.lastIndexOf('}');
     const d=JSON.parse(a>=0?t.slice(a,b+1):t);
+    const setting=resolvePlaceRef(d.location);
 
     const stages=coerceArray(d.objectives).slice(0,5).map((o,i)=>({
       id:slug(o.id||'obj_'+(i+1)),title:o.text||'Objective '+(i+1),
-      location:loc(d.location)?d.location:(P.locations[0]?.id||''),
+      location:setting||(P.locations[0]?.id||''),
       nodes:[],flag:'',requires:[],
       completion:{event:'conversation_completed',conversation:''}
     }));
     const brs=coerceArray(d.branches);
     if(brs.length>1)stages.push({id:'branch',title:'Branch — outcome',
-      location:loc(d.location)?d.location:'',requires:[],flag:'',
+      location:setting||'',requires:[],flag:'',
       nodes:[{type:'choice',options:brs.slice(0,4).map(b=>({
         text:b.summary||pretty(b.id),flag:slug(b.id),requires:[],nodes:[]}))}]});
 
     const uid='q_'+hook;
     const item={uid,type:'quest',id:hook,title:d.title||pretty(hook),
       character:c.id,cast:[c.id],hook:d.summary||'',premise:d.summary||'',
-      location:loc(d.location)?d.location:(P.locations[0]?.id||''),
+      location:setting||(P.locations[0]?.id||''),
       day:'monday',block:d.block||'evening',chapter:1,requires:[],after:'',
       stages:stages.length?stages:[{id:'stage_1',title:'Opening',location:'',nodes:[],
         flag:'quest_'+hook+'_done',requires:[]}]};

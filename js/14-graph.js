@@ -69,7 +69,7 @@ function openGraph(){
         '<text class="gr-who" x="32" y="'+(y+16)+'" fill="#7FA3C4">STAGE '+(i+1)+'</text>'+
         '<text class="gr-t" x="32" y="'+(y+30)+'" style="font-size:11px">'+esc(s.title)+'</text>'+
         '<text class="gr-cond" x="32" y="'+(y+42)+'" fill="#938599">'+
-          esc(loc(s.location)?.name||'no location')+' · '+countLines(s.nodes||[])+' lines</text>'+
+          esc(s.location?placeName(s.location):'no location')+' · '+countLines(s.nodes||[])+' lines</text>'+
         (s.requires?.length?'<text class="gr-cond" x="32" y="'+(y+53)+'">needs '+
           esc(s.requires.map(condLabel).join(' · ').slice(0,44))+'</text>':'')+
         (s.flag?'<text class="gr-cond" x="330" y="'+(y+34)+'" fill="#C9A227">→ '+esc(s.flag)+'</text>':'')+

@@ -46,8 +46,7 @@ function roleplayNodes(source,c){
 function sceneLocation(raw){
   const value=String(raw||'').trim();
   if(!value)return '';
-  const found=P.locations.find(l=>l.id===value||l.name.toLowerCase()===value.toLowerCase());
-  return found?found.id:'';
+  return resolvePlaceRef(value)||'';
 }
 
 function cleanChoiceText(raw){
