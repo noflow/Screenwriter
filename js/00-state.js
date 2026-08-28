@@ -22,6 +22,12 @@ const PA_RELATIONSHIP_MILESTONES=Object.freeze([
   Object.freeze({level:4,shared_activities:6,bond:65,trust:60,agreement_required:true}),
   Object.freeze({level:5,shared_activities:10,bond:85,trust:80,agreement_required:true})
 ]);
+const PA_RELATIONSHIP_ROUTES=Object.freeze([
+  Object.freeze({id:'shared',name:'Shared / organic'}),
+  Object.freeze({id:'platonic',name:'Platonic'}),
+  Object.freeze({id:'romantic',name:'Romantic'})
+]);
+const PA_STORY_STATUSES=Object.freeze(['draft','ready','complete']);
 
 function defaultSocialPreferences(){
   return {invitation_threshold:20,preferred_activities:['waterfront_hangout','cafe_catchup']};
@@ -39,6 +45,27 @@ function normalizeSocialPreferences(character){
 }
 function relationshipMilestoneRule(level){
   return PA_RELATIONSHIP_MILESTONES.find(rule=>rule.level===+level)||null;
+}
+function defaultRelationshipStoryPlan(character,level=1){
+  return {status:'draft',primary_location:character?.home?.location_id||'',
+    conflict:'',important_choice:'',consequence:'',callback:'',
+    supporting_characters:[],required_memories:[],prerequisite_quests:[],notes:'',level:+level||1};
+}
+function normalizeRelationshipChapterStory(character,chapter){
+  if(!PA_RELATIONSHIP_ROUTES.some(route=>route.id===chapter.route))chapter.route='shared';
+  const current=chapter.story_plan;
+  chapter.story_plan=current&&typeof current==='object'&&!Array.isArray(current)
+    ?current:defaultRelationshipStoryPlan(character,chapter.level);
+  const plan=chapter.story_plan,defaults=defaultRelationshipStoryPlan(character,chapter.level);
+  Object.keys(defaults).forEach(key=>{
+    if(plan[key]===undefined)plan[key]=Array.isArray(defaults[key])?defaults[key].slice():defaults[key];
+  });
+  if(!PA_STORY_STATUSES.includes(plan.status))plan.status='draft';
+  ['supporting_characters','required_memories','prerequisite_quests'].forEach(key=>{
+    if(!Array.isArray(plan[key]))plan[key]=[];
+  });
+  plan.level=+chapter.level||1;
+  return plan;
 }
 
 let P={characters:[],locations:[],content:[],districts:[],travel:null,aliases:{},dismissedBundledCharacters:[]};

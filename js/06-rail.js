@@ -54,11 +54,13 @@ function paintSheet(){
         : '';
     })()+
     '<button class="btn wide" id="editSched">Edit schedule</button>'+
+    '<button class="btn wide" id="storyArc" style="margin-top:5px">Story arc workshop</button>'+
     '<button class="btn wide" id="editSheet" style="margin-top:5px">Edit sheet &amp; limits</button>'+
     '<div class="field" style="margin-top:10px"><label>Colour</label><input type="color" id="cColor" value="'+c.color+
       '" style="width:100%;height:28px;background:none;border:1px solid var(--edge);border-radius:3px"></div>';
   if($('draftHook'))$('draftHook').onclick=openHooks;
   $('editSched').onclick=()=>openSchedule(selChar);
+  $('storyArc').onclick=()=>openRelationshipArcWorkshop(selChar);
   $('editSheet').onclick=()=>openEditor(selChar);
   $('cColor').oninput=e=>{c.color=e.target.value;paintCast();paintBody();save();};
 }

@@ -48,7 +48,8 @@ function newPortAlderCharacter(){
     ['first_meeting','First Meeting'],['getting_to_know_you','Getting to Know You'],
     ['a_shared_routine','A Shared Routine'],['trust_on_the_line','Trust on the Line'],
     ['a_place_in_each_others_lives','A Place in Each Other’s Lives']
-  ].map((chapter,index)=>({level:index+1,id:id+'_'+chapter[0],title:chapter[1]}));
+  ].map((chapter,index)=>({level:index+1,id:id+'_'+chapter[0],title:chapter[1],route:'shared',
+    story_plan:defaultRelationshipStoryPlan({home:{location_id:home.id}},index+1)}));
   const hardLimits=romance?['coercion','dishonesty']:['romance_with_player','sexual_content_with_player'];
   return {
     format_version:1,id,display_name:displayName,

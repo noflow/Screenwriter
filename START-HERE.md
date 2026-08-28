@@ -101,6 +101,15 @@ matching quest and opens it in the Quest builder; **Edit story arc** opens an ex
 one. The quest uses the milestone id, so Port Alder can start it when that level is
 earned. Renaming a linked milestone also renames its quest references safely.
 
+Use **Story arc workshop** from the selected character’s Cast panel or sheet header
+to plan all five milestones together. Each milestone records its shared, platonic,
+or romantic route; central conflict; important player choice; lasting consequence;
+future callback; primary location; supporting cast; required memories; prerequisites;
+and writer notes. The workshop reports missing objectives and dialogue, links the
+conversations that complete quest objectives, and lets you reorder objectives by
+dragging them or using the arrow buttons. **Scaffold missing quests** creates every
+same-id milestone quest that has not been written yet without replacing existing work.
+
 In **Plan scene**, use **Lasting consequence** to unlock a character's next
 relationship chapter and/or create a named memory when that scene finishes. The
 memory is stored in the save game, not in the sheet. In a later choice, choose

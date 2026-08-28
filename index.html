@@ -501,10 +501,21 @@
   <div class="sheet-head">
     <h3 id="edName">Character</h3>
     <span class="sp"></span>
+    <button class="btn" id="edStoryArc">Story arc workshop</button>
     <button class="btn" id="edSheetOut">Export this sheet</button>
     <button class="btn" id="closeEditor">Done</button>
   </div>
   <div class="sheet-body" id="edBody"></div>
+</dialog>
+
+<dialog id="relationshipArcWorkshop">
+  <div class="sheet-head">
+    <h3 id="relationshipArcName">Character story arc</h3>
+    <span class="sp"></span>
+    <button class="btn gold" id="scaffoldRelationshipArcs">Scaffold missing quests</button>
+    <button class="btn" id="closeRelationshipArc">Close</button>
+  </div>
+  <div class="sheet-body arc-workshop-body" id="relationshipArcBody"></div>
 </dialog>
 
 <dialog id="sheet">
@@ -551,6 +562,7 @@
 <script src="js/10e-generate.js"></script>
 <script src="js/10f-planner.js"></script>
 <script src="js/11-editor.js"></script>
+<script src="js/11b-relationship-arc.js"></script>
 <script src="js/12-conditions.js"></script>
 <script src="js/13-routes.js"></script>
 <script src="js/14-graph.js"></script>

@@ -32,6 +32,10 @@ hangout invitation threshold, preferred non-romantic activities, and exactly fiv
 relationship story milestones. Each milestone can create or reopen a same-id quest
 in the Quest builder; that id is the runtime link that starts the arc when the
 shared-activity, bond, trust, and dating-agreement requirements are met.
+The Character Story Arc Workshop adds a five-level overview with route, conflict,
+choice, consequence, callback, location, cast, memory, and prerequisite planning;
+quest/dialogue readiness checks; linked-conversation access; objective reordering;
+and one-click scaffolding for every missing milestone quest.
 
 Run the focused state/player and quest-workshop regression checks with:
 
@@ -40,6 +44,7 @@ Run the focused state/player and quest-workshop regression checks with:
     node tests/character-registry.test.js
     node tests/location-registry.test.js
     node tests/phone-authoring.test.js
+    node tests/relationship-arc-workshop.test.js
 
 ## Layout
 
@@ -49,7 +54,7 @@ Run the focused state/player and quest-workshop regression checks with:
     manifest.json       load order (regenerate by sorting js/ filenames)
     _markup.html        shared markup template with @@CSS@@ / @@JS@@ slots
     css/app.css         all styles
-    js/                 44 modules, loaded in filename order
+    js/                 45 modules, loaded in filename order
 
 ## The modules
 
@@ -85,6 +90,7 @@ Numeric prefixes are load order, not importance.
     10e-generate        askModel, run, continueBranch, fillEmpty
     10f-planner          scene planner and outline-first generation
     11-editor           sheet & limits editor
+    11b-relationship-arc five-milestone character story planning and quest readiness
     12-conditions       condition rows and evaluation
     13-routes           route enumeration, the walker
     14-graph            flow diagrams

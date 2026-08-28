@@ -237,6 +237,9 @@ function wireEditor(c,adult,romance){
 }
 
 $('closeEditor').onclick=()=>{$('editor').close();paintAll();};
+$('edStoryArc').onclick=()=>{
+  $('editor').close();openRelationshipArcWorkshop(edIx);
+};
 
 /** Writes the sheet back out with every edit applied and adult fields normalised. */
 function gameReady(c){

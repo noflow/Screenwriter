@@ -275,6 +275,26 @@ function validate(){
           (chr(chapterArcIds.get(id))?.name||chapterArcIds.get(id))+'.',where);
       else if(id)chapterArcIds.set(id,c.id);
       if(!String(ch?.title||'').trim())add('err','Relationship milestone "'+(id||'?')+'" needs a title.',where);
+      if(ch.route!==undefined&&!PA_RELATIONSHIP_ROUTES.some(route=>route.id===ch.route))
+        add('err','Relationship milestone "'+(id||'?')+'" has unknown route "'+ch.route+'".',where);
+      const plan=ch.story_plan;
+      if(plan!==undefined){
+        if(!plan||typeof plan!=='object'||Array.isArray(plan))
+          add('err','Relationship milestone "'+(id||'?')+'" has an invalid story plan.',where);
+        else{
+          if(!PA_STORY_STATUSES.includes(plan.status))add('err','Relationship milestone "'+(id||'?')+
+            '" has unknown writing status "'+plan.status+'".',where);
+          ['supporting_characters','required_memories','prerequisite_quests'].forEach(key=>{
+            if(!Array.isArray(plan[key]))add('err','Story plan field "'+key+'" must be a list.',where);
+          });
+          if(plan.primary_location&&!loc(locPart(plan.primary_location)))
+            add('err','Story plan location "'+plan.primary_location+'" is not in the registry.',where);
+          if(plan.status==='complete'&&typeof relationshipArcPlanIssues==='function'){
+            const issues=relationshipArcPlanIssues(c,ch);
+            if(issues.length)add('err','Milestone "'+(ch.title||id)+'" is marked complete but still needs: '+issues.join(' '),where);
+          }
+        }
+      }
     });
     const social=c.social_preferences;
     if(!social||typeof social!=='object'||Array.isArray(social))
