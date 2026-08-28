@@ -3,6 +3,44 @@ const PAL=['#C9A227','#C4778E','#8FB08A','#7FA3C4','#C98F5B','#A98FC4','#C4B27F'
 const DAYS=['monday','tuesday','wednesday','thursday','friday','saturday','sunday'];
 const BLOCKS=['early_morning','morning','lunch','afternoon','evening','late_evening','night'];
 
+/** Port Alder's reusable, non-romantic invitations. Character sheets choose
+    favorites from this stable registry; the runtime owns prices and venues. */
+const PA_SOCIAL_ACTIVITIES=Object.freeze([
+  Object.freeze({id:'waterfront_hangout',name:'Waterfront Hangout'}),
+  Object.freeze({id:'cafe_catchup',name:'Café Catch-Up'}),
+  Object.freeze({id:'movie_hangout',name:'Movie Hangout'}),
+  Object.freeze({id:'galleria_browse',name:'Browse the Galleria'}),
+  Object.freeze({id:'nightclub_hangout',name:'Nightclub Hangout'})
+]);
+
+/** Relationship chapters advance in the game only after this due diligence.
+    The character sheet supplies the five story-arc ids and titles. */
+const PA_RELATIONSHIP_MILESTONES=Object.freeze([
+  Object.freeze({level:1,shared_activities:0,bond:0,trust:0,agreement_required:false}),
+  Object.freeze({level:2,shared_activities:1,bond:20,trust:15,agreement_required:false}),
+  Object.freeze({level:3,shared_activities:3,bond:40,trust:40,agreement_required:false}),
+  Object.freeze({level:4,shared_activities:6,bond:65,trust:60,agreement_required:true}),
+  Object.freeze({level:5,shared_activities:10,bond:85,trust:80,agreement_required:true})
+]);
+
+function defaultSocialPreferences(){
+  return {invitation_threshold:20,preferred_activities:['waterfront_hangout','cafe_catchup']};
+}
+function normalizeSocialPreferences(character){
+  const current=character?.social_preferences;
+  if(!current||typeof current!=='object'||Array.isArray(current))
+    character.social_preferences=defaultSocialPreferences();
+  else{
+    const threshold=Number(current.invitation_threshold);
+    current.invitation_threshold=Number.isFinite(threshold)?Math.max(0,Math.min(100,threshold)):20;
+    if(!Array.isArray(current.preferred_activities))current.preferred_activities=[];
+  }
+  return character.social_preferences;
+}
+function relationshipMilestoneRule(level){
+  return PA_RELATIONSHIP_MILESTONES.find(rule=>rule.level===+level)||null;
+}
+
 let P={characters:[],locations:[],content:[],districts:[],travel:null,aliases:{},dismissedBundledCharacters:[]};
 let sel=null, selChar=null, selPlace=null, focusPath=[], stageIx=0;
 let mode='play', busy=false, abort=null, fmt='sheets';
@@ -90,6 +128,36 @@ function renameContentId(c,raw){
   return next;
 }
 const cur=()=>P.content.find(c=>c.uid===sel);
+
+/** Finds the quest whose id makes it the story arc for one relationship chapter. */
+function relationshipChapterQuest(character,chapter){
+  if(!character||!chapter?.id)return null;
+  return P.content.find(item=>item.type==='quest'&&item.id===chapter.id&&
+    (item.character===character.id||(item.cast||[]).includes(character.id)))||null;
+}
+
+/** Makes a writer-ready quest for a chapter. Its chapter requirement prevents
+    the arc from being discovered before the runtime milestone is reached. */
+function ensureRelationshipChapterQuest(character,chapter){
+  const existing=relationshipChapterQuest(character,chapter);
+  if(existing)return {quest:existing,created:false};
+  const collision=P.content.find(item=>item.type==='quest'&&item.id===chapter.id);
+  if(collision)throw new Error('Quest id "'+chapter.id+'" already belongs to '+
+    (collision.title||'another quest')+'. Give this chapter a unique id first.');
+  const location=character.home?.location_id||P.locations[0]?.id||'';
+  const level=+chapter.level||1;
+  const quest={uid:'u'+Date.now().toString(36)+Math.random().toString(36).slice(2,5),
+    type:'quest',id:chapter.id,title:chapter.title||pretty(chapter.id),
+    character:character.id,hook:'Write the relationship story for chapter '+level+'.',
+    location,day:'',block:'',cast:[],premise:'',
+    requires:[{type:'chapter',character:character.id,key:'',op:'gte',value:level}],
+    stages:[{id:'objective_1',title:'Write the first story objective',location,nodes:[],flag:'',requires:[]}],
+    questPlan:{category:'relationship',summary:'Write the relationship story for chapter '+level+'.',
+      rewards:'',rewardRows:[{character:character.id,reward:'relationship:trust',value:1}],
+      advancedRewards:'',participants:[],deadline:'',branchIdeas:'',event:null,eventDraft:null}};
+  P.content.push(quest);
+  return {quest,created:true};
+}
 const NARRATOR={id:'__narrator__',name:'Narration',color:'#938599'};
 /** Port Alder creates this person from the user's choices for every new save.
     It is an authoring reference, never a .character package. */

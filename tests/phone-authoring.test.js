@@ -4,7 +4,8 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const gameRoot = path.resolve(root, '..', 'testgodot');
+const siblingGameRoot=path.resolve(root,'..','testgodot');
+const gameRoot=process.env.SCENEWRIGHT_GAME_ROOT||siblingGameRoot;
 const elements = new Proxy({}, {get(target, id) {
   if (!target[id]) target[id] = {checked: id === 'writePlayer', value: '', innerHTML: ''};
   return target[id];
@@ -17,6 +18,7 @@ const load = file => vm.runInContext(
   fs.readFileSync(path.join(root, file), 'utf8'), context, {filename:file});
 
 load('js/00-state.js');
+load('js/01a-game-characters.js');
 vm.runInContext(`
   var DISTRICTS=[],TRAVEL=null,ALIASES={};
   function customStatDefs(){ return []; }
@@ -42,9 +44,11 @@ load('js/15b-validate.js');
 load('js/18-authored-out.js');
 load('js/08j-phone-builder.js');
 
-const sheets = fs.readdirSync(path.join(gameRoot, 'characters'))
-  .filter(name => name.endsWith('.character'))
-  .map(name => JSON.parse(fs.readFileSync(path.join(gameRoot, 'characters', name), 'utf8')));
+const characterDirectory=path.join(gameRoot,'characters');
+const sheets=fs.existsSync(characterDirectory)
+  ?fs.readdirSync(characterDirectory).filter(name=>name.endsWith('.character'))
+    .map(name=>JSON.parse(fs.readFileSync(path.join(characterDirectory,name),'utf8')))
+  :JSON.parse(vm.runInContext('JSON.stringify(BUNDLED_CHARACTER_SHEETS)',context));
 context.SHEETS = sheets;
 
 vm.runInContext(`
@@ -156,7 +160,7 @@ vm.runInContext(`
   emma.text_messages.push({id:'bad_condition_shape',direction:'outgoing',sender:'player',trigger:{},
     conditions:{flag:'phone.bad_shape'},text:'Bad condition shape',effects:[]});
   const rachel=Object.assign({},SHEETS.find(character=>character.id==='rachel_morgan'),{
-    name:'Rachel Morgan',text_messages:[
+    name:'Rachel Morgan',encounter:null,text_messages:[
       {id:'rachel_locked_send',direction:'outgoing',sender:'player',trigger:{},text:'Can I text you?',effects:[]},
       {id:'rachel_impossible_intro',direction:'incoming',sender:'rachel_morgan',introduces_contact:true,
         trigger:{message_sent:'rachel_locked_send'},text:'This cannot arrive first.',quick_replies:[]}

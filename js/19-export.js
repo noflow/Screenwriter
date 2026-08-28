@@ -17,6 +17,7 @@ function toJSON(){
         adult_hard_limits:g.private_profile?.adult_preferences?.hard_limits||[],
         chapters:(c.relationship_chapters||[]).map(x=>({level:x.level,id:x.id,title:x.title,
           requires:x.requires||[]})),
+        social_preferences:g.social_preferences||{},
         stat_caps:c.stat_caps||{},
         relationship_defaults:c.relationship_defaults||{}};
     }),

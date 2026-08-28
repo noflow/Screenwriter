@@ -78,7 +78,8 @@ editor's scene structure automatically, so the model does not need to write JSON
    deliberately replacing one character from a separate checkout. Or choose
    **New character** to make a complete Port Alder NPC sheet from a
    guided form. It starts with every required field, the 12 relationship meters,
-   five relationship chapters, and a weekday schedule you can edit afterward.
+   five relationship story milestones, preferred non-romantic hangouts, an
+   invitation threshold, and a weekday schedule you can edit afterward.
    **World builder** adds reusable custom stats (such as Confidence or Stress) and
    creates a location with its rooms in one step. Open a character's sheet to set
    their identity, pronouns, presentation, traits, likes, dislikes, fears, strengths,
@@ -92,6 +93,13 @@ editor's scene structure automatically, so the model does not need to write JSON
 5. **Inspect → Validate** to see what needs attention inside the story itself.
 
 ## Lasting relationship consequences
+
+Open a character’s sheet to edit their **Social activity preferences** and five
+**Relationship story milestones**. The milestone rows show the game’s shared-activity,
+bond, trust, and dating-agreement requirements. **Build story arc** creates the
+matching quest and opens it in the Quest builder; **Edit story arc** opens an existing
+one. The quest uses the milestone id, so Port Alder can start it when that level is
+earned. Renaming a linked milestone also renames its quest references safely.
 
 In **Plan scene**, use **Lasting consequence** to unlock a character's next
 relationship chapter and/or create a named memory when that scene finishes. The

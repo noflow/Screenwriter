@@ -46,7 +46,11 @@ vm.runInContext(`
   P={
     characters:[{
       id:'emma_rowan',name:'Emma Rowan',color:'#fff',profile:{},home:{household:['player']},
-      relationship_defaults:{trust:10},relationship_chapters:[],custom_stats:{},connections:[]
+      relationship_defaults:{trust:10},social_preferences:{invitation_threshold:20,
+        preferred_activities:['cafe_catchup']},relationship_chapters:[
+          {level:1,id:'emma_first',title:'First'},{level:2,id:'emma_second',title:'Second'},
+          {level:3,id:'emma_third',title:'Third'},{level:4,id:'emma_fourth',title:'Fourth'},
+          {level:5,id:'emma_fifth',title:'Fifth'}],custom_stats:{},connections:[]
     }],
     locations:[{id:'home',name:'Home',tags:[]}],districts:[],travel:null,aliases:{},
     content:[{

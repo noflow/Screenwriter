@@ -27,6 +27,12 @@ The 15 Port Alder NPC sheets and the location registry are built in. When the si
 Set `SCENEWRIGHT_GAME_CHARACTERS` to the character directory and
 `SCENEWRIGHT_GAME_LOCATIONS` to the location file when the repositories are not siblings.
 
+The guided character creator and existing-sheet editor both author Port Alder's
+hangout invitation threshold, preferred non-romantic activities, and exactly five
+relationship story milestones. Each milestone can create or reopen a same-id quest
+in the Quest builder; that id is the runtime link that starts the arc when the
+shared-activity, bond, trust, and dating-agreement requirements are met.
+
 Run the focused state/player and quest-workshop regression checks with:
 
     node tests/player-runtime.test.js

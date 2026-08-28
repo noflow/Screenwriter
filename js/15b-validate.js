@@ -201,6 +201,10 @@ function validatePhoneAuthoring(add){
   // undiscovered thread. Cross-contact phone events are reachable once their
   // source contact is reachable, so resolve those chains to a fixed point.
   const reachableContacts=new Set(INITIAL_PHONE_CONTACTS);
+  // A discoverable acquaintance can exchange numbers after the introduction;
+  // their queued messages remain valid until the player accepts that exchange.
+  npcs().filter(owner=>owner.encounter?.contact_policy==='after_introduction')
+    .forEach(owner=>reachableContacts.add(owner.id));
   const introductionSourceOwner=(owner,message)=>{
     if(textMessageDirection(message)!=='incoming'||message.introduces_contact!==true)return null;
     const trigger=message.trigger||{};
@@ -238,7 +242,7 @@ function validatePhoneAuthoring(add){
 function validate(){
   const out=[],add=(sev,msg,where,fix)=>out.push({sev,msg,where,fix});
   const districts=typeof DISTRICTS==='undefined'?(P.districts||[]):DISTRICTS;
-  const ids=new Set(),cids=new Set();
+  const ids=new Set(),cids=new Set(),chapterArcIds=new Map();
   const impossibleStats=reqs=>{
     const limits={};
     (reqs||[]).filter(r=>r.type==='stat').forEach(r=>{
@@ -254,6 +258,39 @@ function validate(){
   P.characters.forEach(c=>{
     if(cids.has(c.id))add('err','Two characters share the id "'+c.id+'".','Cast');
     cids.add(c.id);
+    if(isPlayer(c))return;
+    const where=c.name||c.id||'Cast',chapters=Array.isArray(c.relationship_chapters)?c.relationship_chapters:[];
+    if(chapters.length!==5)add('err',where+' needs exactly five relationship story milestones; found '+chapters.length+'.',where);
+    const levels=chapters.map(ch=>+ch.level);
+    if(levels.join(',')!=='1,2,3,4,5')add('err',where+' relationship milestones must be ordered as levels 1 through 5.',where);
+    const localChapterIds=new Set();
+    chapters.forEach(ch=>{
+      const id=String(ch?.id||'');
+      if(!id)add('err','A relationship milestone has no story-arc id.',where);
+      else if(slug(id)!==id)add('err','Relationship milestone id "'+id+'" must use lowercase words joined by underscores.',where);
+      if(id&&localChapterIds.has(id))add('err','Two relationship milestones share id "'+id+'".',where);
+      localChapterIds.add(id);
+      if(id&&chapterArcIds.has(id)&&chapterArcIds.get(id)!==c.id)
+        add('err','Relationship story-arc id "'+id+'" is also used by '+
+          (chr(chapterArcIds.get(id))?.name||chapterArcIds.get(id))+'.',where);
+      else if(id)chapterArcIds.set(id,c.id);
+      if(!String(ch?.title||'').trim())add('err','Relationship milestone "'+(id||'?')+'" needs a title.',where);
+    });
+    const social=c.social_preferences;
+    if(!social||typeof social!=='object'||Array.isArray(social))
+      add('err',where+' needs social activity preferences.',where);
+    else{
+      if(!Number.isFinite(social.invitation_threshold)||social.invitation_threshold<0||social.invitation_threshold>100)
+        add('err','Hangout invitation threshold must be a number from 0 to 100.',where);
+      const preferred=social.preferred_activities;
+      if(!Array.isArray(preferred)||!preferred.length)add('err','Choose at least one preferred non-romantic hangout.',where);
+      else{
+        const known=new Set(PA_SOCIAL_ACTIVITIES.map(activity=>activity.id));
+        if(new Set(preferred).size!==preferred.length)add('err','Preferred hangouts contain a duplicate.',where);
+        preferred.filter(id=>!known.has(id)).forEach(id=>
+          add('err','Preferred hangout "'+id+'" is not in the Port Alder social activity registry.',where));
+      }
+    }
   });
   const phoneMessages=validatePhoneAuthoring(add);
   const locationIds=new Set();

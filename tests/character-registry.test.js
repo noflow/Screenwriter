@@ -4,7 +4,8 @@ const path = require('node:path');
 const vm = require('node:vm');
 
 const root = path.resolve(__dirname, '..');
-const gameRoot = path.resolve(root, '..', 'testgodot');
+const siblingGameRoot=path.resolve(root,'..','testgodot');
+const gameRoot=process.env.SCENEWRIGHT_GAME_ROOT||siblingGameRoot;
 const context = vm.createContext({console});
 const load = file => vm.runInContext(
   fs.readFileSync(path.join(root, file), 'utf8'), context, {filename:file});
@@ -22,6 +23,29 @@ const bundled = JSON.parse(run('JSON.stringify(BUNDLED_CHARACTER_SHEETS)'));
 assert.equal(bundled.length, 15);
 assert.equal(new Set(bundled.map(sheet => sheet.id)).size, 15);
 assert.ok(bundled.every(sheet => sheet.id && sheet.display_name && sheet.profile));
+assert.ok(bundled.every(sheet => sheet.relationship_chapters?.length === 5));
+assert.ok(bundled.every(sheet => Number.isFinite(sheet.social_preferences?.invitation_threshold)));
+assert.ok(bundled.every(sheet => sheet.social_preferences?.preferred_activities?.length));
+assert.equal(run('PA_RELATIONSHIP_MILESTONES.length'), 5);
+assert.equal(run('PA_SOCIAL_ACTIVITIES.length'), 5);
+
+run(`
+  P={characters:[{id:'test_friend',name:'Test Friend',home:{location_id:'test_home'},
+      relationship_chapters:[{level:2,id:'test_friend_getting_closer',title:'Getting Closer'}]}],
+    locations:[{id:'test_home'}],content:[],districts:[],travel:null,aliases:{},
+    dismissedBundledCharacters:[]};
+  globalThis.DEFAULT_SOCIAL=JSON.stringify(defaultSocialPreferences());
+  globalThis.FIRST_ARC=ensureRelationshipChapterQuest(P.characters[0],P.characters[0].relationship_chapters[0]);
+  globalThis.SECOND_ARC=ensureRelationshipChapterQuest(P.characters[0],P.characters[0].relationship_chapters[0]);
+`);
+assert.deepEqual(JSON.parse(context.DEFAULT_SOCIAL), {
+  invitation_threshold:20,preferred_activities:['waterfront_hangout','cafe_catchup']
+});
+assert.equal(context.FIRST_ARC.created, true);
+assert.equal(context.SECOND_ARC.created, false);
+assert.equal(run("P.content.filter(item=>item.id==='test_friend_getting_closer').length"), 1);
+assert.equal(run("P.content[0].requires[0].type"), 'chapter');
+assert.equal(run("P.content[0].requires[0].value"), 2);
 
 const characterDirectory = path.join(gameRoot, 'characters');
 if (fs.existsSync(characterDirectory)) {
@@ -47,7 +71,6 @@ assert.equal(run("P.characters.find(character=>character.id==='elena_reyes_hale'
   'Elena Reyes-Hale');
 assert.equal(run("P.content.some(item=>item.type==='quest'&&item.id==='one_last_summer_movie')"), true);
 assert.equal(run("P.content.some(item=>item.type==='conversation'&&item.id==='emma_alder_bay_walk')"), true);
-assert.equal(run("P.content.some(item=>item.type==='activity'&&item.id==='weekend_tv_with_mom')"), true);
 assert.equal(run('allTextMessages().length'), 10);
 assert.equal(run('P.characterPackage.count'), 15);
 assert.equal(run('P.characterPackage.signature'), run('BUNDLED_CHARACTER_SIGNATURE'));

@@ -31,6 +31,10 @@ function newPortAlderCharacter(){
   const age=clampInt(creatorValue('ccAge'),18,120,22);
   const friendship=clampInt(creatorValue('ccFriendship'),0,100,0);
   const romance=creatorValue('ccRomance')==='yes';
+  const invitationThreshold=clampInt(creatorValue('ccInviteThreshold'),0,100,20);
+  const preferredActivities=Array.from(document.querySelectorAll('[data-cc-social]:checked'))
+    .map(input=>input.dataset.ccSocial);
+  if(!preferredActivities.length)throw new Error('Choose at least one preferred non-romantic hangout.');
   const stats={friendship,love:0,attraction:0,lust:0,trust:friendship,
     respect:Math.min(friendship,25),resentment:0,jealousy:0,comfort:friendship,
     commitment:0,compatibility:Math.max(0,Math.min(50,friendship)),satisfaction:50};
@@ -44,7 +48,7 @@ function newPortAlderCharacter(){
     ['first_meeting','First Meeting'],['getting_to_know_you','Getting to Know You'],
     ['a_shared_routine','A Shared Routine'],['trust_on_the_line','Trust on the Line'],
     ['a_place_in_each_others_lives','A Place in Each Other’s Lives']
-  ].map((chapter,index)=>({level:index+1,id:chapter[0],title:chapter[1]}));
+  ].map((chapter,index)=>({level:index+1,id:id+'_'+chapter[0],title:chapter[1]}));
   const hardLimits=romance?['coercion','dishonesty']:['romance_with_player','sexual_content_with_player'];
   return {
     format_version:1,id,display_name:displayName,
@@ -65,6 +69,7 @@ function newPortAlderCharacter(){
       night:{room:'',spawn:false,activity:'sleeping',label:'Asleep'}
     }},
     ambient_dialogue:[],skills:{},goals:[goal],connections:[],relationship_defaults:stats,
+    social_preferences:{invitation_threshold:invitationThreshold,preferred_activities:preferredActivities},
     boundaries:{alcohol_consent:'never_when_impaired',hard_limits:hardLimits},
     private_profile:{knowledge:'hidden_until_relevant'},relationship_chapters:chapters,
     quest_hooks:[],conversation_topics:[topic],text_style:{tone:creatorValue('ccTone'),emoji_rate:'low',response_delay:'variable'},

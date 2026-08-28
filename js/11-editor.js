@@ -23,6 +23,25 @@ function tagList(id,arr,tone){
     '<input placeholder="add… (enter)" data-add="'+id+'"></div>';
 }
 
+function milestoneRuleText(level){
+  const rule=relationshipMilestoneRule(level);
+  if(!rule)return 'Unknown milestone level';
+  if(rule.level===1)return 'Available from the start';
+  return rule.shared_activities+' shared activit'+(rule.shared_activities===1?'y':'ies')+
+    ' · bond '+rule.bond+' · trust '+rule.trust+
+    (rule.agreement_required?' · dating agreement on romantic routes':'');
+}
+
+function openRelationshipChapterQuest(character,index){
+  const chapter=character.relationship_chapters[index];if(!chapter)return;
+  try{
+    const result=ensureRelationshipChapterQuest(character,chapter);
+    sel=result.quest.uid;focusPath=[];stageIx=0;save();paintAll();
+    $('editor').close();openQuestBuilder();
+    if(result.created)note('Created the story quest for '+esc(chapter.title)+'. Build its objectives and scenes here.');
+  }catch(error){note(esc(error.message));}
+}
+
 function paintEditor(){
   const c=P.characters[edIx];if(!c)return;
   c.profile=c.profile||{};c.personality=c.personality||{};c.boundaries=c.boundaries||{};
@@ -31,6 +50,7 @@ function paintEditor(){
   c.private_profile.adult_preferences=c.private_profile.adult_preferences||{};
   c.relationship_defaults=c.relationship_defaults||{};
   c.relationship_chapters=c.relationship_chapters||[];
+  const social=normalizeSocialPreferences(c);
 
   const adult=isAdult(c), ap=c.private_profile.adult_preferences;
   const romance=c.profile.romance_eligible===true&&adult;
@@ -106,21 +126,29 @@ function paintEditor(){
           (Number.isFinite(+c.custom_stats[s.id])?+c.custom_stats[s.id]:s.default)+'"></div>').join('')+
         '</div><p class="hint">Defined in World builder. These can be checked by scene branches and changed by effects.</p></div>':'')+
 
-      '<div class="field edfull"><p class="rubric">Chapters</p>'+
-        c.relationship_chapters.map((ch,j)=>'<div class="chapline"><span class="lv">'+ch.level+'</span>'+
+      '<div class="field edfull"><p class="rubric">Social activity preferences</p></div>'+
+      '<div class="field"><label>Hangout invitation threshold (0–100)</label>'+
+        '<input type="text" id="edInviteThreshold" inputmode="numeric" value="'+
+        esc(social.invitation_threshold)+'">'+
+        '<p class="hint">Higher values make this character harder to invite successfully.</p></div>'+
+      '<div class="field"><label>Preferred non-romantic hangouts</label><div class="social-choice-grid">'+
+        PA_SOCIAL_ACTIVITIES.map(activity=>'<label><input type="checkbox" data-social-activity="'+activity.id+'"'+
+          (social.preferred_activities.includes(activity.id)?' checked':'')+'> '+esc(activity.name)+'</label>').join('')+
+        '</div><p class="hint">Favorites improve acceptance. Hidden venues remain unavailable until the player discovers them.</p></div>'+
+
+      '<div class="field edfull"><p class="rubric">Five relationship story milestones</p>'+
+        c.relationship_chapters.map((ch,j)=>{
+          const quest=relationshipChapterQuest(c,ch);
+          return '<div class="chapline"><span class="lv">'+esc(ch.level||j+1)+'</span>'+
         '<input value="'+esc(ch.id||'')+'" data-chid="'+j+'"><input value="'+esc(ch.title||'')+'" data-chtitle="'+j+'">'+
-        (ch.level>1
-          ? '<span class="lv" style="opacity:.7">at</span>'+
-            '<select data-chstat="'+j+'"><option value="">no threshold</option>'+
-            STATS.map(s=>'<option value="'+s+'"'+
-              (chapterGate(ch)?.key===s?' selected':'')+'>'+s+'</option>').join('')+'</select>'+
-            '<input type="text" data-chval="'+j+'" style="width:52px" placeholder="n" value="'+
-            (chapterGate(ch)?.value??'')+'">'
-          : '<span class="lv" style="opacity:.55">starts here</span>')+
-        '<button data-chx="'+j+'">×</button></div>').join('')+
-        '<button class="btn" id="edAddChap">+ chapter</button>'+
-        '<p class="hint">Without a threshold a relationship never leaves chapter 1 in play, '+
-        'so anything gated higher can never appear.</p></div>'+
+        '<span class="milestone-rule">'+esc(milestoneRuleText(ch.level||j+1))+'</span>'+
+        '<span class="chapter-actions"><button class="btn chapter-quest" data-chquest="'+j+'">'+
+          (quest?'Edit story arc':'Build story arc')+'</button>'+
+          (j>=5?'<button class="chapter-remove" data-chx="'+j+'" title="Remove extra milestone">×</button>':'')+
+        '</span></div>';}).join('')+
+        (c.relationship_chapters.length<5?'<button class="btn" id="edAddChap">+ add missing milestone</button>':'')+
+        '<p class="hint">The game advances these at the player’s pace using shared activities, bond, and trust. '+
+        'Levels 4–5 also require a dating agreement on romantic routes. A story quest with the same id starts when its milestone is reached.</p></div>'+
 
       '<div class="field edfull"><label>Conversation topics</label>'+
         tagList('conversation_topics',c.conversation_topics,'ok')+'</div>'+
@@ -178,31 +206,34 @@ function wireEditor(c,adult,romance){
   B.querySelectorAll('[data-custom-stat]').forEach(el=>el.oninput=()=>{
     const def=statDefinition(el.dataset.customStat);if(!def)return;
     c.custom_stats[def.id]=Math.max(def.minimum,Math.min(def.maximum,Number(el.value)||0));save();});
-  const setGate=(j)=>{
-    const ch=c.relationship_chapters[j];
-    const key=B.querySelector('[data-chstat="'+j+'"]')?.value||'';
-    const val=parseInt(B.querySelector('[data-chval="'+j+'"]')?.value,10);
-    ch.requires=(key&&Number.isFinite(val))
-      ? [{type:'stat',character:c.id,key,op:'gte',value:val}] : [];
-    save();};
-  B.querySelectorAll('[data-chstat]').forEach(el=>el.onchange=()=>setGate(+el.dataset.chstat));
-  B.querySelectorAll('[data-chval]').forEach(el=>el.oninput=()=>setGate(+el.dataset.chval));
-  B.querySelectorAll('[data-chid]').forEach(el=>el.oninput=()=>{
-    c.relationship_chapters[+el.dataset.chid].id=slug(el.value);save();});
+  $('edInviteThreshold').oninput=e=>{
+    c.social_preferences.invitation_threshold=Math.max(0,Math.min(100,parseInt(e.target.value,10)||0));save();};
+  B.querySelectorAll('[data-social-activity]').forEach(el=>el.onchange=()=>{
+    const selected=Array.from(B.querySelectorAll('[data-social-activity]:checked')).map(input=>input.dataset.socialActivity);
+    if(!selected.length){el.checked=true;note('Choose at least one preferred hangout.');return;}
+    c.social_preferences.preferred_activities=selected;save();
+  });
+  B.querySelectorAll('[data-chid]').forEach(el=>el.onchange=()=>{
+    const index=+el.dataset.chid,chapter=c.relationship_chapters[index];
+    const old=chapter.id,next=slug(el.value),linked=relationshipChapterQuest(c,chapter);
+    const duplicate=c.relationship_chapters.some((item,j)=>j!==index&&item.id===next);
+    const collision=P.content.find(item=>item.type==='quest'&&item.id===next&&item!==linked);
+    if(duplicate||collision){el.value=old;note(duplicate?'Every milestone needs a unique id.':'That id already belongs to another quest.');return;}
+    if(linked)renameContentId(linked,next);
+    chapter.id=next;el.value=next;save();paintEditor();paintSetup();
+  });
   B.querySelectorAll('[data-chtitle]').forEach(el=>el.oninput=()=>{
-    c.relationship_chapters[+el.dataset.chtitle].title=el.value;save();paintSetup();});
+    const chapter=c.relationship_chapters[+el.dataset.chtitle],linked=relationshipChapterQuest(c,chapter);
+    chapter.title=el.value;if(linked)linked.title=el.value;save();paintSetup();});
+  B.querySelectorAll('[data-chquest]').forEach(button=>button.onclick=()=>
+    openRelationshipChapterQuest(c,+button.dataset.chquest));
   B.querySelectorAll('[data-chx]').forEach(b=>b.onclick=()=>{
     c.relationship_chapters.splice(+b.dataset.chx,1);
     c.relationship_chapters.forEach((ch,i)=>ch.level=i+1);save();paintEditor();paintSetup();});
-  $('edAddChap').onclick=()=>{
+  if($('edAddChap'))$('edAddChap').onclick=()=>{
     const n=c.relationship_chapters.length+1;
-    c.relationship_chapters.push({level:n,id:'chapter_'+n,title:'New chapter'});
+    c.relationship_chapters.push({level:n,id:c.id+'_chapter_'+n,title:'New milestone'});
     save();paintEditor();paintSetup();};
-}
-
-/** The meter threshold a chapter opens on, if one is set. */
-function chapterGate(ch){
-  return (ch?.requires||[]).find(r=>r.type==='stat')||null;
 }
 
 $('closeEditor').onclick=()=>{$('editor').close();paintAll();};

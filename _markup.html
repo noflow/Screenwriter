@@ -328,6 +328,17 @@
       <div class="field"><label for="ccTopic1">Conversation topic</label><input id="ccTopic1" type="text" value="city_life"></div>
       <div class="field"><label for="ccFriendship">Starting friendship (0–100)</label><input id="ccFriendship" type="text" value="0" inputmode="numeric"></div>
       <div class="field"><label for="ccRomance">Romance eligible</label><select id="ccRomance"><option value="yes">Yes</option><option value="no">No</option></select></div>
+      <div class="field"><label for="ccInviteThreshold">Hangout invitation threshold (0–100)</label><input id="ccInviteThreshold" type="text" value="20" inputmode="numeric"></div>
+      <div class="field edfull"><label>Preferred non-romantic hangouts</label>
+        <div class="social-choice-grid">
+          <label><input type="checkbox" data-cc-social="waterfront_hangout" checked> Waterfront Hangout</label>
+          <label><input type="checkbox" data-cc-social="cafe_catchup" checked> Café Catch-Up</label>
+          <label><input type="checkbox" data-cc-social="movie_hangout"> Movie Hangout</label>
+          <label><input type="checkbox" data-cc-social="galleria_browse"> Browse the Galleria</label>
+          <label><input type="checkbox" data-cc-social="nightclub_hangout"> Nightclub Hangout</label>
+        </div>
+        <p class="hint">Favorites improve this character’s chance of accepting that invitation. Locations still obey discovery.</p>
+      </div>
       <div class="field edfull"><label for="ccGoal">Character goal</label><input id="ccGoal" type="text" placeholder="Build a life in Port Alder"></div>
     </div>
     <p id="ccMessage" class="hint"></p>

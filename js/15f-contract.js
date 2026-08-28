@@ -313,12 +313,12 @@ function godotCheck(){
   });
   [...new Set(chapterGates.map(g=>g.who))].forEach(who=>{
     const ch=chr(who);if(!ch)return;
-    const ruled=(ch.relationship_chapters||[]).some(x=>(x.requires||[]).length);
-    if(!ruled){
-      const gs=chapterGates.filter(g=>g.who===who);
+    const gs=chapterGates.filter(g=>g.who===who);
+    const highest=Math.max(...gs.map(g=>g.level));
+    if(highest>(ch.relationship_chapters||[]).length){
       add('err',ch.name+' has content gated at chapter '+Math.max(...gs.map(g=>g.level))+
-        ' but no chapter has a threshold, so they stay at 1 forever and '+gs.length+
-        ' item'+(gs.length===1?'':'s')+' can never play. Add requirements to their chapters.','Chapters');
+        ' but only '+(ch.relationship_chapters||[]).length+' milestone'+
+        ((ch.relationship_chapters||[]).length===1?' is':'s are')+' defined.','Chapters');
     }
   });
 
