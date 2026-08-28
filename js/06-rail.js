@@ -97,16 +97,11 @@ function paintPlaceForm(){
         (l.residents?.length?'lives here: '+esc(l.residents.map(id=>chr(id)?.name||pretty(id)).join(', '))+'<br>':'')+
         (l.services?.length?'services: '+esc(l.services.map(pretty).join(', ')):'')+
         '</div>'+
-        ((l.rooms||[]).length
-          ? '<p class="rubric">Rooms</p><div class="chip-list">'+l.rooms.map(r=>
-              '<div class="chip" style="cursor:default"><span class="swatch" style="background:'+
-              (r.access==='shared'?'var(--sage)':r.access==='restricted'?'var(--rose)':'var(--ash)')+
-              '"></span>'+esc(r.name)+'<span class="tag">'+esc(pretty(r.access||''))+'</span></div>'+
-              (r.actions?.length?'<p class="hint" style="margin:-1px 0 5px 18px">'+
-                esc(r.actions.map(pretty).join(' · '))+'</p>':'')
-            ).join('')+'</div>'
-          : '')
+        ((l.rooms||[]).length?'<p class="hint place-room-summary">'+l.rooms.length+' mapped rooms · '+
+          roomMapIssues(l).filter(issue=>issue.severity==='error').length+' map errors</p>':'')
       : '')+
+    '<button class="btn wide gold" id="openRoomMap" style="margin:12px 0 3px">Edit visual room map</button>'+
+    '<p class="hint" style="margin:0 0 10px">Arrange rooms, choose the entrance, and edit access, actions, and directional arrows.</p>'+
     '<div class="field" style="margin-top:12px"><label>Name</label><input type="text" id="lName" value="'+esc(l.name)+'"'+(packaged?' readonly':'')+'></div>'+
     '<div class="two"><div class="field"><label>ID</label><input type="text" id="lId" value="'+esc(l.id)+'"'+(packaged?' readonly':'')+'></div>'+
     '<div class="field"><label>Background</label><input type="text" id="lBg" value="'+esc(l.background||'')+'"></div></div>'+
@@ -126,6 +121,7 @@ function paintPlaceForm(){
   }
   $('lBg').oninput=e=>{l.background=e.target.value;paintPlaces();save()};
   $('lNotes').oninput=e=>{l.notes=e.target.value;save()};
+  $('openRoomMap').onclick=()=>openRoomMapEditor(l);
 }
 
 function paintContent(){

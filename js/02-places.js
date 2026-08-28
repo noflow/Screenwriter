@@ -22,7 +22,7 @@ const locationPackageView=pkg=>({
   districts:pkg.districts||[],travel_rules:pkg.travel_rules||null,
   legacy_aliases:pkg.legacy_aliases||{},
   locations:(pkg.locations||[]).map(l=>{
-    const out={...l};delete out.background;delete out.tags;delete out.notes;
+    const out={...l};delete out.background;delete out.tags;delete out.notes;delete out.editor_layout;
     Object.assign(out,{id:l.id||'',name:l.name||'',district:l.district||'',type:l.type||'',
       travel_node:l.travel_node!==false,access:l.access||{},privacy:l.privacy||null,
       // Authored character sheets own their current home link, so their resident
@@ -44,11 +44,12 @@ const sameLocationPackage=pkg=>JSON.stringify(orderedJson(locationPackageView(pk
     project that happened to be open before it. */
 function restoreProject(project,{refreshLocations=true}={}){
   const source=project&&typeof project==='object'?project:{};
-  P=Object.assign({characters:[],locations:[],content:[],districts:[],travel:null,aliases:{},
+  P=Object.assign({characters:[],locations:[],content:[],ensemble_arcs:[],districts:[],travel:null,aliases:{},
     dismissedBundledCharacters:[],residence_overrides:{}},source);
   if(!Array.isArray(P.characters))P.characters=[];
   if(!Array.isArray(P.locations))P.locations=[];
   if(!Array.isArray(P.content))P.content=[];
+  if(!Array.isArray(P.ensemble_arcs))P.ensemble_arcs=[];
   if(!Array.isArray(P.dismissedBundledCharacters))P.dismissedBundledCharacters=[];
   if(!P.residence_overrides||typeof P.residence_overrides!=='object'||Array.isArray(P.residence_overrides))
     P.residence_overrides={};
@@ -59,14 +60,16 @@ function restoreProject(project,{refreshLocations=true}={}){
 
 /** Per-project discovery/access decisions survive a refresh of the game-owned
     location registry without copying the whole registry into the project. */
-function rememberResidenceOverride(location){
+function rememberResidenceOverride(location,fields=['discovery','access','outside_room']){
   if(!location?.id||!location.tags?.includes('package'))return;
   if(!P.residence_overrides||typeof P.residence_overrides!=='object')P.residence_overrides={};
-  P.residence_overrides[location.id]={
-    discovery:JSON.parse(JSON.stringify(location.discovery||{})),
-    access:JSON.parse(JSON.stringify(location.access||{})),
-    outside_room:location.outside_room||''
-  };
+  const override=P.residence_overrides[location.id]||{};
+  fields.forEach(field=>{
+    if(field==='outside_room')override.outside_room=location.outside_room||'';
+    else if(field==='editor_layout')override.editor_layout=JSON.parse(JSON.stringify(location.editor_layout||{}));
+    else override[field]=JSON.parse(JSON.stringify(location[field]||(/^(rooms|residents)$/.test(field)?[]:{})));
+  });
+  P.residence_overrides[location.id]=override;
 }
 
 function applyResidenceOverrides(){
@@ -78,6 +81,9 @@ function applyResidenceOverrides(){
       location.access=JSON.parse(JSON.stringify(override.access));
     if(Object.prototype.hasOwnProperty.call(override,'outside_room'))
       location.outside_room=override.outside_room||'';
+    if(Array.isArray(override.rooms))location.rooms=JSON.parse(JSON.stringify(override.rooms));
+    if(override.editor_layout&&typeof override.editor_layout==='object')
+      location.editor_layout=JSON.parse(JSON.stringify(override.editor_layout));
   });
 }
 
@@ -254,6 +260,199 @@ const roomPart=ref=>String(ref||'').split('.')[1]||'';
 function roomOf(ref){
   const l=loc(locPart(ref));
   return l?(l.rooms||[]).find(r=>r.id===roomPart(ref))||null:null;
+}
+
+const ROOM_DIRECTIONS=['up','right','down','left'];
+const ROOM_DIRECTION_DELTA={up:[0,-1],right:[1,0],down:[0,1],left:[-1,0]};
+const ROOM_DIRECTION_OPPOSITE={up:'down',right:'left',down:'up',left:'right'};
+
+function effectiveRoomNavigation(location,room){
+  return room?.navigation||(
+    typeof residenceRoomNavigation==='function'?residenceRoomNavigation(location,room):{});
+}
+
+function roomMapLayout(location){
+  return location?.editor_layout&&typeof location.editor_layout==='object'?
+    location.editor_layout:{};
+}
+
+/** Derive a stable authoring layout from navigation. It is presentation data,
+    not travel logic, and can be rearranged without changing exits. */
+function autoRoomMapLayout(location){
+  const rooms=location?.rooms||[],ids=new Set(rooms.map(room=>room.id));
+  const positions={},occupied=new Set();let componentX=0;
+  const freePosition=(x,y)=>{
+    let px=x,py=y;
+    while(occupied.has(px+','+py)){px++;if(px-x>4){px=x;py++;}}
+    occupied.add(px+','+py);return {x:px,y:py};
+  };
+  const walk=root=>{
+    const start=freePosition(componentX,0);positions[root.id]=start;
+    const queue=[root];
+    while(queue.length){
+      const room=queue.shift(),from=positions[room.id];
+      ROOM_DIRECTIONS.forEach(direction=>{
+        const target=effectiveRoomNavigation(location,room)[direction];
+        if(!ids.has(target)||positions[target])return;
+        const delta=ROOM_DIRECTION_DELTA[direction],next=freePosition(from.x+delta[0],from.y+delta[1]);
+        positions[target]=next;queue.push(rooms.find(item=>item.id===target));
+      });
+    }
+    componentX=Math.max(componentX,...Object.values(positions).map(point=>point.x))+2;
+  };
+  const entrance=rooms.find(room=>room.id===(location.outside_room||
+    (typeof residenceEntranceId==='function'?residenceEntranceId(location):'')));
+  if(entrance)walk(entrance);
+  rooms.filter(room=>!positions[room.id]).forEach(walk);
+  location.editor_layout=positions;return positions;
+}
+
+function ensureRoomMapLayout(location){
+  const rooms=location?.rooms||[],current=roomMapLayout(location);
+  if(!rooms.length){location.editor_layout={};return location.editor_layout;}
+  const complete=rooms.every(room=>Number.isFinite(+current[room.id]?.x)&&Number.isFinite(+current[room.id]?.y));
+  return complete?current:autoRoomMapLayout(location);
+}
+
+function materializeSpecialResidenceLayout(location){
+  const special=typeof residenceLayout==='function'?residenceLayout(location):null;
+  if(!special)return false;
+  (location.rooms||[]).forEach(room=>{
+    room.navigation=JSON.parse(JSON.stringify(special.navigation?.[room.id]||room.navigation||{}));
+  });
+  if(!location.outside_room)location.outside_room=special.outside_room||'';
+  rememberResidenceOverride(location,['rooms','outside_room']);return true;
+}
+
+function roomMapIssues(location){
+  const rooms=location?.rooms||[],ids=new Set(rooms.map(room=>room.id)),issues=[];
+  const entrance=location?.outside_room||(
+    typeof residenceEntranceId==='function'?residenceEntranceId(location):'');
+  if(rooms.length&&!entrance)issues.push({severity:'error',message:'Choose an entrance room.'});
+  else if(entrance&&!ids.has(entrance))issues.push({severity:'error',message:'Entrance room "'+entrance+'" does not exist.'});
+  rooms.forEach(room=>Object.entries(effectiveRoomNavigation(location,room)).forEach(([direction,target])=>{
+    if(!ROOM_DIRECTIONS.includes(direction))
+      issues.push({severity:'error',room:room.id,message:pretty(direction)+' is not a supported direction.'});
+    if(!target)return;
+    if(!String(target).includes('.')&&!ids.has(target))
+      issues.push({severity:'error',room:room.id,message:pretty(direction)+' points to missing room "'+target+'".'});
+    if(ids.has(target)){
+      const reverse=effectiveRoomNavigation(location,rooms.find(item=>item.id===target))[ROOM_DIRECTION_OPPOSITE[direction]];
+      if(reverse!==room.id)issues.push({severity:'warning',room:room.id,
+        message:pretty(room.id)+' → '+pretty(target)+' has no matching return arrow.'});
+    }else if(String(target).includes('.')&&typeof roomOf==='function'&&!roomOf(target))
+      issues.push({severity:'error',room:room.id,message:pretty(direction)+' points to unknown destination "'+target+'".'});
+  }));
+  if(entrance&&ids.has(entrance)){
+    const visited=new Set([entrance]),queue=[entrance];
+    while(queue.length){
+      const current=queue.shift(),room=rooms.find(item=>item.id===current);
+      Object.values(effectiveRoomNavigation(location,room)).forEach(target=>{
+        if(ids.has(target)&&!visited.has(target)){visited.add(target);queue.push(target);}
+      });
+      rooms.forEach(candidate=>{
+        if(!visited.has(candidate.id)&&Object.values(effectiveRoomNavigation(location,candidate)).includes(current)){
+          visited.add(candidate.id);queue.push(candidate.id);
+        }
+      });
+    }
+    rooms.filter(room=>!visited.has(room.id)).forEach(room=>issues.push({severity:'warning',room:room.id,
+      message:pretty(room.id)+' is disconnected from the entrance.'}));
+  }
+  return issues;
+}
+
+function rewriteRoomReferences(location,oldId,newId){
+  const locationId=location.id,oldRef=locationId+'.'+oldId,newRef=locationId+'.'+newId;
+  const rewrite=value=>value===oldRef?newRef:value;
+  const fixPlace=object=>{if(object?.location)object.location=rewrite(object.location);};
+  (P.content||[]).forEach(item=>{fixPlace(item);(item.stages||[]).forEach(fixPlace);
+    fixPlace(item.questPlan?.event);fixPlace(item.questPlan?.eventDraft);});
+  (P.characters||[]).forEach(character=>{
+    (character.schedule?.fixed_commitments||[]).forEach(commitment=>{
+      fixPlace(commitment);
+      if(locPart(character.home?.location_id||character.home?.residence_id)===locationId&&
+         commitment.home_placement?.room===oldId)commitment.home_placement.room=newId;
+    });
+    if(locPart(character.home?.location_id||character.home?.residence_id)===locationId){
+      Object.values(character.home_routine?.default_by_block||{}).forEach(placement=>{
+        if(placement?.room===oldId)placement.room=newId;
+      });
+      (character.home_routine?.overrides||[]).forEach(placement=>{
+        if(placement?.room===oldId)placement.room=newId;
+      });
+    }
+  });
+  P.locations.forEach(place=>(place.rooms||[]).forEach(room=>{
+    Object.keys(room.navigation||{}).forEach(direction=>{
+      const target=room.navigation[direction];
+      if(place===location&&target===oldId)room.navigation[direction]=newId;
+      else if(target===oldRef)room.navigation[direction]=newRef;
+    });
+  }));
+}
+
+function renameRoomId(location,room,raw){
+  if(!location||!room)return '';
+  if(location.tags?.includes('package'))return room.id;
+  const oldId=room.id,next=slug(raw);
+  if(!next||next===oldId)return oldId;
+  if((location.rooms||[]).some(item=>item!==room&&item.id===next))return oldId;
+  rewriteRoomReferences(location,oldId,next);
+  if(location.outside_room===oldId)location.outside_room=next;
+  const layout=roomMapLayout(location);if(layout[oldId]){layout[next]=layout[oldId];delete layout[oldId];}
+  room.id=next;return next;
+}
+
+function uniqueRoomId(location,base='new_room'){
+  const used=new Set((location?.rooms||[]).map(room=>room.id));let id=slug(base),number=2;
+  while(used.has(id))id=slug(base)+'_'+number++;
+  return id;
+}
+
+function addLocationRoom(location,name='New Room'){
+  location.rooms=Array.isArray(location.rooms)?location.rooms:[];
+  const priorLayout=roomMapLayout(location),priorComplete=location.rooms.every(existing=>
+    Number.isFinite(+priorLayout[existing.id]?.x)&&Number.isFinite(+priorLayout[existing.id]?.y));
+  const id=uniqueRoomId(location,name),room={id,name,access:'shared',navigation:{},actions:[]};
+  location.rooms.push(room);
+  if(priorComplete){
+    const points=Object.values(priorLayout);priorLayout[id]={
+      x:points.length?Math.max(...points.map(point=>+point.x||0))+1:0,y:0};
+  }else ensureRoomMapLayout(location);
+  return room;
+}
+
+function removeLocationRoom(location,roomId){
+  const room=(location?.rooms||[]).find(item=>item.id===roomId);if(!room)return false;
+  location.rooms=location.rooms.filter(item=>item!==room);
+  location.rooms.forEach(item=>Object.keys(item.navigation||{}).forEach(direction=>{
+    if(item.navigation[direction]===roomId)delete item.navigation[direction];
+  }));
+  if(location.outside_room===roomId)location.outside_room='';
+  delete roomMapLayout(location)[roomId];return true;
+}
+
+function setRoomExit(location,room,direction,target,{addReturn=true}={}){
+  if(!ROOM_DIRECTIONS.includes(direction)||!room)return false;
+  if(typeof residenceLayout==='function'&&residenceLayout(location)&&
+     !(location.rooms||[]).some(item=>item.navigation))materializeSpecialResidenceLayout(location);
+  room.navigation=room.navigation||{};const previous=room.navigation[direction];
+  if(!target)delete room.navigation[direction];else room.navigation[direction]=target;
+  const opposite=ROOM_DIRECTION_OPPOSITE[direction],previousRoom=(location.rooms||[]).find(item=>item.id===previous);
+  if(previousRoom?.navigation?.[opposite]===room.id)delete previousRoom.navigation[opposite];
+  const targetRoom=(location.rooms||[]).find(item=>item.id===target);
+  if(addReturn&&targetRoom){targetRoom.navigation=targetRoom.navigation||{};
+    if(!targetRoom.navigation[opposite])targetRoom.navigation[opposite]=room.id;}
+  return true;
+}
+
+function locationExportRecord(location){
+  return {id:location.id,name:location.name,district:location.district,type:location.type||'place',
+    travel_node:location.travel_node!==false,outside_room:location.outside_room||residenceEntranceId(location)||'',
+    discovery:location.discovery||{},access:location.access||{},residents:location.residents||[],
+    services:location.services||[],rooms:(location.rooms||[]).map(room=>({id:room.id,name:room.name,
+      access:room.access||'shared',navigation:effectiveRoomNavigation(location,room),actions:room.actions||[]})),notes:location.notes||''};
 }
 function placeName(ref){
   const l=loc(locPart(ref));

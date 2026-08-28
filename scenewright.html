@@ -333,6 +333,68 @@
     .home-routine-grid>[data-home-routine-activity],.home-routine-visible{display:none}
   }
 
+  /* visual room-map editor */
+  #roomMapEditor{max-width:1180px;width:96vw}
+  .room-map-editor-body{max-height:78vh;overflow-y:auto;padding-top:14px}
+  .room-map-health{font-family:var(--util);font-size:8px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--sage);border:1px solid rgba(143,176,138,.35);border-radius:10px;padding:3px 7px}
+  .room-map-health.bad{color:var(--rose);border-color:rgba(196,119,142,.4)}
+  .room-map-location-bar{display:grid;grid-template-columns:2fr 1.3fr .6fr 1.5fr;gap:8px;margin-bottom:10px}
+  .room-map-location-bar>span,.room-map-location-bar>label{display:flex;flex-direction:column;justify-content:center;
+    min-height:42px;background:var(--curtain);border:1px solid var(--edge);border-radius:4px;padding:6px 9px;
+    font-family:var(--util);font-size:9px;color:var(--paper)}
+  .room-map-location-bar b{display:block;font-size:7px;letter-spacing:.09em;text-transform:uppercase;color:var(--ash);margin-bottom:2px}
+  .room-map-location-bar label{display:grid;grid-template-columns:auto 1fr;align-items:center;gap:7px;text-transform:uppercase;color:var(--ash)}
+  .room-map-location-bar select{min-width:0;padding:5px 6px;text-transform:none;color:var(--paper)}
+  .room-map-runtime-note{display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:8px 10px;
+    border-left:3px solid var(--brass);background:rgba(201,162,39,.07);font-family:var(--util);font-size:8.5px;line-height:1.55;color:var(--ash)}
+  .room-map-runtime-note .btn{margin-left:auto;white-space:nowrap}
+  .room-map-workspace{display:grid;grid-template-columns:minmax(0,1fr) 370px;gap:10px;align-items:start}
+  .room-map-stage{min-width:0;background:rgba(10,15,20,.35);border:1px solid var(--edge);border-radius:5px;overflow:hidden}
+  .room-map-scroll{overflow:auto;min-height:390px;max-height:540px;background-color:#111a20;
+    background-image:linear-gradient(rgba(127,163,196,.055) 1px,transparent 1px),linear-gradient(90deg,rgba(127,163,196,.055) 1px,transparent 1px);
+    background-size:26px 26px}
+  .room-map-canvas{position:relative;min-width:100%;min-height:390px;user-select:none}
+  .room-map-canvas svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+  .room-map-canvas line{stroke:rgba(127,163,196,.65);stroke-width:2;fill:none}.room-map-canvas line.one-way{stroke:rgba(196,119,142,.65);stroke-dasharray:5 4}
+  .room-map-canvas marker path{fill:var(--sky)}
+  .room-map-node{position:absolute;width:140px;height:66px;display:flex;flex-direction:column;text-align:left;
+    background:#17222a;border:1px solid rgba(127,163,196,.35);border-radius:5px;color:var(--paper);padding:7px 9px;
+    cursor:grab;box-shadow:0 5px 14px rgba(0,0,0,.28);touch-action:none;z-index:2}
+  .room-map-node:hover{border-color:var(--sky)}.room-map-node:active{cursor:grabbing}
+  .room-map-node.selected{border-color:var(--brass);box-shadow:0 0 0 2px rgba(201,162,39,.17),0 5px 14px rgba(0,0,0,.3)}
+  .room-map-node.entrance{background:linear-gradient(135deg,rgba(201,162,39,.13),#17222a 58%)}
+  .room-map-node>b{font-family:var(--display);font-size:14px;font-weight:400;line-height:1.1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .room-map-node>small{font-family:var(--util);font-size:7px;color:var(--ash);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .room-map-node-meta{display:flex;align-items:center;gap:4px;margin-top:4px}.room-map-node-meta i,.room-map-node-meta em{
+    font-family:var(--util);font-size:6.5px;font-style:normal;text-transform:uppercase;border:1px solid rgba(127,163,196,.3);border-radius:8px;padding:1px 4px;color:var(--sky)}
+  .room-map-node-meta i{color:var(--brass);border-color:rgba(201,162,39,.35)}
+  .room-map-node-exits{position:absolute;right:6px;bottom:5px;display:flex;gap:2px;color:var(--brass);font-family:var(--util);font-size:9px}
+  .room-map-issues{display:flex;flex-direction:column;gap:3px;max-height:120px;overflow:auto;border-top:1px solid var(--edge);padding:7px;background:var(--curtain)}
+  .room-map-issues button{background:none;border:0;text-align:left;color:var(--ash);cursor:pointer;font-family:var(--util);font-size:8px;line-height:1.45;padding:2px 4px}
+  .room-map-issues button:hover{color:var(--paper);background:rgba(127,163,196,.08)}
+  .room-map-issues button b{text-transform:uppercase;color:var(--rose);margin-right:5px}.room-map-issues button.warning b{color:var(--brass)}
+  .room-map-issues.clear{display:flex;flex-direction:row;align-items:center;gap:8px;min-height:34px;color:var(--sage);font-family:var(--util);font-size:8px}
+  .room-map-issues.clear b{text-transform:uppercase}.room-map-issues.clear span{color:var(--ash)}
+  .room-map-inspector{background:rgba(20,13,22,.42);border:1px solid var(--edge);border-radius:5px;padding:11px;min-height:450px}
+  .room-map-inspector-head{display:flex;align-items:center;gap:5px;margin-bottom:10px}.room-map-inspector-head>div{flex:1;min-width:0}
+  .room-map-inspector-head span{font-family:var(--util);font-size:7px;text-transform:uppercase;color:var(--ash)}
+  .room-map-inspector-head h4{font-family:var(--display);font-size:20px;font-weight:400;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .room-map-inspector .field{margin-bottom:8px}.room-map-inspector .two{gap:7px}
+  .room-map-entrance-choice{display:flex;align-items:center;gap:6px;padding:7px 9px;margin:4px 0 12px;
+    border:1px solid rgba(201,162,39,.28);border-radius:4px;font-family:var(--util);font-size:8.5px;color:var(--brass)}
+  .room-map-entrance-choice input,.room-map-exit-head input{width:auto}
+  .room-map-exit-head{display:flex;align-items:center;gap:8px;margin-bottom:6px}.room-map-exit-head>b{font-family:var(--util);font-size:8px;text-transform:uppercase;color:var(--paper)}
+  .room-map-exit-head label{display:flex;align-items:center;gap:4px;margin-left:auto;font-family:var(--util);font-size:7px;color:var(--ash)}
+  .room-map-exits{display:flex;flex-direction:column;gap:5px}.room-map-exit-row{display:grid;grid-template-columns:58px 1fr 1fr;gap:5px;align-items:center}
+  .room-map-exit-row .direction{font-family:var(--util);font-size:8px;text-transform:uppercase;color:var(--brass)}
+  .room-map-exit-row select,.room-map-exit-row input{min-width:0;padding:5px 6px;font-family:var(--util);font-size:8.5px}
+  .room-map-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;color:var(--ash);font-family:var(--util);font-size:9px}
+  .room-map-empty b{font-family:var(--display);font-size:20px;font-weight:400;color:var(--paper)}
+  @media(max-width:880px){
+    .room-map-workspace{grid-template-columns:1fr}.room-map-inspector{min-height:0}.room-map-location-bar{grid-template-columns:1fr 1fr}
+  }
+
   /* relationship story arc workshop */
   #relationshipArcWorkshop{max-width:1120px;width:96vw}
   .arc-workshop-body{max-height:76vh;overflow-y:auto;padding-top:14px}
@@ -891,6 +953,40 @@
   @media (max-width:1000px){.phone-builder-layout{grid-template-columns:170px 230px minmax(390px,1fr)}}
   @media (max-width:820px){dialog#phoneBuilder:not(#map):not(#sched){width:98vw;height:95vh}.phone-builder-layout{grid-template-columns:145px 210px minmax(370px,1fr)}.phone-editor-panel{padding:12px}.phone-preview{display:none}}
   @media (max-width:650px){.phone-builder-layout{display:flex;flex-direction:column;overflow-y:auto}.phone-contacts-panel,.phone-message-panel,.phone-editor-panel{overflow:visible;border-right:0;border-bottom:1px solid rgba(220,231,241,.1)}.phone-contact-list{display:flex;overflow-x:auto}.phone-contact-button{min-width:155px}.phone-message-panel{max-height:310px;overflow-y:auto}.phone-form-grid{grid-template-columns:1fr}.phone-form-grid .edfull{grid-column:1}.phone-effect-row,.phone-condition-row{grid-template-columns:1fr 30px}.phone-effect-fields,.phone-condition-fields{grid-column:1}.phone-reply-head{grid-template-columns:1fr 34px}.phone-reply-head .field:nth-child(2){grid-column:1}.phone-reply-head .x{grid-column:2;grid-row:1}}
+
+  /* Ensemble Story Arc Studio */
+  dialog#ensembleArcStudio:not(#map):not(#sched),dialog#ensemblePlaytest:not(#map):not(#sched){width:min(98vw,1480px);max-width:none;height:min(94vh,940px);max-height:none}
+  dialog#ensembleArcStudio[open],dialog#ensemblePlaytest[open]{display:flex;flex-direction:column}
+  .ensemble-arc-head,.ensemble-playtest-head{min-height:66px;padding:9px 17px}.ensemble-arc-head>div:first-child,.ensemble-playtest-head>div:first-child{display:grid;gap:1px}
+  .ensemble-kicker{color:#7ec0ba;font:8px var(--util);letter-spacing:.17em;text-transform:uppercase}.ensemble-arc-head h3,.ensemble-playtest-head h3{margin:0}
+  .ensemble-health{padding:4px 7px;border:1px solid rgba(143,176,138,.25);border-radius:12px;color:var(--sage);font:8px var(--util);letter-spacing:.1em;text-transform:uppercase}
+  .ensemble-health.bad{border-color:rgba(196,119,142,.4);color:var(--rose)}.ensemble-playtest-head>label{display:flex;align-items:center;gap:6px;color:var(--ash);font:8px var(--util);text-transform:uppercase}
+  .ensemble-playtest-head select{padding:5px 7px;border:1px solid var(--edge);border-radius:4px;background:var(--curtain)}
+  .ensemble-arc-body,.ensemble-playtest-body{flex:1;min-height:0;padding:0;overflow:hidden}
+  .ensemble-layout{display:grid;grid-template-columns:220px minmax(900px,1fr);height:100%;min-height:0}.ensemble-sidebar{padding:14px 11px;border-right:1px solid var(--edge);overflow-y:auto;background:rgba(9,14,22,.3)}
+  .ensemble-sidebar-head{display:flex;align-items:center;gap:8px;margin-bottom:10px;color:var(--brass);font:9px var(--util);letter-spacing:.16em;text-transform:uppercase}.ensemble-sidebar-head span{flex:1}
+  .ensemble-arc-card{display:grid;gap:3px;width:100%;margin-bottom:6px;padding:10px;border:1px solid rgba(237,228,211,.1);border-radius:7px;color:var(--ash);background:rgba(10,15,23,.25);text-align:left;cursor:pointer}
+  .ensemble-arc-card:hover{border-color:rgba(201,162,39,.3)}.ensemble-arc-card.on{border-color:rgba(201,162,39,.55);color:var(--paper);background:rgba(201,162,39,.08)}.ensemble-arc-card b{font-size:11px}.ensemble-arc-card span,.ensemble-arc-card small{font:8px var(--util)}
+  .ensemble-sidebar>.btn.wide{margin-top:10px}.ensemble-main{min-width:0;overflow-y:auto}.ensemble-welcome{display:grid;place-content:center;justify-items:center;gap:8px;text-align:center}.ensemble-welcome>b{font:24px var(--display)}.ensemble-welcome p{max-width:510px;color:var(--ash)}
+  .ensemble-arc-overview{padding:13px 16px 9px;border-bottom:1px solid var(--edge);background:rgba(51,33,58,.32)}.ensemble-arc-fields{display:grid;grid-template-columns:2fr 1.2fr .8fr .9fr;gap:8px}.ensemble-arc-overview .field{margin-bottom:7px}
+  .ensemble-cast-panel{border:1px solid var(--edge);border-radius:6px;background:rgba(7,12,19,.25)}.ensemble-cast-panel summary{padding:7px 9px;color:#aebdc7;font:8.5px var(--util);cursor:pointer;text-transform:uppercase}.ensemble-cast-grid{display:grid;grid-template-columns:repeat(4,minmax(160px,1fr));gap:5px;padding:4px 9px 9px}
+  .ensemble-cast-row{display:grid;grid-template-columns:1fr 88px;gap:4px;align-items:center;padding:4px 6px;border-radius:5px;background:rgba(237,228,211,.035)}.ensemble-cast-row label{display:flex;align-items:center;gap:5px;min-width:0;font-size:9px}.ensemble-cast-row input{width:auto}.ensemble-cast-row select{min-width:0;padding:3px;border:1px solid var(--edge);border-radius:3px;background:var(--curtain);font:8px var(--util)}
+  .ensemble-variable-panel{margin-top:6px;border:1px solid var(--edge);border-radius:6px;background:rgba(7,12,19,.25)}.ensemble-variable-panel summary{padding:7px 9px;color:#aebdc7;font:8.5px var(--util);cursor:pointer;text-transform:uppercase}.ensemble-variable-body{padding:4px 9px 9px}.ensemble-variable-body>.field textarea{min-height:55px;font:9px var(--util)}.ensemble-variable-list{display:grid;gap:5px}.ensemble-variable-row{display:grid;grid-template-columns:1.25fr 1fr 90px 100px 26px;gap:6px;align-items:end;padding:7px;border-radius:6px;background:rgba(237,228,211,.035)}.ensemble-variable-row .field{margin:0}.ensemble-variable-row .x{height:32px;border:1px solid rgba(196,119,142,.2);border-radius:4px;color:var(--rose);background:rgba(98,40,53,.1);cursor:pointer}.ensemble-variable-body>.btn{margin-top:7px}
+  .ensemble-node-toolbar{display:flex;align-items:center;gap:5px;padding:8px 14px;border-bottom:1px solid var(--edge);overflow-x:auto;background:rgba(17,24,34,.38)}.ensemble-node-toolbar span{margin-right:5px;color:var(--brass);font:8px var(--util);letter-spacing:.13em;text-transform:uppercase;white-space:nowrap}.ensemble-node-toolbar button{padding:5px 7px;border:1px solid rgba(237,228,211,.12);border-radius:4px;color:#aebbc5;background:rgba(237,228,211,.035);font:8px var(--util);white-space:nowrap;cursor:pointer}.ensemble-node-toolbar button:hover{border-color:rgba(201,162,39,.38);color:var(--paper)}.ensemble-node-toolbar #ensembleAutoArrange{margin-left:auto}
+  .ensemble-workspace{display:grid;grid-template-columns:minmax(580px,1fr) 410px;height:680px;min-height:0}.ensemble-graph-panel{display:grid;grid-template-rows:minmax(0,1fr) auto;min-height:0;border-right:1px solid var(--edge)}.ensemble-graph-scroll{min-height:0;overflow:auto;background-color:#111923;background-image:linear-gradient(rgba(126,192,186,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(126,192,186,.045) 1px,transparent 1px);background-size:24px 24px}
+  .ensemble-canvas{position:relative;min-width:100%;min-height:100%}.ensemble-canvas svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}.ensemble-canvas svg path:not([d^="M0"]){fill:none;stroke:#708da0;stroke-width:1.5}.ensemble-canvas marker path{fill:#708da0}
+  .ensemble-node{position:absolute;display:grid;gap:4px;width:172px;min-height:83px;padding:10px;border:1px solid rgba(126,192,186,.25);border-radius:8px;color:#c8d7df;background:linear-gradient(145deg,rgba(29,48,62,.97),rgba(17,29,40,.98));box-shadow:0 6px 18px rgba(0,0,0,.2);text-align:left;cursor:grab;user-select:none}.ensemble-node:hover{border-color:rgba(126,192,186,.55)}.ensemble-node.selected{border-color:var(--brass);box-shadow:0 0 0 2px rgba(201,162,39,.16),0 8px 22px rgba(0,0,0,.25)}.ensemble-node.start:after{content:'START';position:absolute;right:7px;top:6px;color:var(--brass);font:7px var(--util)}.ensemble-node.choice,.ensemble-node.gate{border-color:rgba(196,143,204,.42)}.ensemble-node.ending{border-color:rgba(143,176,138,.45)}.ensemble-node.placeholder{border-style:dashed;border-color:rgba(196,119,142,.5)}.ensemble-node small,.ensemble-node span{color:#8297a6;font:7.5px var(--util);text-transform:uppercase}.ensemble-node b{padding-right:25px;font-size:12px}
+  .ensemble-issues{display:flex;gap:5px;max-height:118px;padding:7px 9px;border-top:1px solid var(--edge);overflow:auto;background:rgba(7,12,19,.7)}.ensemble-issues button{min-width:230px;padding:6px 8px;border:1px solid rgba(196,119,142,.22);border-radius:5px;color:#bd9da6;background:rgba(98,40,53,.09);font:8px var(--util);text-align:left;cursor:pointer}.ensemble-issues button.warning{border-color:rgba(215,180,111,.2);color:#bdaf91}.ensemble-issues button b{text-transform:uppercase}.ensemble-issues.clear{align-items:center;color:var(--sage);font:8px var(--util)}.ensemble-issues.clear span{color:var(--ash)}
+  .ensemble-inspector{padding:14px 15px 36px;overflow-y:auto;background:linear-gradient(155deg,rgba(29,43,55,.35),rgba(10,16,23,.2))}.ensemble-inspector-head{display:flex;align-items:center;gap:6px;margin-bottom:13px}.ensemble-inspector-head>div{flex:1}.ensemble-inspector-head span{color:#8297a6;font:8px var(--util);letter-spacing:.12em;text-transform:uppercase}.ensemble-inspector-head h4{margin:2px 0 0;font:20px var(--display)}
+  .ensemble-node-meta{display:grid;grid-template-columns:1fr 1fr;gap:6px}.ensemble-node-meta .field:nth-child(3){grid-column:1/-1}.ensemble-start{display:flex;align-items:center;gap:6px;margin-bottom:11px;padding:7px;border:1px solid var(--edge);border-radius:5px;color:#c5d2d9;font:8.5px var(--util)}.ensemble-start input{width:auto}.ensemble-node-cast{display:flex;flex-wrap:wrap;gap:4px}.ensemble-node-cast label{display:flex;align-items:center;gap:4px;padding:5px 6px;border-radius:5px;background:rgba(237,228,211,.045);font:8px var(--util)}.ensemble-node-cast label:has(input:checked){color:#e6f2f4;background:rgba(60,112,118,.3)}.ensemble-node-cast input{width:auto}.ensemble-dialogue-draft{min-height:130px!important;font-family:var(--util);font-size:10px!important;line-height:1.55!important}
+  .ensemble-routes-title{display:flex;align-items:center;margin:15px 0 7px;color:var(--brass);font:9px var(--util);text-transform:uppercase}.ensemble-routes-title b{flex:1}.ensemble-route-card{margin-bottom:8px;padding:9px;border:1px solid var(--edge);border-radius:7px;background:rgba(5,11,17,.24)}.ensemble-route-head{display:flex;align-items:center;margin-bottom:7px;color:#aebdc7;font:8px var(--util);text-transform:uppercase}.ensemble-route-head b{flex:1}.ensemble-route-head .x{border:0;color:var(--ash);background:none;cursor:pointer}.ensemble-route-card textarea{min-height:65px!important;font-family:var(--util);font-size:9px!important}
+  .ensemble-empty{padding:16px;color:var(--ash);font:9px var(--util);line-height:1.5}.ensemble-empty.inspector{display:grid;place-content:center;min-height:300px;text-align:center}
+  .ensemble-play-layout{display:grid;grid-template-columns:250px minmax(560px,1fr);height:100%;min-height:0}.ensemble-test-nav{padding:14px;border-right:1px solid var(--edge);overflow-y:auto;background:rgba(7,13,20,.4)}.ensemble-test-nav>label{display:grid;gap:5px;color:var(--brass);font:8px var(--util);text-transform:uppercase}.ensemble-test-nav select,.ensemble-test-state input{width:100%;padding:6px 7px;border:1px solid var(--edge);border-radius:4px;background:var(--curtain)}.ensemble-play-history{display:grid;gap:4px;margin:14px 0;padding:10px;border:1px solid var(--edge);border-radius:7px}.ensemble-play-history b,.ensemble-test-state h4{margin:0 0 4px;color:#aebdc7;font:8px var(--util);text-transform:uppercase}.ensemble-play-history span{color:#8498a6;font:8px var(--util)}.ensemble-test-state>p{color:#718795;font:8px var(--util)}.ensemble-test-state>label,.ensemble-test-state details label{display:grid;grid-template-columns:1fr 65px;align-items:center;gap:5px;margin-bottom:5px;color:#9cabb5;font:8px var(--util)}.ensemble-test-state details{margin-top:7px;border-top:1px solid var(--edge);padding-top:6px}.ensemble-test-state summary{margin-bottom:6px;color:#bac8d0;font-size:9px;cursor:pointer}
+  .ensemble-vn{display:flex;flex-direction:column;min-height:0;padding:20px 28px 28px;overflow-y:auto;background:radial-gradient(circle at 50% 0,rgba(80,105,122,.2),transparent 58%),#0c141c}.ensemble-vn-slug{display:grid;grid-template-columns:1fr auto;gap:3px 12px;padding:0 3px 11px;border-bottom:1px solid rgba(220,231,241,.1)}.ensemble-vn-slug span{color:#7ec0ba;font:8px var(--util);letter-spacing:.14em;text-transform:uppercase}.ensemble-vn-slug b{grid-column:1;font:22px var(--display)}.ensemble-vn-slug small{grid-column:2;grid-row:1/3;align-self:center;color:#8195a3;font:8px var(--util)}.ensemble-vn-screen{display:grid;align-content:end;gap:9px;min-height:330px;margin:16px 0;padding:22px;border:1px solid rgba(220,231,241,.13);border-radius:11px;background:linear-gradient(180deg,rgba(31,52,68,.35),rgba(6,12,18,.82));box-shadow:inset 0 -80px 100px rgba(0,0,0,.28)}
+  .ensemble-entry-warning{display:flex;align-items:center;gap:8px;margin:10px 0 -7px;padding:7px 9px;border:1px solid rgba(215,180,111,.25);border-radius:6px;color:#d0bb91;background:rgba(104,75,24,.1);font:8px var(--util)}.ensemble-entry-warning span{color:#9d907a}
+  .ensemble-vn-line{max-width:78%;padding:12px 14px;border:1px solid rgba(126,192,186,.17);border-radius:9px;background:rgba(15,28,38,.87)}.ensemble-vn-line:nth-child(even){margin-left:auto}.ensemble-vn-line b{display:block;margin-bottom:4px;color:#7ec0ba;font:8px var(--util);letter-spacing:.1em;text-transform:uppercase}.ensemble-vn-line p{margin:0;font-size:15px;line-height:1.5}.ensemble-vn-line.narrator{max-width:100%;margin:0;color:#aebbc4;background:transparent;text-align:center;font-style:italic}.ensemble-vn-line.narrator b{display:none}.ensemble-vn-placeholder{align-self:center;color:#8496a3;text-align:center;font-style:italic}.ensemble-vn-choices{display:grid;gap:7px;width:min(720px,100%);margin:0 auto}.ensemble-vn-choices button{display:grid;gap:2px;padding:11px 14px;border:1px solid rgba(126,192,186,.25);border-radius:7px;color:#dce8ec;background:rgba(32,67,74,.22);text-align:left;cursor:pointer}.ensemble-vn-choices button:hover:not(:disabled){border-color:#7ec0ba;background:rgba(32,87,87,.32)}.ensemble-vn-choices button:disabled{opacity:.42;cursor:not-allowed}.ensemble-vn-choices button span{color:#8295a3;font:8px var(--util)}.ensemble-vn-ending{padding:14px;border:1px solid rgba(143,176,138,.28);border-radius:7px;color:var(--sage);text-align:center}.ensemble-test-changes{display:flex;flex-wrap:wrap;gap:5px;margin:-7px 0 12px}.ensemble-test-changes b,.ensemble-test-changes span{padding:5px 7px;border-radius:5px;font:8px var(--util)}.ensemble-test-changes b{color:#7ec0ba}.ensemble-test-changes span{color:#aebbc4;background:rgba(126,192,186,.08)}
+  @media(max-width:1100px){.ensemble-layout{grid-template-columns:180px minmax(820px,1fr)}.ensemble-workspace{grid-template-columns:minmax(520px,1fr) 360px}.ensemble-cast-grid{grid-template-columns:repeat(3,minmax(155px,1fr))}}
+  @media(max-width:820px){dialog#ensembleArcStudio:not(#map):not(#sched),dialog#ensemblePlaytest:not(#map):not(#sched){width:99vw;height:96vh}.ensemble-layout{grid-template-columns:150px minmax(760px,1fr)}.ensemble-play-layout{grid-template-columns:210px minmax(520px,1fr)}.ensemble-vn{padding:15px}.ensemble-vn-line{max-width:92%}}
 </style>
 
 <header class="masthead">
@@ -907,6 +1003,7 @@
       <button class="btn quiet" id="pasteChars" title="Paste character JSON">Paste</button>
     </div>
     <div class="mast-group mast-tools" aria-label="Project tools">
+      <button class="btn quiet" id="openEnsembleArcs">Arcs</button>
       <button class="btn quiet" id="openMap">Map</button>
       <button class="btn quiet" id="openInspect">Inspect</button>
       <button class="btn quiet" id="openMemory">Memory</button>
@@ -1383,6 +1480,19 @@
   </div>
 </dialog>
 
+<dialog id="roomMapEditor">
+  <div class="sheet-head">
+    <h3 id="roomMapTitle">Room map</h3>
+    <span class="room-map-health" id="roomMapHealth"></span>
+    <span class="sp"></span>
+    <button class="btn" id="roomMapDownload">Download location</button>
+    <button class="btn" id="roomMapAuto">Auto arrange</button>
+    <button class="btn gold" id="roomMapAdd">+ Room</button>
+    <button class="btn" id="roomMapClose">Done</button>
+  </div>
+  <div class="sheet-body room-map-editor-body" id="roomMapBody"></div>
+</dialog>
+
 <dialog id="editor">
   <div class="sheet-head">
     <h3 id="edName">Character</h3>
@@ -1398,10 +1508,36 @@
   <div class="sheet-head">
     <h3 id="relationshipArcName">Character story arc</h3>
     <span class="sp"></span>
+    <button class="btn" id="openEnsembleArcsFromCharacter">Ensemble arcs</button>
     <button class="btn gold" id="scaffoldRelationshipArcs">Scaffold missing quests</button>
     <button class="btn" id="closeRelationshipArc">Close</button>
   </div>
   <div class="sheet-body arc-workshop-body" id="relationshipArcBody"></div>
+</dialog>
+
+<dialog id="ensembleArcStudio">
+  <div class="sheet-head ensemble-arc-head">
+    <div><span class="ensemble-kicker">Multi-character branching stories</span><h3 id="ensembleArcTitle">Ensemble Story Arc Studio</h3></div>
+    <span class="ensemble-health" id="ensembleArcHealth"></span>
+    <span class="sp"></span>
+    <button class="btn" id="ensembleArcDownload">Download arc</button>
+    <button class="btn" id="ensembleArcScaffold">Scaffold approved nodes</button>
+    <button class="btn gold" id="ensembleArcPlay">Playtest</button>
+    <button class="btn" id="ensembleArcClose">Close</button>
+  </div>
+  <div class="sheet-body ensemble-arc-body" id="ensembleArcBody"></div>
+</dialog>
+
+<dialog id="ensemblePlaytest">
+  <div class="sheet-head ensemble-playtest-head">
+    <div><span class="ensemble-kicker">Isolated draft state</span><h3 id="ensemblePlaytestTitle">Arc Playtest</h3></div>
+    <span class="sp"></span>
+    <label>Preset <select id="ensemblePlaytestPreset"><option value="fresh">Fresh start</option><option value="midgame">Midgame social</option><option value="open">All routes open</option></select></label>
+    <button class="btn" id="ensemblePlaytestRestart">Restart</button>
+    <button class="btn" id="ensemblePlaytestBack">Rewind</button>
+    <button class="btn" id="ensemblePlaytestClose">Back to studio</button>
+  </div>
+  <div class="sheet-body ensemble-playtest-body" id="ensemblePlaytestBody"></div>
 </dialog>
 
 <dialog id="sheet">
@@ -1602,7 +1738,7 @@ function ensureCharacterStoryArcQuest(character,slot){
   return {quest,created:true};
 }
 
-let P={characters:[],locations:[],content:[],districts:[],travel:null,aliases:{},
+let P={characters:[],locations:[],content:[],ensemble_arcs:[],districts:[],travel:null,aliases:{},
   dismissedBundledCharacters:[],residence_overrides:{}};
 let sel=null, selChar=null, selPlace=null, focusPath=[], stageIx=0;
 let mode='play', busy=false, abort=null, fmt='sheets';
@@ -2106,7 +2242,7 @@ const locationPackageView=pkg=>({
   districts:pkg.districts||[],travel_rules:pkg.travel_rules||null,
   legacy_aliases:pkg.legacy_aliases||{},
   locations:(pkg.locations||[]).map(l=>{
-    const out={...l};delete out.background;delete out.tags;delete out.notes;
+    const out={...l};delete out.background;delete out.tags;delete out.notes;delete out.editor_layout;
     Object.assign(out,{id:l.id||'',name:l.name||'',district:l.district||'',type:l.type||'',
       travel_node:l.travel_node!==false,access:l.access||{},privacy:l.privacy||null,
       // Authored character sheets own their current home link, so their resident
@@ -2128,11 +2264,12 @@ const sameLocationPackage=pkg=>JSON.stringify(orderedJson(locationPackageView(pk
     project that happened to be open before it. */
 function restoreProject(project,{refreshLocations=true}={}){
   const source=project&&typeof project==='object'?project:{};
-  P=Object.assign({characters:[],locations:[],content:[],districts:[],travel:null,aliases:{},
+  P=Object.assign({characters:[],locations:[],content:[],ensemble_arcs:[],districts:[],travel:null,aliases:{},
     dismissedBundledCharacters:[],residence_overrides:{}},source);
   if(!Array.isArray(P.characters))P.characters=[];
   if(!Array.isArray(P.locations))P.locations=[];
   if(!Array.isArray(P.content))P.content=[];
+  if(!Array.isArray(P.ensemble_arcs))P.ensemble_arcs=[];
   if(!Array.isArray(P.dismissedBundledCharacters))P.dismissedBundledCharacters=[];
   if(!P.residence_overrides||typeof P.residence_overrides!=='object'||Array.isArray(P.residence_overrides))
     P.residence_overrides={};
@@ -2143,14 +2280,16 @@ function restoreProject(project,{refreshLocations=true}={}){
 
 /** Per-project discovery/access decisions survive a refresh of the game-owned
     location registry without copying the whole registry into the project. */
-function rememberResidenceOverride(location){
+function rememberResidenceOverride(location,fields=['discovery','access','outside_room']){
   if(!location?.id||!location.tags?.includes('package'))return;
   if(!P.residence_overrides||typeof P.residence_overrides!=='object')P.residence_overrides={};
-  P.residence_overrides[location.id]={
-    discovery:JSON.parse(JSON.stringify(location.discovery||{})),
-    access:JSON.parse(JSON.stringify(location.access||{})),
-    outside_room:location.outside_room||''
-  };
+  const override=P.residence_overrides[location.id]||{};
+  fields.forEach(field=>{
+    if(field==='outside_room')override.outside_room=location.outside_room||'';
+    else if(field==='editor_layout')override.editor_layout=JSON.parse(JSON.stringify(location.editor_layout||{}));
+    else override[field]=JSON.parse(JSON.stringify(location[field]||(/^(rooms|residents)$/.test(field)?[]:{})));
+  });
+  P.residence_overrides[location.id]=override;
 }
 
 function applyResidenceOverrides(){
@@ -2162,6 +2301,9 @@ function applyResidenceOverrides(){
       location.access=JSON.parse(JSON.stringify(override.access));
     if(Object.prototype.hasOwnProperty.call(override,'outside_room'))
       location.outside_room=override.outside_room||'';
+    if(Array.isArray(override.rooms))location.rooms=JSON.parse(JSON.stringify(override.rooms));
+    if(override.editor_layout&&typeof override.editor_layout==='object')
+      location.editor_layout=JSON.parse(JSON.stringify(override.editor_layout));
   });
 }
 
@@ -2339,6 +2481,199 @@ function roomOf(ref){
   const l=loc(locPart(ref));
   return l?(l.rooms||[]).find(r=>r.id===roomPart(ref))||null:null;
 }
+
+const ROOM_DIRECTIONS=['up','right','down','left'];
+const ROOM_DIRECTION_DELTA={up:[0,-1],right:[1,0],down:[0,1],left:[-1,0]};
+const ROOM_DIRECTION_OPPOSITE={up:'down',right:'left',down:'up',left:'right'};
+
+function effectiveRoomNavigation(location,room){
+  return room?.navigation||(
+    typeof residenceRoomNavigation==='function'?residenceRoomNavigation(location,room):{});
+}
+
+function roomMapLayout(location){
+  return location?.editor_layout&&typeof location.editor_layout==='object'?
+    location.editor_layout:{};
+}
+
+/** Derive a stable authoring layout from navigation. It is presentation data,
+    not travel logic, and can be rearranged without changing exits. */
+function autoRoomMapLayout(location){
+  const rooms=location?.rooms||[],ids=new Set(rooms.map(room=>room.id));
+  const positions={},occupied=new Set();let componentX=0;
+  const freePosition=(x,y)=>{
+    let px=x,py=y;
+    while(occupied.has(px+','+py)){px++;if(px-x>4){px=x;py++;}}
+    occupied.add(px+','+py);return {x:px,y:py};
+  };
+  const walk=root=>{
+    const start=freePosition(componentX,0);positions[root.id]=start;
+    const queue=[root];
+    while(queue.length){
+      const room=queue.shift(),from=positions[room.id];
+      ROOM_DIRECTIONS.forEach(direction=>{
+        const target=effectiveRoomNavigation(location,room)[direction];
+        if(!ids.has(target)||positions[target])return;
+        const delta=ROOM_DIRECTION_DELTA[direction],next=freePosition(from.x+delta[0],from.y+delta[1]);
+        positions[target]=next;queue.push(rooms.find(item=>item.id===target));
+      });
+    }
+    componentX=Math.max(componentX,...Object.values(positions).map(point=>point.x))+2;
+  };
+  const entrance=rooms.find(room=>room.id===(location.outside_room||
+    (typeof residenceEntranceId==='function'?residenceEntranceId(location):'')));
+  if(entrance)walk(entrance);
+  rooms.filter(room=>!positions[room.id]).forEach(walk);
+  location.editor_layout=positions;return positions;
+}
+
+function ensureRoomMapLayout(location){
+  const rooms=location?.rooms||[],current=roomMapLayout(location);
+  if(!rooms.length){location.editor_layout={};return location.editor_layout;}
+  const complete=rooms.every(room=>Number.isFinite(+current[room.id]?.x)&&Number.isFinite(+current[room.id]?.y));
+  return complete?current:autoRoomMapLayout(location);
+}
+
+function materializeSpecialResidenceLayout(location){
+  const special=typeof residenceLayout==='function'?residenceLayout(location):null;
+  if(!special)return false;
+  (location.rooms||[]).forEach(room=>{
+    room.navigation=JSON.parse(JSON.stringify(special.navigation?.[room.id]||room.navigation||{}));
+  });
+  if(!location.outside_room)location.outside_room=special.outside_room||'';
+  rememberResidenceOverride(location,['rooms','outside_room']);return true;
+}
+
+function roomMapIssues(location){
+  const rooms=location?.rooms||[],ids=new Set(rooms.map(room=>room.id)),issues=[];
+  const entrance=location?.outside_room||(
+    typeof residenceEntranceId==='function'?residenceEntranceId(location):'');
+  if(rooms.length&&!entrance)issues.push({severity:'error',message:'Choose an entrance room.'});
+  else if(entrance&&!ids.has(entrance))issues.push({severity:'error',message:'Entrance room "'+entrance+'" does not exist.'});
+  rooms.forEach(room=>Object.entries(effectiveRoomNavigation(location,room)).forEach(([direction,target])=>{
+    if(!ROOM_DIRECTIONS.includes(direction))
+      issues.push({severity:'error',room:room.id,message:pretty(direction)+' is not a supported direction.'});
+    if(!target)return;
+    if(!String(target).includes('.')&&!ids.has(target))
+      issues.push({severity:'error',room:room.id,message:pretty(direction)+' points to missing room "'+target+'".'});
+    if(ids.has(target)){
+      const reverse=effectiveRoomNavigation(location,rooms.find(item=>item.id===target))[ROOM_DIRECTION_OPPOSITE[direction]];
+      if(reverse!==room.id)issues.push({severity:'warning',room:room.id,
+        message:pretty(room.id)+' → '+pretty(target)+' has no matching return arrow.'});
+    }else if(String(target).includes('.')&&typeof roomOf==='function'&&!roomOf(target))
+      issues.push({severity:'error',room:room.id,message:pretty(direction)+' points to unknown destination "'+target+'".'});
+  }));
+  if(entrance&&ids.has(entrance)){
+    const visited=new Set([entrance]),queue=[entrance];
+    while(queue.length){
+      const current=queue.shift(),room=rooms.find(item=>item.id===current);
+      Object.values(effectiveRoomNavigation(location,room)).forEach(target=>{
+        if(ids.has(target)&&!visited.has(target)){visited.add(target);queue.push(target);}
+      });
+      rooms.forEach(candidate=>{
+        if(!visited.has(candidate.id)&&Object.values(effectiveRoomNavigation(location,candidate)).includes(current)){
+          visited.add(candidate.id);queue.push(candidate.id);
+        }
+      });
+    }
+    rooms.filter(room=>!visited.has(room.id)).forEach(room=>issues.push({severity:'warning',room:room.id,
+      message:pretty(room.id)+' is disconnected from the entrance.'}));
+  }
+  return issues;
+}
+
+function rewriteRoomReferences(location,oldId,newId){
+  const locationId=location.id,oldRef=locationId+'.'+oldId,newRef=locationId+'.'+newId;
+  const rewrite=value=>value===oldRef?newRef:value;
+  const fixPlace=object=>{if(object?.location)object.location=rewrite(object.location);};
+  (P.content||[]).forEach(item=>{fixPlace(item);(item.stages||[]).forEach(fixPlace);
+    fixPlace(item.questPlan?.event);fixPlace(item.questPlan?.eventDraft);});
+  (P.characters||[]).forEach(character=>{
+    (character.schedule?.fixed_commitments||[]).forEach(commitment=>{
+      fixPlace(commitment);
+      if(locPart(character.home?.location_id||character.home?.residence_id)===locationId&&
+         commitment.home_placement?.room===oldId)commitment.home_placement.room=newId;
+    });
+    if(locPart(character.home?.location_id||character.home?.residence_id)===locationId){
+      Object.values(character.home_routine?.default_by_block||{}).forEach(placement=>{
+        if(placement?.room===oldId)placement.room=newId;
+      });
+      (character.home_routine?.overrides||[]).forEach(placement=>{
+        if(placement?.room===oldId)placement.room=newId;
+      });
+    }
+  });
+  P.locations.forEach(place=>(place.rooms||[]).forEach(room=>{
+    Object.keys(room.navigation||{}).forEach(direction=>{
+      const target=room.navigation[direction];
+      if(place===location&&target===oldId)room.navigation[direction]=newId;
+      else if(target===oldRef)room.navigation[direction]=newRef;
+    });
+  }));
+}
+
+function renameRoomId(location,room,raw){
+  if(!location||!room)return '';
+  if(location.tags?.includes('package'))return room.id;
+  const oldId=room.id,next=slug(raw);
+  if(!next||next===oldId)return oldId;
+  if((location.rooms||[]).some(item=>item!==room&&item.id===next))return oldId;
+  rewriteRoomReferences(location,oldId,next);
+  if(location.outside_room===oldId)location.outside_room=next;
+  const layout=roomMapLayout(location);if(layout[oldId]){layout[next]=layout[oldId];delete layout[oldId];}
+  room.id=next;return next;
+}
+
+function uniqueRoomId(location,base='new_room'){
+  const used=new Set((location?.rooms||[]).map(room=>room.id));let id=slug(base),number=2;
+  while(used.has(id))id=slug(base)+'_'+number++;
+  return id;
+}
+
+function addLocationRoom(location,name='New Room'){
+  location.rooms=Array.isArray(location.rooms)?location.rooms:[];
+  const priorLayout=roomMapLayout(location),priorComplete=location.rooms.every(existing=>
+    Number.isFinite(+priorLayout[existing.id]?.x)&&Number.isFinite(+priorLayout[existing.id]?.y));
+  const id=uniqueRoomId(location,name),room={id,name,access:'shared',navigation:{},actions:[]};
+  location.rooms.push(room);
+  if(priorComplete){
+    const points=Object.values(priorLayout);priorLayout[id]={
+      x:points.length?Math.max(...points.map(point=>+point.x||0))+1:0,y:0};
+  }else ensureRoomMapLayout(location);
+  return room;
+}
+
+function removeLocationRoom(location,roomId){
+  const room=(location?.rooms||[]).find(item=>item.id===roomId);if(!room)return false;
+  location.rooms=location.rooms.filter(item=>item!==room);
+  location.rooms.forEach(item=>Object.keys(item.navigation||{}).forEach(direction=>{
+    if(item.navigation[direction]===roomId)delete item.navigation[direction];
+  }));
+  if(location.outside_room===roomId)location.outside_room='';
+  delete roomMapLayout(location)[roomId];return true;
+}
+
+function setRoomExit(location,room,direction,target,{addReturn=true}={}){
+  if(!ROOM_DIRECTIONS.includes(direction)||!room)return false;
+  if(typeof residenceLayout==='function'&&residenceLayout(location)&&
+     !(location.rooms||[]).some(item=>item.navigation))materializeSpecialResidenceLayout(location);
+  room.navigation=room.navigation||{};const previous=room.navigation[direction];
+  if(!target)delete room.navigation[direction];else room.navigation[direction]=target;
+  const opposite=ROOM_DIRECTION_OPPOSITE[direction],previousRoom=(location.rooms||[]).find(item=>item.id===previous);
+  if(previousRoom?.navigation?.[opposite]===room.id)delete previousRoom.navigation[opposite];
+  const targetRoom=(location.rooms||[]).find(item=>item.id===target);
+  if(addReturn&&targetRoom){targetRoom.navigation=targetRoom.navigation||{};
+    if(!targetRoom.navigation[opposite])targetRoom.navigation[opposite]=room.id;}
+  return true;
+}
+
+function locationExportRecord(location){
+  return {id:location.id,name:location.name,district:location.district,type:location.type||'place',
+    travel_node:location.travel_node!==false,outside_room:location.outside_room||residenceEntranceId(location)||'',
+    discovery:location.discovery||{},access:location.access||{},residents:location.residents||[],
+    services:location.services||[],rooms:(location.rooms||[]).map(room=>({id:room.id,name:room.name,
+      access:room.access||'shared',navigation:effectiveRoomNavigation(location,room),actions:room.actions||[]})),notes:location.notes||''};
+}
 function placeName(ref){
   const l=loc(locPart(ref));
   if(!l)return ref||'nowhere';
@@ -2464,13 +2799,7 @@ function openWorldBuilder(){paintWorldBuilder();$('worldMessage').textContent=''
 
 function customLocationsOut(){
   return {format_version:1,package_id:'scenewright_custom_locations',reference_format:'location_id.room_id',
-    locations:P.locations.filter(l=>l.tags?.includes('custom')).map(l=>({id:l.id,name:l.name,
-      district:l.district,type:l.type||'place',travel_node:l.travel_node!==false,
-      outside_room:l.outside_room||'',discovery:l.discovery||{},
-      access:l.access||{always_open:true},residents:l.residents||[],services:l.services||[],
-      rooms:(l.rooms||[]).map(r=>({id:r.id,name:r.name,access:r.access||'shared',
-        navigation:r.navigation||{},actions:r.actions||[]})),
-      notes:l.notes||''}))};
+    locations:P.locations.filter(l=>l.tags?.includes('custom')).map(locationExportRecord)};
 }
 
 function worldNumber(id,fallback){
@@ -2936,16 +3265,11 @@ function paintPlaceForm(){
         (l.residents?.length?'lives here: '+esc(l.residents.map(id=>chr(id)?.name||pretty(id)).join(', '))+'<br>':'')+
         (l.services?.length?'services: '+esc(l.services.map(pretty).join(', ')):'')+
         '</div>'+
-        ((l.rooms||[]).length
-          ? '<p class="rubric">Rooms</p><div class="chip-list">'+l.rooms.map(r=>
-              '<div class="chip" style="cursor:default"><span class="swatch" style="background:'+
-              (r.access==='shared'?'var(--sage)':r.access==='restricted'?'var(--rose)':'var(--ash)')+
-              '"></span>'+esc(r.name)+'<span class="tag">'+esc(pretty(r.access||''))+'</span></div>'+
-              (r.actions?.length?'<p class="hint" style="margin:-1px 0 5px 18px">'+
-                esc(r.actions.map(pretty).join(' · '))+'</p>':'')
-            ).join('')+'</div>'
-          : '')
+        ((l.rooms||[]).length?'<p class="hint place-room-summary">'+l.rooms.length+' mapped rooms · '+
+          roomMapIssues(l).filter(issue=>issue.severity==='error').length+' map errors</p>':'')
       : '')+
+    '<button class="btn wide gold" id="openRoomMap" style="margin:12px 0 3px">Edit visual room map</button>'+
+    '<p class="hint" style="margin:0 0 10px">Arrange rooms, choose the entrance, and edit access, actions, and directional arrows.</p>'+
     '<div class="field" style="margin-top:12px"><label>Name</label><input type="text" id="lName" value="'+esc(l.name)+'"'+(packaged?' readonly':'')+'></div>'+
     '<div class="two"><div class="field"><label>ID</label><input type="text" id="lId" value="'+esc(l.id)+'"'+(packaged?' readonly':'')+'></div>'+
     '<div class="field"><label>Background</label><input type="text" id="lBg" value="'+esc(l.background||'')+'"></div></div>'+
@@ -2965,6 +3289,7 @@ function paintPlaceForm(){
   }
   $('lBg').oninput=e=>{l.background=e.target.value;paintPlaces();save()};
   $('lNotes').oninput=e=>{l.notes=e.target.value;save()};
+  $('openRoomMap').onclick=()=>openRoomMapEditor(l);
 }
 
 function paintContent(){
@@ -2987,6 +3312,198 @@ function paintContent(){
     e.stopPropagation();P.content=P.content.filter(c=>c.uid!==b.dataset.ux);
     if(sel===b.dataset.ux)sel=null;save();paintAll();});
 }
+
+/* ---- 06b-room-map-editor.js ---- */
+/* ============ visual room-map editor ============ */
+let roomMapLocationId='',roomMapSelectedId='',roomMapAutoReturn=true,roomMapSuppressClick='';
+
+const activeRoomMapLocation=()=>loc(roomMapLocationId);
+const activeRoomMapRoom=()=>activeRoomMapLocation()?.rooms?.find(room=>room.id===roomMapSelectedId)||null;
+
+function saveRoomMap(location,fields=['rooms','outside_room','editor_layout']){
+  rememberResidenceOverride(location,fields);save();paintPlaces();paintPlaceForm();
+}
+
+function roomMapRenderGeometry(location){
+  const layout=ensureRoomMapLayout(location),rooms=location.rooms||[];
+  const xs=rooms.map(room=>+layout[room.id]?.x||0),ys=rooms.map(room=>+layout[room.id]?.y||0);
+  const minX=Math.min(0,...xs),minY=Math.min(0,...ys),unitX=176,unitY=104,pad=28;
+  const points={};
+  rooms.forEach(room=>{const point=layout[room.id]||{x:0,y:0};points[room.id]={
+    x:(+point.x-minX)*unitX+pad,y:(+point.y-minY)*unitY+pad};});
+  return {layout,points,minX,minY,unitX,unitY,pad,
+    width:Math.max(620,(Math.max(0,...xs)-minX+1)*unitX+pad*2),
+    height:Math.max(390,(Math.max(0,...ys)-minY+1)*unitY+pad*2)};
+}
+
+function roomMapCanvasHtml(location){
+  const geometry=roomMapRenderGeometry(location),rooms=location.rooms||[],byId=new Map(rooms.map(room=>[room.id,room]));
+  const seen=new Set(),lines=[];
+  rooms.forEach(room=>ROOM_DIRECTIONS.forEach(direction=>{
+    const target=effectiveRoomNavigation(location,room)[direction];if(!byId.has(target))return;
+    const key=[room.id,target].sort().join('\u0000');if(seen.has(key))return;seen.add(key);
+    const from=geometry.points[room.id],to=geometry.points[target],other=byId.get(target);
+    const reciprocal=effectiveRoomNavigation(location,other)[ROOM_DIRECTION_OPPOSITE[direction]]===room.id;
+    lines.push('<line x1="'+(from.x+70)+'" y1="'+(from.y+32)+'" x2="'+(to.x+70)+'" y2="'+(to.y+32)+'"'+
+      ' marker-end="url(#room-map-arrow)"'+(reciprocal?' marker-start="url(#room-map-arrow-start)"':'')+
+      ' class="'+(reciprocal?'two-way':'one-way')+'"/>');
+  }));
+  const entrance=location.outside_room||residenceEntranceId(location);
+  const nodes=rooms.map(room=>{
+    const point=geometry.points[room.id],navigation=effectiveRoomNavigation(location,room);
+    const exits=ROOM_DIRECTIONS.filter(direction=>navigation[direction]).map(direction=>
+      '<span title="'+esc(residenceRoomTarget(location,navigation[direction]))+'">'+
+      (direction==='up'?'↑':direction==='right'?'→':direction==='down'?'↓':'←')+'</span>').join('');
+    return '<button type="button" class="room-map-node'+(room.id===roomMapSelectedId?' selected':'')+
+      (room.id===entrance?' entrance':'')+'" data-map-room="'+esc(room.id)+'" style="left:'+point.x+'px;top:'+point.y+'px">'+
+      '<b>'+esc(room.name||pretty(room.id))+'</b><small>'+esc(room.id)+'</small><span class="room-map-node-meta">'+
+      (room.id===entrance?'<i>entrance</i>':'')+'<em>'+esc(pretty(room.access||'shared'))+'</em></span>'+
+      '<span class="room-map-node-exits">'+exits+'</span></button>';
+  }).join('');
+  return '<div class="room-map-canvas" id="roomMapCanvas" data-min-x="'+geometry.minX+'" data-min-y="'+geometry.minY+
+    '" style="width:'+geometry.width+'px;height:'+geometry.height+'px">'+
+    '<svg viewBox="0 0 '+geometry.width+' '+geometry.height+'" aria-hidden="true"><defs>'+
+    '<marker id="room-map-arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L8,4 L0,8 z"/></marker>'+
+    '<marker id="room-map-arrow-start" markerWidth="8" markerHeight="8" refX="1" refY="4" orient="auto" markerUnits="strokeWidth"><path d="M8,0 L0,4 L8,8 z"/></marker>'+
+    '</defs>'+lines.join('')+'</svg>'+nodes+'</div>';
+}
+
+function roomMapExitOptions(location,current){
+  const local=(location.rooms||[]).map(room=>'<option value="'+esc(room.id)+'"'+(current===room.id?' selected':'')+'>'+esc(room.name)+'</option>').join('');
+  const external=current&&String(current).includes('.')?'<option value="'+esc(current)+'" selected>External: '+esc(placeName(current))+'</option>':'';
+  return '<option value="">— no arrow —</option>'+local+external;
+}
+
+function roomMapInspectorHtml(location,room){
+  if(!room)return '<div class="room-map-empty"><b>No room selected</b><p>Add a room or choose one on the map.</p></div>';
+  const packaged=location.tags?.includes('package'),navigation=effectiveRoomNavigation(location,room),
+    entrance=location.outside_room||residenceEntranceId(location);
+  return '<div class="room-map-inspector-head"><div><span>Selected room</span><h4>'+esc(room.name||pretty(room.id))+'</h4></div>'+
+    '<button class="btn quiet" id="roomMapDuplicate">Duplicate</button><button class="btn danger" id="roomMapRemove">Remove</button></div>'+
+    '<div class="field"><label>Room name</label><input id="roomMapRoomName" value="'+esc(room.name||'')+'"></div>'+
+    '<div class="two"><div class="field"><label>Stable room id</label><input id="roomMapRoomId" value="'+esc(room.id)+'"'+
+      (packaged?' readonly':'')+'></div><div class="field"><label>Access rule</label><input id="roomMapRoomAccess" list="roomAccessRules" value="'+esc(room.access||'shared')+'"></div></div>'+
+    '<datalist id="roomAccessRules"><option value="shared"><option value="public"><option value="restricted"><option value="permission_required"><option value="relationship_permission"><option value="employee"><option value="appointment"><option value="occupied_lock"></datalist>'+
+    '<div class="field"><label>Room actions</label><input id="roomMapRoomActions" value="'+esc((room.actions||[]).join(', '))+'" placeholder="talk, relax, cook"></div>'+
+    '<label class="room-map-entrance-choice"><input type="checkbox" id="roomMapRoomEntrance"'+
+      (entrance===room.id?' checked':'')+'> This is the location entrance</label>'+
+    '<div class="room-map-exit-head"><b>Directional arrows</b><label><input type="checkbox" id="roomMapAutoReturn"'+
+      (roomMapAutoReturn?' checked':'')+'> automatically add a return arrow</label></div>'+
+    '<div class="room-map-exits">'+ROOM_DIRECTIONS.map(direction=>{
+      const target=navigation[direction]||'',external=String(target).includes('.')?target:'';
+      return '<div class="room-map-exit-row"><span class="direction">'+
+        (direction==='up'?'↑':direction==='right'?'→':direction==='down'?'↓':'←')+' '+esc(pretty(direction))+'</span>'+
+        '<select data-room-exit="'+direction+'">'+roomMapExitOptions(location,target)+'</select>'+
+        '<input data-room-external="'+direction+'" value="'+esc(external)+'" placeholder="or location.room"></div>';
+    }).join('')+'</div>'+
+    '<p class="hint">Drag rooms on the map to arrange the authoring view. Moving a box does not change travel; directional arrows do.</p>';
+}
+
+function roomMapIssuesHtml(location){
+  const issues=roomMapIssues(location);
+  if(!issues.length)return '<div class="room-map-issues clear"><b>Map check passed</b><span>Every room and arrow resolves.</span></div>';
+  return '<div class="room-map-issues">'+issues.map(issue=>'<button type="button" data-map-issue-room="'+esc(issue.room||'')+'" class="'+issue.severity+'"><b>'+esc(issue.severity)+'</b> '+esc(issue.message)+'</button>').join('')+'</div>';
+}
+
+function paintRoomMapEditor(){
+  const location=activeRoomMapLocation();if(!location)return;
+  location.rooms=Array.isArray(location.rooms)?location.rooms:[];ensureRoomMapLayout(location);
+  if(!location.rooms.some(room=>room.id===roomMapSelectedId))roomMapSelectedId=location.rooms[0]?.id||'';
+  const district=DISTRICTS.find(item=>item.id===location.district),special=residenceLayout(location);
+  const entrance=location.outside_room||residenceEntranceId(location);
+  const errors=roomMapIssues(location).filter(issue=>issue.severity==='error').length;
+  $('roomMapTitle').textContent=location.name+' · room map';
+  $('roomMapHealth').textContent=errors?errors+' error'+(errors===1?'':'s'):'map ready';
+  $('roomMapHealth').classList.toggle('bad',!!errors);
+  $('roomMapBody').innerHTML='<div class="room-map-location-bar"><span><b>'+esc(location.name)+'</b>'+esc(pretty(location.type||'location'))+'</span>'+
+    '<span><b>District</b>'+esc(district?.name||pretty(location.district||'unassigned'))+'</span>'+
+    '<span><b>Rooms</b>'+location.rooms.length+'</span><label>Entrance <select id="roomMapEntrance"><option value="">— choose —</option>'+
+    location.rooms.map(room=>'<option value="'+esc(room.id)+'"'+(entrance===room.id?' selected':'')+'>'+esc(room.name)+'</option>').join('')+'</select></label></div>'+
+    (special?'<div class="room-map-runtime-note">This location has a legacy Godot runtime layout. It is visible here; editing an arrow copies that layout into this project’s location data. <button class="btn quiet" id="roomMapMaterialize">Copy runtime arrows now</button></div>':'')+
+    '<div class="room-map-workspace"><section class="room-map-stage"><div class="room-map-scroll">'+roomMapCanvasHtml(location)+'</div>'+roomMapIssuesHtml(location)+'</section>'+
+    '<aside class="room-map-inspector">'+roomMapInspectorHtml(location,activeRoomMapRoom())+'</aside></div>';
+  wireRoomMapEditor(location);
+}
+
+function roomMapCommit(location,{repaint=true}={}){
+  saveRoomMap(location);if(repaint)paintRoomMapEditor();
+}
+
+function wireRoomMapDrag(location){
+  const canvas=$('roomMapCanvas');if(!canvas)return;
+  canvas.querySelectorAll('[data-map-room]').forEach(node=>{
+    let origin=null;
+    node.onclick=()=>{if(roomMapSuppressClick===node.dataset.mapRoom){roomMapSuppressClick='';return;}
+      roomMapSelectedId=node.dataset.mapRoom;paintRoomMapEditor();};
+    node.onpointerdown=event=>{origin={x:event.clientX,y:event.clientY,left:parseFloat(node.style.left),top:parseFloat(node.style.top),moved:false};
+      node.setPointerCapture(event.pointerId);};
+    node.onpointermove=event=>{if(!origin)return;const dx=event.clientX-origin.x,dy=event.clientY-origin.y;
+      if(Math.abs(dx)+Math.abs(dy)>6)origin.moved=true;
+      if(origin.moved)node.style.transform='translate('+dx+'px,'+dy+'px)';};
+    node.onpointerup=event=>{if(!origin)return;const state=origin;origin=null;node.releasePointerCapture(event.pointerId);
+      if(!state.moved){node.style.transform='';return;}
+      const layout=roomMapLayout(location),minX=+canvas.dataset.minX||0,minY=+canvas.dataset.minY||0;
+      layout[node.dataset.mapRoom]={x:Math.round((state.left+event.clientX-state.x-28)/176)+minX,
+        y:Math.round((state.top+event.clientY-state.y-28)/104)+minY};
+      roomMapSuppressClick=node.dataset.mapRoom;roomMapCommit(location);
+    };
+  });
+}
+
+function wireRoomMapEditor(location){
+  const room=activeRoomMapRoom();wireRoomMapDrag(location);
+  $('roomMapEntrance').onchange=event=>{location.outside_room=event.target.value;roomMapCommit(location);};
+  $('roomMapBody').querySelectorAll('[data-map-issue-room]').forEach(button=>button.onclick=()=>{
+    if(button.dataset.mapIssueRoom){roomMapSelectedId=button.dataset.mapIssueRoom;paintRoomMapEditor();}
+  });
+  if($('roomMapMaterialize'))$('roomMapMaterialize').onclick=()=>{materializeSpecialResidenceLayout(location);
+    autoRoomMapLayout(location);roomMapCommit(location);};
+  if(!room)return;
+  $('roomMapRoomName').onchange=event=>{const value=event.target.value.trim();if(value)room.name=value;
+    roomMapCommit(location);};
+  $('roomMapRoomId').onchange=event=>{const actual=renameRoomId(location,room,event.target.value);
+    if(actual!==slug(event.target.value))note('That room id is already in use. The old id was kept.');
+    roomMapSelectedId=actual;roomMapCommit(location);};
+  $('roomMapRoomAccess').onchange=event=>{room.access=slug(event.target.value||'shared');roomMapCommit(location);};
+  $('roomMapRoomActions').onchange=event=>{room.actions=[...new Set(String(event.target.value||'').split(',').map(value=>value.trim()).filter(Boolean).map(slug))];roomMapCommit(location);};
+  $('roomMapRoomEntrance').onchange=event=>{location.outside_room=event.target.checked?room.id:'';roomMapCommit(location);};
+  $('roomMapAutoReturn').onchange=event=>{roomMapAutoReturn=event.target.checked;};
+  $('roomMapDuplicate').onclick=()=>{const copy=addLocationRoom(location,(room.name||pretty(room.id))+' Copy');
+    copy.access=room.access||'shared';copy.actions=JSON.parse(JSON.stringify(room.actions||[]));
+    roomMapSelectedId=copy.id;roomMapCommit(location);};
+  $('roomMapRemove').onclick=()=>{
+    if(!confirm('Remove '+(room.name||room.id)+' from this location? Existing story references will remain visible as validation errors.'))return;
+    removeLocationRoom(location,room.id);roomMapSelectedId=location.rooms[0]?.id||'';roomMapCommit(location);
+  };
+  $('roomMapBody').querySelectorAll('[data-room-exit]').forEach(select=>select.onchange=()=>{
+    setRoomExit(location,room,select.dataset.roomExit,select.value,{addReturn:roomMapAutoReturn});roomMapCommit(location);
+  });
+  $('roomMapBody').querySelectorAll('[data-room-external]').forEach(input=>input.onchange=()=>{
+    const value=input.value.trim(),resolved=value?resolvePlaceRef(value):'';
+    if(value&&!resolved){note('That external room is not in the location registry.');input.value=effectiveRoomNavigation(location,room)[input.dataset.roomExternal]||'';return;}
+    setRoomExit(location,room,input.dataset.roomExternal,resolved||'',{addReturn:false});roomMapCommit(location);
+  });
+}
+
+function openRoomMapEditor(location){
+  if(!location)return;roomMapLocationId=location.id;roomMapSelectedId=location.outside_room||
+    residenceEntranceId(location)||location.rooms?.[0]?.id||'';
+  ensureRoomMapLayout(location);rememberResidenceOverride(location,['editor_layout']);save();
+  paintRoomMapEditor();$('roomMapEditor').showModal();
+}
+
+$('roomMapClose').onclick=()=>$('roomMapEditor').close();
+$('roomMapAuto').onclick=()=>{const location=activeRoomMapLocation();if(!location)return;
+  autoRoomMapLayout(location);roomMapCommit(location);};
+$('roomMapAdd').onclick=()=>{const location=activeRoomMapLocation();if(!location)return;
+  const room=addLocationRoom(location);roomMapSelectedId=room.id;roomMapCommit(location);};
+$('roomMapDownload').onclick=()=>{
+  const location=activeRoomMapLocation();if(!location)return;
+  const packageData={format_version:1,package_kind:'location_patch',reference_format:'location_id.room_id',
+    locations:[locationExportRecord(location)]};
+  const url=URL.createObjectURL(new Blob([JSON.stringify(packageData,null,2)],{type:'application/json'}));
+  Object.assign(document.createElement('a'),{href:url,download:location.id+'.location.json'}).click();URL.revokeObjectURL(url);
+};
 
 /* ---- 07-setup.js ---- */
 /* ============ setup strip ============ */
@@ -6905,6 +7422,642 @@ if(typeof document!=='undefined'){
   $('scaffoldRelationshipArcs').onclick=scaffoldRelationshipArcQuests;
 }
 
+/* ---- 11c-ensemble-arc.js ---- */
+/* ============ ensemble story arc studio ============ */
+const ENSEMBLE_NODE_TYPES=Object.freeze([
+  ['scene','Scene'],['choice','Player choice'],['gate','Stat / state gate'],['quest','Quest beat'],
+  ['delay','Time delay'],['merge','Branch merge'],['ending','Ending'],['placeholder','Placeholder']
+]);
+const ENSEMBLE_ARC_STATUSES=Object.freeze(['draft','playtest','approved']);
+const ENSEMBLE_NODE_STATUSES=Object.freeze(['draft','approved','implemented']);
+const ENSEMBLE_CAST_ROLES=Object.freeze(['lead','supporting','optional','opposing']);
+
+let ensembleArcId='',ensembleNodeId='',ensemblePlayArcId='',ensemblePlayNodeId='';
+let ensemblePlayState=null,ensemblePlayHistory=[],ensemblePlayLastChanges=[];
+let ensembleDragSuppress='';
+
+function ensembleUid(prefix='node'){
+  return prefix+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+}
+function ensembleUniqueId(items,base,except=null){
+  const root=slug(base||'item');let id=root,n=2;
+  while((items||[]).some(item=>item!==except&&item.id===id))id=root+'_'+n++;
+  return id;
+}
+function defaultEnsembleNode(type='scene',index=0){
+  const label=ENSEMBLE_NODE_TYPES.find(row=>row[0]===type)?.[1]||'Story beat';
+  return {id:slug(label),type,title:label,summary:'',location:'',day:'',block:'',cast:[],
+    lines:[],requires:[],effects:[],routes:type==='ending'?[]:[{id:'continue',label:'Continue',target:'',requires:[],effects:[]}],
+    implementation_status:'draft',layout:{x:40+(index%4)*220,y:40+Math.floor(index/4)*126}};
+}
+function defaultEnsembleArc(index=0){
+  const number=index+1,id='ensemble_arc_'+number;
+  const opening=defaultEnsembleNode('scene',0),decision=defaultEnsembleNode('choice',1),
+    accepted=defaultEnsembleNode('placeholder',2),declined=defaultEnsembleNode('ending',3);
+  Object.assign(opening,{id:'opening',title:'Opening scene',summary:'Introduce the situation and the characters.',routes:[{id:'continue',label:'Continue',target:'decision',requires:[],effects:[]}]});
+  Object.assign(decision,{id:'decision',title:'Important choice',summary:'Give the player meaningful directions.',routes:[
+    {id:'accept',label:'Accept',target:'accepted_path',requires:[],effects:[]},
+    {id:'decline',label:'Decline',target:'declined_ending',requires:[],effects:[]}
+  ]});
+  Object.assign(accepted,{id:'accepted_path',title:'Accepted path',summary:'Plan the next scene or quest on this branch.',routes:[]});
+  Object.assign(declined,{id:'declined_ending',title:'Declined ending',summary:'Close this route without blocking unrelated stories.'});
+  return {format_version:1,id,title:'New ensemble story',status:'draft',category:'character_story',
+    summary:'',themes:[],notes:'',cast:[],variables:[],entry_requirements:[],start_node:'opening',
+    nodes:[opening,decision,accepted,declined]};
+}
+function normalizeEnsembleRule(rule){
+  if(!rule||typeof rule!=='object')rule={};
+  const out={kind:String(rule.kind||rule.type||'flag'),key:String(rule.key||''),op:String(rule.op||'eq'),
+    value:rule.value===undefined?true:rule.value};
+  if(rule.character)out.character=String(rule.character);
+  if(!['stat','variable','flag'].includes(out.kind))out.kind='flag';
+  if(!['gte','lte','eq','neq','is_true','is_false'].includes(out.op))out.op='eq';
+  return out;
+}
+function normalizeEnsembleEffect(effect){
+  if(!effect||typeof effect!=='object')effect={};
+  const out={kind:String(effect.kind||effect.type||'flag'),key:String(effect.key||''),
+    op:String(effect.op||'set'),value:effect.value===undefined?true:effect.value};
+  if(effect.character)out.character=String(effect.character);
+  if(!['stat','variable','flag'].includes(out.kind))out.kind='flag';
+  if(!['set','add'].includes(out.op))out.op='set';
+  return out;
+}
+function normalizeEnsembleRoute(route,index=0){
+  route=route&&typeof route==='object'?route:{};
+  route.id=String(route.id||'route_'+(index+1));
+  route.label=String(route.label||pretty(route.id)||'Continue');
+  route.target=String(route.target||'');
+  route.requires=Array.isArray(route.requires)?route.requires.map(normalizeEnsembleRule):[];
+  route.effects=Array.isArray(route.effects)?route.effects.map(normalizeEnsembleEffect):[];
+  return route;
+}
+function normalizeEnsembleArc(arc,index=0){
+  const defaults=defaultEnsembleArc(index);
+  if(!arc||typeof arc!=='object')arc=defaults;
+  ['id','title','status','category','summary','notes','start_node'].forEach(key=>{
+    if(arc[key]===undefined)arc[key]=defaults[key];
+  });
+  ['themes','cast','variables','entry_requirements','nodes'].forEach(key=>{
+    if(!Array.isArray(arc[key]))arc[key]=[];
+  });
+  arc.id=String(arc.id||defaults.id);arc.title=String(arc.title||'');
+  if(!ENSEMBLE_ARC_STATUSES.includes(arc.status))arc.status='draft';
+  arc.themes=[...new Set(arc.themes.map(value=>slug(value)).filter(Boolean))];
+  arc.cast=arc.cast.map(row=>typeof row==='string'?{character:row,role:'supporting'}:row)
+    .filter(row=>row&&row.character).map(row=>({character:String(row.character),
+      role:ENSEMBLE_CAST_ROLES.includes(row.role)?row.role:'supporting'}));
+  arc.variables=arc.variables.map((row,i)=>({id:String(row?.id||'variable_'+(i+1)),
+    label:String(row?.label||pretty(row?.id||'Variable '+(i+1))),type:['number','boolean','text'].includes(row?.type)?row.type:'number',
+    default:row?.default===undefined?0:row.default}));
+  arc.entry_requirements=arc.entry_requirements.map(normalizeEnsembleRule);
+  arc.nodes=arc.nodes.map((node,nodeIndex)=>{
+    const type=ENSEMBLE_NODE_TYPES.some(row=>row[0]===node?.type)?node.type:'scene';
+    const base=defaultEnsembleNode(type,nodeIndex);node=Object.assign(base,node||{});node.type=type;
+    node.id=String(node.id||base.id);node.title=String(node.title||pretty(node.id));node.summary=String(node.summary||'');
+    ['location','day','block'].forEach(key=>node[key]=String(node[key]||''));
+    node.cast=Array.isArray(node.cast)?[...new Set(node.cast.map(String))]:[];
+    node.lines=Array.isArray(node.lines)?node.lines.map(line=>({speaker:String(line?.speaker||'__narrator__'),text:String(line?.text||'')})):[];
+    node.requires=Array.isArray(node.requires)?node.requires.map(normalizeEnsembleRule):[];
+    node.effects=Array.isArray(node.effects)?node.effects.map(normalizeEnsembleEffect):[];
+    node.routes=Array.isArray(node.routes)?node.routes.map(normalizeEnsembleRoute):[];
+    if(node.type==='ending')node.routes=[];
+    if(!ENSEMBLE_NODE_STATUSES.includes(node.implementation_status))node.implementation_status='draft';
+    if(!node.layout||!Number.isFinite(+node.layout.x)||!Number.isFinite(+node.layout.y))node.layout=base.layout;
+    else node.layout={x:+node.layout.x,y:+node.layout.y};
+    return node;
+  });
+  if(!arc.nodes.length)arc.nodes=defaults.nodes;
+  if(!arc.nodes.some(node=>node.id===arc.start_node))arc.start_node=arc.nodes[0]?.id||'';
+  return arc;
+}
+function normalizeEnsembleArcs(){
+  if(!Array.isArray(P.ensemble_arcs))P.ensemble_arcs=[];
+  P.ensemble_arcs=P.ensemble_arcs.map((arc,index)=>normalizeEnsembleArc(arc,index));
+  return P.ensemble_arcs;
+}
+function activeEnsembleArc(){return normalizeEnsembleArcs().find(arc=>arc.id===ensembleArcId)||null;}
+function activeEnsembleNode(arc=activeEnsembleArc()){return arc?.nodes.find(node=>node.id===ensembleNodeId)||null;}
+
+function ensembleValue(raw){
+  const value=String(raw??'').trim();
+  if(value==='true')return true;if(value==='false')return false;if(value==='null')return null;
+  if(/^-?(?:\d+|\d*\.\d+)$/.test(value))return Number(value);
+  return value.replace(/^(?:"([\s\S]*)"|'([\s\S]*)')$/,'$1$2');
+}
+function ensembleKeyKind(key,arc){
+  const dot=String(key).indexOf('.'),character=dot>0?String(key).slice(0,dot):'';
+  if(character&&(P.characters||[]).some(item=>item.id===character))
+    return {kind:'stat',character,key:String(key).slice(dot+1)};
+  if((arc.variables||[]).some(item=>item.id===key))return {kind:'variable',key};
+  return {kind:'flag',key};
+}
+function parseEnsembleRequirements(text,arc){
+  return String(text||'').split(/[;\n]+/).map(row=>row.trim()).filter(Boolean).map(row=>{
+    if(row.startsWith('!'))return {kind:'flag',key:row.slice(1).trim(),op:'is_false',value:false};
+    const match=row.match(/^(.+?)\s*(>=|<=|==|!=|=)\s*(.+)$/);
+    if(!match)return Object.assign(ensembleKeyKind(row,arc),{op:'is_true',value:true});
+    const key=match[1].trim(),op={'>=':'gte','<=':'lte','==':'eq','=':'eq','!=':'neq'}[match[2]];
+    return Object.assign(ensembleKeyKind(key,arc),{op,value:ensembleValue(match[3])});
+  });
+}
+function parseEnsembleEffects(text,arc){
+  return String(text||'').split(/[;\n]+/).map(row=>row.trim()).filter(Boolean).map(row=>{
+    if(row.startsWith('!'))return {kind:'flag',key:row.slice(1).trim(),op:'set',value:false};
+    const match=row.match(/^(.+?)\s*(\+=|-=|=|\+|-)\s*(.+)$/);
+    if(!match)return Object.assign(ensembleKeyKind(row,arc),{op:'set',value:true});
+    const key=match[1].trim(),add=match[2]!=='=',raw=ensembleValue(match[3]);
+    return Object.assign(ensembleKeyKind(key,arc),{op:add?'add':'set',value:match[2].startsWith('-')?-Math.abs(+raw||0):raw});
+  });
+}
+function ensembleRuleKey(rule){return rule.kind==='stat'?rule.character+'.'+rule.key:rule.key;}
+function ensembleRequirementsText(rules){
+  return (rules||[]).map(rule=>{
+    const key=ensembleRuleKey(rule);
+    if(rule.op==='is_true')return key;if(rule.op==='is_false')return '!'+key;
+    const op={gte:'>=',lte:'<=',eq:'=',neq:'!='}[rule.op]||'=';
+    return key+' '+op+' '+stateValueText(rule.value);
+  }).join('\n');
+}
+function ensembleEffectsText(effects){
+  return (effects||[]).map(effect=>{
+    const key=ensembleRuleKey(effect);
+    if(effect.op==='set'&&effect.value===true)return key;
+    if(effect.op==='set'&&effect.value===false)return '!'+key;
+    return key+' '+(effect.op==='add'?(+effect.value<0?'- ':'+ '):'= ')+
+      stateValueText(effect.op==='add'&&+effect.value<0?Math.abs(+effect.value):effect.value);
+  }).join('\n');
+}
+function parseEnsembleLines(text){
+  return String(text||'').split('\n').map(row=>row.trim()).filter(Boolean).map(row=>{
+    const at=row.indexOf(':');if(at<1)return {speaker:'__narrator__',text:row};
+    const raw=row.slice(0,at).trim(),needle=raw.toLowerCase();
+    const character=(P.characters||[]).find(item=>item.id.toLowerCase()===needle||String(item.name||'').toLowerCase()===needle);
+    const speaker=/^(player|you)$/i.test(raw)?'player':/^(narrator|direction|stage)$/i.test(raw)?'__narrator__':character?.id||slug(raw);
+    return {speaker,text:row.slice(at+1).trim()};
+  });
+}
+function ensembleLinesText(lines){
+  return (lines||[]).map(line=>(line.speaker==='__narrator__'?'Narrator':line.speaker==='player'?'Player':
+    (P.characters||[]).find(item=>item.id===line.speaker)?.name||line.speaker)+': '+line.text).join('\n');
+}
+
+function autoArrangeEnsembleArc(arc){
+  normalizeEnsembleArc(arc);const byId=new Map(arc.nodes.map(node=>[node.id,node])),depth=new Map(),queue=[];
+  if(byId.has(arc.start_node)){depth.set(arc.start_node,0);queue.push(arc.start_node);}
+  while(queue.length){const id=queue.shift(),next=(byId.get(id)?.routes||[]).map(route=>route.target).filter(target=>byId.has(target));
+    next.forEach(target=>{if(depth.has(target))return;depth.set(target,depth.get(id)+1);queue.push(target);});}
+  let orphanDepth=Math.max(0,...depth.values())+1;
+  arc.nodes.forEach(node=>{if(!depth.has(node.id))depth.set(node.id,orphanDepth);});
+  const columns={};arc.nodes.forEach(node=>(columns[depth.get(node.id)]||(columns[depth.get(node.id)]=[])).push(node));
+  Object.entries(columns).forEach(([column,nodes])=>nodes.forEach((node,index)=>{
+    node.layout={x:36+(+column)*226,y:34+index*126};
+  }));
+  return arc;
+}
+function ensembleReachable(arc){
+  const byId=new Map(arc.nodes.map(node=>[node.id,node])),seen=new Set(),stack=[arc.start_node];
+  while(stack.length){const id=stack.pop();if(!byId.has(id)||seen.has(id))continue;seen.add(id);
+    byId.get(id).routes.forEach(route=>{if(route.target)stack.push(route.target);});}
+  return seen;
+}
+function ensembleCanReachEnding(arc){
+  const ending=new Set(arc.nodes.filter(node=>node.type==='ending').map(node=>node.id));let changed=true;
+  while(changed){changed=false;arc.nodes.forEach(node=>{if(ending.has(node.id))return;
+    if(node.routes.some(route=>ending.has(route.target))){ending.add(node.id);changed=true;}});}
+  return ending;
+}
+function ensembleScheduleConflict(node,character){
+  if(!node.day||!node.block)return null;
+  return (character.schedule?.fixed_commitments||[]).find(item=>item.unavailable!==false&&
+    (item.days||[]).includes(node.day)&&(item.blocks||[]).includes(node.block));
+}
+function ensembleArcIssues(arc){
+  normalizeEnsembleArc(arc);const issues=[],add=(severity,message,node='')=>issues.push({severity,message,node});
+  if(!arc.title.trim())add('error','Arc needs a title.');
+  if(!arc.summary.trim())add('warning','Add a short arc summary.');
+  if(!arc.cast.length)add('warning','Add at least one character to the arc cast.');
+  arc.cast.forEach(row=>{if(!(P.characters||[]).some(item=>item.id===row.character))add('error','Arc cast refers to missing character '+row.character+'.');});
+  const ids=new Set(),byId=new Map();arc.nodes.forEach(node=>{
+    if(!node.id)add('error','A story node has no id.');
+    else if(ids.has(node.id))add('error','Two story nodes share id '+node.id+'.',node.id);
+    ids.add(node.id);byId.set(node.id,node);
+  });
+  if(!byId.has(arc.start_node))add('error','Start node '+(arc.start_node||'(blank)')+' does not exist.');
+  const reachable=ensembleReachable(arc),endingReach=ensembleCanReachEnding(arc);
+  arc.nodes.forEach(node=>{
+    if(!node.title.trim())add('error','Node '+node.id+' needs a title.',node.id);
+    if(!reachable.has(node.id))add('warning',node.title+' is unreachable from the start.',node.id);
+    if(node.type!=='ending'&&!endingReach.has(node.id))add('warning',node.title+' cannot reach an ending.',node.id);
+    if(node.type==='choice'&&node.routes.length<2)add('warning',node.title+' is a choice with fewer than two branches.',node.id);
+    if(node.type!=='ending'&&!node.routes.length)add('warning',node.title+' has no outgoing route.',node.id);
+    if(node.type==='placeholder')add(node.implementation_status==='approved'?'error':'warning',node.title+' is still a placeholder.',node.id);
+    if(['scene','choice','gate','ending'].includes(node.type)&&!node.lines.some(line=>line.text.trim()))
+      add('warning',node.title+' has no draft dialogue yet.',node.id);
+    if(node.location&&typeof loc==='function'&&!loc(locPart(node.location)))add('error',node.title+' uses missing location '+node.location+'.',node.id);
+    node.cast.forEach(id=>{
+      const character=(P.characters||[]).find(item=>item.id===id);
+      if(!character)add('error',node.title+' uses missing character '+id+'.',node.id);
+      else{const conflict=ensembleScheduleConflict(node,character);if(conflict)add('warning',character.name+' is busy with '+
+        pretty(conflict.activity||conflict.label||'another commitment')+' at this time.',node.id);}
+    });
+    [...node.requires,...node.routes.flatMap(route=>route.requires)].filter(rule=>rule.kind==='stat').forEach(rule=>{
+      if(!(P.characters||[]).some(item=>item.id===rule.character))add('error',node.title+' has a gate for missing character '+rule.character+'.',node.id);
+    });
+    [...node.effects,...node.routes.flatMap(route=>route.effects)].forEach(effect=>{
+      if(!effect.key)add('error',node.title+' has an effect without a state key.',node.id);
+    });
+    node.routes.forEach(route=>{
+      if(!route.label.trim())add('error',node.title+' has an unnamed route.',node.id);
+      if(!route.target)add('error',node.title+' route “'+route.label+'” has no destination.',node.id);
+      else if(!byId.has(route.target))add('error',node.title+' route “'+route.label+'” points to missing node '+route.target+'.',node.id);
+    });
+    if(node.implementation_status==='implemented'){
+      const id=ensembleNodeContentId(arc,node),content=P.content.find(item=>item.id===id);
+      if(!content)add('error',node.title+' is marked implemented but '+id+' is missing.',node.id);
+    }
+  });
+  return issues;
+}
+
+function addEnsembleNode(arc,type='scene'){
+  const node=defaultEnsembleNode(type,arc.nodes.length);node.id=ensembleUniqueId(arc.nodes,node.id);
+  node.title=ENSEMBLE_NODE_TYPES.find(row=>row[0]===type)?.[1]||'Story beat';
+  if(type==='choice')node.routes=[{id:'choice_1',label:'First choice',target:'',requires:[],effects:[]},
+    {id:'choice_2',label:'Second choice',target:'',requires:[],effects:[]}];
+  arc.nodes.push(node);ensembleNodeId=node.id;save();return node;
+}
+function duplicateEnsembleNode(arc,node){
+  const copy=JSON.parse(JSON.stringify(node));copy.id=ensembleUniqueId(arc.nodes,node.id+'_copy');copy.title=node.title+' Copy';
+  copy.implementation_status='draft';copy.layout={x:+node.layout.x+40,y:+node.layout.y+80};arc.nodes.push(copy);ensembleNodeId=copy.id;save();return copy;
+}
+function renameEnsembleNode(arc,node,raw){
+  const old=node.id,next=ensembleUniqueId(arc.nodes,raw,node);if(old===next)return next;
+  const content=P.content.find(item=>item.id===ensembleNodeContentId(arc,node));
+  const nextContentId=arc.id+'__'+next,collision=P.content.find(item=>item!==content&&item.id===nextContentId);
+  if(collision)throw new Error('Content id '+nextContentId+' already exists. Choose another node id.');
+  if(arc.start_node===old)arc.start_node=next;
+  arc.nodes.forEach(item=>item.routes.forEach(route=>{if(route.target===old)route.target=next;}));
+  node.id=next;if(content){renameContentId(content,nextContentId);const marker=content.ensembleArc||content.questPlan?.ensembleArc;if(marker)marker.node_id=next;}
+  ensembleNodeId=next;return next;
+}
+function renameEnsembleArc(arc,raw){
+  const old=arc.id,next=ensembleUniqueId(P.ensemble_arcs,raw,arc);if(old===next)return next;
+  const linked=arc.nodes.map(node=>({node,content:P.content.find(item=>item.id===old+'__'+node.id)})).filter(row=>row.content);
+  const collision=linked.find(row=>P.content.some(item=>item!==row.content&&item.id===next+'__'+row.node.id));
+  if(collision)throw new Error('Content id '+next+'__'+collision.node.id+' already exists. Choose another arc id.');
+  linked.forEach(row=>renameContentId(row.content,next+'__'+row.node.id));
+  arc.id=next;ensembleArcId=next;
+  P.content.forEach(item=>{
+    if(item.ensembleArc?.arc_id===old)item.ensembleArc.arc_id=next;
+    if(item.questPlan?.ensembleArc?.arc_id===old)item.questPlan.ensembleArc.arc_id=next;
+  });
+  return next;
+}
+function renameEnsembleVariable(arc,variable,raw){
+  const old=variable.id,next=ensembleUniqueId(arc.variables,raw,variable);if(old===next)return next;
+  const rewrite=list=>(list||[]).forEach(rule=>{if(rule.kind==='variable'&&rule.key===old)rule.key=next;});
+  rewrite(arc.entry_requirements);arc.nodes.forEach(node=>{rewrite(node.requires);rewrite(node.effects);
+    node.routes.forEach(route=>{rewrite(route.requires);rewrite(route.effects);});});
+  variable.id=next;return next;
+}
+
+function ensembleNodeContentId(arc,node){return arc.id+'__'+node.id;}
+function ensembleRequirementsLegacy(rules){
+  return (rules||[]).map(rule=>rule.kind==='stat'?{type:'stat',character:rule.character,key:rule.key,op:rule.op,value:rule.value}:
+    {type:'flag',key:rule.op==='eq'&&rule.value!==true?rule.key+'='+stateValueText(rule.value):rule.key,
+      op:rule.op==='is_false'||rule.op==='neq'?'is_false':'is_true',value:1});
+}
+function ensembleEffectsFlag(effects){
+  return (effects||[]).map(effect=>{
+    const key=ensembleRuleKey(effect);
+    if(effect.op==='add')return key+' '+(+effect.value>=0?'+':'')+(+effect.value||0);
+    return effect.value===false?'!'+key:effect.value===true?key:key+'='+stateValueText(effect.value);
+  }).join('; ');
+}
+function ensembleNodeTree(arc,node){
+  const lines=node.lines.map(line=>({type:'line',speaker:line.speaker,text:line.text,emotion:''}));
+  const branches=node.routes.map(route=>{const target=arc.nodes.find(item=>item.id===route.target);
+    return {text:route.label,requires:ensembleRequirementsLegacy([...route.requires,...(target?.requires||[])]),
+    flag:ensembleEffectsFlag(route.effects),nodes:route.target?[{type:'jump',target:ensembleNodeContentId(arc,
+      target||{id:route.target})}]:[]};});
+  if(branches.length>1||node.type==='choice'||node.type==='gate')lines.push({type:node.type==='gate'?'gate':'choice',options:branches});
+  else if(branches[0]?.nodes.length)lines.push(branches[0].nodes[0]);
+  return lines;
+}
+function scaffoldEnsembleArc(arc){
+  normalizeEnsembleArc(arc);const result={created:[],existing:[],skipped:[],collisions:[]};
+  arc.nodes.filter(node=>['approved','implemented'].includes(node.implementation_status)).forEach(node=>{
+    if(['placeholder','delay','merge'].includes(node.type)){result.skipped.push(node.id);return;}
+    const id=ensembleNodeContentId(arc,node),wanted=node.type==='quest'?'quest':'conversation';
+    const present=P.content.find(item=>item.id===id);
+    if(present){
+      const marker=present.ensembleArc||present.questPlan?.ensembleArc;
+      if(marker?.arc_id===arc.id&&marker?.node_id===node.id){result.existing.push(id);node.implementation_status='implemented';}
+      else result.collisions.push(id);
+      return;
+    }
+    const cast=node.cast.length?node.cast:arc.cast.map(row=>row.character),location=node.location||P.locations[0]?.id||'';
+    if(wanted==='quest'){
+      const giver=cast[0]||arc.cast[0]?.character||'';
+      P.content.push({uid:ensembleUid('q'),type:'quest',id,title:arc.title+' — '+node.title,character:giver,
+        cast:cast.filter(character=>character!==giver),hook:node.summary,location,day:node.day,block:node.block,
+        requires:ensembleRequirementsLegacy([...(node.id===arc.start_node?arc.entry_requirements:[]),...node.requires]),after:'',stages:[{id:'objective_1',title:node.title,
+          location,nodes:ensembleNodeTree(arc,node),flag:ensembleEffectsFlag(node.effects),requires:[]}],
+        questPlan:{category:arc.category,summary:node.summary,ensembleArc:{arc_id:arc.id,node_id:node.id},
+          rewards:'',rewardRows:[],advancedRewards:'',participants:cast,deadline:'',branchIdeas:'',event:null,eventDraft:null}});
+    }else P.content.push({uid:ensembleUid('c'),type:'conversation',id,title:arc.title+' — '+node.title,
+      character:cast[0]||'',cast,location,day:node.day,days:node.day?[node.day]:[],block:node.block,
+      chapter:0,premise:node.summary,requires:ensembleRequirementsLegacy([...(node.id===arc.start_node?arc.entry_requirements:[]),...node.requires]),nodes:ensembleNodeTree(arc,node),
+      flag:ensembleEffectsFlag(node.effects),ensembleArc:{arc_id:arc.id,node_id:node.id}});
+    node.implementation_status='implemented';result.created.push(id);
+  });
+  save();return result;
+}
+
+function ensembleGraphHtml(arc){
+  const width=Math.max(760,...arc.nodes.map(node=>+node.layout.x+210)),height=Math.max(500,...arc.nodes.map(node=>+node.layout.y+120));
+  const byId=new Map(arc.nodes.map(node=>[node.id,node]));
+  const lines=arc.nodes.flatMap(node=>node.routes.map((route,index)=>{
+    const target=byId.get(route.target);if(!target)return '';
+    const x1=+node.layout.x+172,y1=+node.layout.y+42+index*7,x2=+target.layout.x,y2=+target.layout.y+42;
+    return '<path d="M'+x1+' '+y1+' C'+(x1+55)+' '+y1+' '+(x2-55)+' '+y2+' '+x2+' '+y2+'" marker-end="url(#ensembleArrow)"/>';
+  })).join('');
+  const nodes=arc.nodes.map(node=>'<button type="button" class="ensemble-node '+esc(node.type)+
+    (node.id===arc.start_node?' start':'')+(node.id===ensembleNodeId?' selected':'')+'" data-ensemble-node="'+esc(node.id)+
+    '" style="left:'+node.layout.x+'px;top:'+node.layout.y+'px"><small>'+esc(pretty(node.type))+' · '+esc(pretty(node.implementation_status))+
+    '</small><b>'+esc(node.title||pretty(node.id))+'</b><span>'+node.routes.length+' route'+(node.routes.length===1?'':'s')+
+    (node.id===arc.start_node?' · start':'')+'</span></button>').join('');
+  return '<div class="ensemble-canvas" id="ensembleCanvas" style="width:'+width+'px;height:'+height+'px">'+
+    '<svg viewBox="0 0 '+width+' '+height+'" aria-hidden="true"><defs><marker id="ensembleArrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z"/></marker></defs>'+lines+'</svg>'+nodes+'</div>';
+}
+function ensembleArcListHtml(){
+  const arcs=normalizeEnsembleArcs();return '<div class="ensemble-sidebar-head"><span>Story arcs</span><button class="btn gold" id="ensembleNewArc">+ New</button></div>'+(
+    arcs.length?arcs.map(arc=>{const issues=ensembleArcIssues(arc),errors=issues.filter(issue=>issue.severity==='error').length;
+      return '<button class="ensemble-arc-card'+(arc.id===ensembleArcId?' on':'')+'" data-ensemble-arc="'+esc(arc.id)+'"><b>'+esc(arc.title||pretty(arc.id))+
+        '</b><span>'+arc.nodes.length+' nodes · '+arc.cast.length+' characters</span><small>'+esc(pretty(arc.status))+(errors?' · '+errors+' errors':'')+'</small></button>';
+    }).join(''):'<div class="ensemble-empty">Create an arc to begin planning branches across multiple characters.</div>')+
+    '<button class="btn wide" id="ensembleDuplicateArc"'+(activeEnsembleArc()?'':' disabled')+'>Duplicate selected arc</button>';
+}
+function ensembleCastHtml(arc){
+  const selected=new Map(arc.cast.map(row=>[row.character,row.role]));
+  return '<details class="ensemble-cast-panel"><summary>Arc cast · '+arc.cast.length+' characters</summary><div class="ensemble-cast-grid">'+
+    (P.characters||[]).filter(character=>!isPlayer(character)).map(character=>'<div class="ensemble-cast-row"><label><input type="checkbox" data-ensemble-cast="'+esc(character.id)+'"'+
+      (selected.has(character.id)?' checked':'')+'> '+esc(character.name)+'</label><select data-ensemble-role="'+esc(character.id)+'"'+(selected.has(character.id)?'':' disabled')+'>'+ENSEMBLE_CAST_ROLES.map(role=>'<option value="'+role+'"'+
+      (selected.get(character.id)===role?' selected':'')+'>'+esc(pretty(role))+'</option>').join('')+'</select></div>').join('')+
+    '</div></details>';
+}
+function ensembleVariablesHtml(arc){
+  return '<details class="ensemble-variable-panel"><summary>Arc variables and entry gates · '+arc.variables.length+' variables</summary>'+
+    '<div class="ensemble-variable-body"><div class="field"><label>Requirements to discover / begin this arc</label><textarea id="ensembleEntryRequirements" placeholder="emma_rowan.friendship >= 35\nplayer.employment.job = restaurant_kitchen">'+esc(ensembleRequirementsText(arc.entry_requirements))+'</textarea></div>'+
+    '<div class="ensemble-variable-list">'+arc.variables.map((variable,index)=>'<div class="ensemble-variable-row"><div class="field"><label>Variable label</label><input data-ensemble-variable-label="'+index+'" value="'+esc(variable.label)+'"></div>'+
+      '<div class="field"><label>Variable id</label><input data-ensemble-variable-id="'+index+'" value="'+esc(variable.id)+'"></div>'+
+      '<div class="field"><label>Type</label><select data-ensemble-variable-type="'+index+'"><option value="number"'+(variable.type==='number'?' selected':'')+'>number</option><option value="boolean"'+(variable.type==='boolean'?' selected':'')+'>boolean</option><option value="text"'+(variable.type==='text'?' selected':'')+'>text</option></select></div>'+
+      '<div class="field"><label>Starting value</label><input data-ensemble-variable-default="'+index+'" value="'+esc(stateValueText(variable.default))+'"></div><button class="x" title="Remove variable" data-ensemble-remove-variable="'+index+'">×</button></div>').join('')+
+      '</div><button class="btn" id="ensembleAddVariable">+ Arc variable</button></div></details>';
+}
+function ensembleRouteHtml(arc,node,route,index){
+  const options='<option value="">— choose destination —</option>'+arc.nodes.filter(item=>item!==node).map(item=>'<option value="'+esc(item.id)+'"'+
+    (item.id===route.target?' selected':'')+'>'+esc(item.title||pretty(item.id))+'</option>').join('');
+  return '<div class="ensemble-route-card" data-ensemble-route-card="'+index+'"><div class="ensemble-route-head"><b>Route '+(index+1)+'</b><button class="x" data-ensemble-remove-route="'+index+'">×</button></div>'+
+    '<div class="two"><div class="field"><label>Choice / route label</label><input data-ensemble-route-label="'+index+'" value="'+esc(route.label)+'"></div>'+
+    '<div class="field"><label>Destination</label><select data-ensemble-route-target="'+index+'">'+options+'</select></div></div>'+
+    '<div class="two"><div class="field"><label>Requirements · one per line</label><textarea data-ensemble-route-requires="'+index+'" placeholder="emma_rowan.friendship >= 35">'+esc(ensembleRequirementsText(route.requires))+'</textarea></div>'+
+    '<div class="field"><label>Effects · one per line</label><textarea data-ensemble-route-effects="'+index+'" placeholder="emma_rowan.trust + 5">'+esc(ensembleEffectsText(route.effects))+'</textarea></div></div></div>';
+}
+function ensembleNodeInspectorHtml(arc,node){
+  if(!node)return '<div class="ensemble-empty inspector"><b>No story node selected</b><p>Add a node or select one on the graph.</p></div>';
+  const castSet=new Set(node.cast);
+  return '<div class="ensemble-inspector-head"><div><span>Selected node</span><h4>'+esc(node.title||pretty(node.id))+'</h4></div>'+
+    '<button class="btn" id="ensembleDuplicateNode">Duplicate</button><button class="btn danger" id="ensembleRemoveNode">Remove</button></div>'+
+    '<div class="two"><div class="field"><label>Node title</label><input id="ensembleNodeTitleInput" value="'+esc(node.title)+'"></div>'+
+    '<div class="field"><label>Stable node id</label><input id="ensembleNodeIdInput" value="'+esc(node.id)+'"></div></div>'+
+    '<div class="ensemble-node-meta"><div class="field"><label>Node type</label><select id="ensembleNodeType">'+ENSEMBLE_NODE_TYPES.map(row=>'<option value="'+row[0]+'"'+(node.type===row[0]?' selected':'')+'>'+row[1]+'</option>').join('')+'</select></div>'+
+    '<div class="field"><label>Implementation</label><select id="ensembleNodeStatus">'+ENSEMBLE_NODE_STATUSES.map(status=>'<option value="'+status+'"'+(node.implementation_status===status?' selected':'')+'>'+pretty(status)+'</option>').join('')+'</select></div>'+
+    '<div class="field"><label>Location</label><select id="ensembleNodeLocation"><option value="">— flexible —</option>'+placeOptions(node.location)+'</select></div>'+
+    '<div class="field"><label>Day</label><select id="ensembleNodeDay"><option value="">Any day</option>'+DAYS.map(day=>'<option value="'+day+'"'+(node.day===day?' selected':'')+'>'+pretty(day)+'</option>').join('')+'</select></div>'+
+    '<div class="field"><label>Time block</label><select id="ensembleNodeBlock"><option value="">Any block</option>'+BLOCKS.map(block=>'<option value="'+block+'"'+(node.block===block?' selected':'')+'>'+pretty(block)+'</option>').join('')+'</select></div></div>'+
+    '<label class="ensemble-start"><input type="checkbox" id="ensembleNodeStart"'+(arc.start_node===node.id?' checked':'')+'> Start the arc here</label>'+
+    '<div class="field"><label>Purpose / scene summary</label><textarea id="ensembleNodeSummary" placeholder="What changes in this story beat?">'+esc(node.summary)+'</textarea></div>'+
+    '<div class="field"><label>Characters present</label><div class="ensemble-node-cast">'+arc.cast.map(row=>{
+      const character=(P.characters||[]).find(item=>item.id===row.character);return '<label><input type="checkbox" data-ensemble-node-cast="'+esc(row.character)+'"'+(castSet.has(row.character)?' checked':'')+'> '+esc(character?.name||pretty(row.character))+'</label>';
+    }).join('')+'</div></div>'+
+    '<div class="field"><label>Draft dialogue · Speaker: line</label><textarea class="ensemble-dialogue-draft" id="ensembleNodeLines" placeholder="Emma Rowan: I have an idea.\nPlayer: I’m listening.">'+esc(ensembleLinesText(node.lines))+'</textarea></div>'+
+    '<div class="two"><div class="field"><label>Node requirements</label><textarea id="ensembleNodeRequires" placeholder="player.employment.job = restaurant_kitchen">'+esc(ensembleRequirementsText(node.requires))+'</textarea></div>'+
+    '<div class="field"><label>Effects on entry</label><textarea id="ensembleNodeEffects" placeholder="emma_rowan.trust + 2">'+esc(ensembleEffectsText(node.effects))+'</textarea></div></div>'+
+    '<div class="ensemble-routes-title"><b>Outgoing routes</b><button class="btn" id="ensembleAddRoute">+ Route</button></div>'+node.routes.map((route,index)=>ensembleRouteHtml(arc,node,route,index)).join('')+
+    (node.type==='ending'?'<p class="hint">Ending nodes intentionally have no outgoing route.</p>':'')+
+    '<p class="hint">Use one requirement or effect per line. Examples: <code>emma_rowan.friendship &gt;= 35</code>, <code>waitress_path = true</code>, or <code>emma_rowan.trust + 5</code>.</p>';
+}
+function ensembleIssuesHtml(arc){
+  const issues=ensembleArcIssues(arc);if(!issues.length)return '<div class="ensemble-issues clear"><b>Arc check passed</b><span>Every branch resolves and can reach an ending.</span></div>';
+  return '<div class="ensemble-issues">'+issues.map(issue=>'<button class="'+issue.severity+'" data-ensemble-issue-node="'+esc(issue.node||'')+'"><b>'+issue.severity+'</b> '+esc(issue.message)+'</button>').join('')+'</div>';
+}
+function paintEnsembleArcStudio(){
+  const arcs=normalizeEnsembleArcs();if(!arcs.some(arc=>arc.id===ensembleArcId))ensembleArcId=arcs[0]?.id||'';
+  const arc=activeEnsembleArc();if(arc&&!arc.nodes.some(node=>node.id===ensembleNodeId))ensembleNodeId=arc.start_node||arc.nodes[0]?.id||'';
+  $('ensembleArcTitle').textContent=arc?(arc.title||pretty(arc.id)):'Ensemble Story Arc Studio';
+  const issues=arc?ensembleArcIssues(arc):[],errors=issues.filter(issue=>issue.severity==='error').length;
+  $('ensembleArcHealth').textContent=arc?(errors?errors+' errors':issues.length?issues.length+' notes':'ready'):'';
+  $('ensembleArcHealth').classList.toggle('bad',!!errors);
+  ['ensembleArcDownload','ensembleArcScaffold','ensembleArcPlay'].forEach(id=>$(id).disabled=!arc);
+  $('ensembleArcBody').innerHTML='<div class="ensemble-layout"><aside class="ensemble-sidebar">'+ensembleArcListHtml()+'</aside>'+(
+    arc?'<main class="ensemble-main"><section class="ensemble-arc-overview"><div class="ensemble-arc-fields"><div class="field"><label>Arc title</label><input id="ensembleTitleInput" value="'+esc(arc.title)+'"></div>'+
+      '<div class="field"><label>Arc id</label><input id="ensembleIdInput" value="'+esc(arc.id)+'"></div><div class="field"><label>Status</label><select id="ensembleStatus">'+ENSEMBLE_ARC_STATUSES.map(status=>'<option value="'+status+'"'+(arc.status===status?' selected':'')+'>'+pretty(status)+'</option>').join('')+'</select></div>'+
+      '<div class="field"><label>Category</label><input id="ensembleCategory" value="'+esc(arc.category)+'"></div></div>'+
+      '<div class="field"><label>Arc summary</label><textarea id="ensembleSummary" placeholder="What is this story about, and why can the player choose different paths?">'+esc(arc.summary)+'</textarea></div>'+ensembleCastHtml(arc)+ensembleVariablesHtml(arc)+'</section>'+
+      '<div class="ensemble-node-toolbar"><span>Story nodes</span>'+ENSEMBLE_NODE_TYPES.map(row=>'<button data-ensemble-add-node="'+row[0]+'">+ '+esc(row[1])+'</button>').join('')+'<button id="ensembleAutoArrange">Auto arrange</button></div>'+
+      '<div class="ensemble-workspace"><section class="ensemble-graph-panel"><div class="ensemble-graph-scroll">'+ensembleGraphHtml(arc)+'</div>'+ensembleIssuesHtml(arc)+'</section>'+
+      '<aside class="ensemble-inspector">'+ensembleNodeInspectorHtml(arc,activeEnsembleNode(arc))+'</aside></div></main>':
+      '<main class="ensemble-main ensemble-welcome"><b>Plan branching stories before implementing them</b><p>Create an arc, add several characters, connect scenes and choices, then run it in the isolated VN playtester.</p><button class="btn gold" id="ensembleWelcomeNew">Create the first arc</button></main>')+'</div>';
+  wireEnsembleArcStudio(arc);
+}
+
+function wireEnsembleGraph(arc){
+  const canvas=$('ensembleCanvas');if(!canvas)return;
+  canvas.querySelectorAll('[data-ensemble-node]').forEach(button=>{
+    let origin=null;
+    button.onclick=()=>{if(ensembleDragSuppress===button.dataset.ensembleNode){ensembleDragSuppress='';return;}
+      ensembleNodeId=button.dataset.ensembleNode;paintEnsembleArcStudio();};
+    button.onpointerdown=event=>{origin={x:event.clientX,y:event.clientY,left:parseFloat(button.style.left),top:parseFloat(button.style.top),moved:false};button.setPointerCapture(event.pointerId);};
+    button.onpointermove=event=>{if(!origin)return;const dx=event.clientX-origin.x,dy=event.clientY-origin.y;if(Math.abs(dx)+Math.abs(dy)>6)origin.moved=true;
+      if(origin.moved)button.style.transform='translate('+dx+'px,'+dy+'px)';};
+    button.onpointerup=event=>{if(!origin)return;const state=origin;origin=null;button.releasePointerCapture(event.pointerId);
+      if(!state.moved){button.style.transform='';return;}const node=arc.nodes.find(item=>item.id===button.dataset.ensembleNode);
+      node.layout={x:Math.max(20,Math.round((state.left+event.clientX-state.x)/10)*10),y:Math.max(20,Math.round((state.top+event.clientY-state.y)/10)*10)};
+      ensembleDragSuppress=node.id;save();paintEnsembleArcStudio();};
+  });
+}
+function wireEnsembleArcStudio(arc){
+  const body=$('ensembleArcBody');
+  body.querySelectorAll('[data-ensemble-arc]').forEach(button=>button.onclick=()=>{ensembleArcId=button.dataset.ensembleArc;ensembleNodeId='';paintEnsembleArcStudio();});
+  const create=()=>{const item=defaultEnsembleArc(P.ensemble_arcs.length);item.id=ensembleUniqueId(P.ensemble_arcs,item.id);P.ensemble_arcs.push(item);
+    ensembleArcId=item.id;ensembleNodeId=item.start_node;save();paintEnsembleArcStudio();};
+  if($('ensembleNewArc'))$('ensembleNewArc').onclick=create;if($('ensembleWelcomeNew'))$('ensembleWelcomeNew').onclick=create;
+  if(!arc)return;
+  $('ensembleDuplicateArc').onclick=()=>{const copy=JSON.parse(JSON.stringify(arc));copy.id=ensembleUniqueId(P.ensemble_arcs,arc.id+'_copy');copy.title=arc.title+' Copy';copy.status='draft';
+    copy.nodes.forEach(node=>{node.implementation_status='draft';});P.ensemble_arcs.push(copy);ensembleArcId=copy.id;ensembleNodeId=copy.start_node;save();paintEnsembleArcStudio();};
+  const arcField=(id,key,paint=false)=>$(id).onchange=event=>{arc[key]=event.target.value.trim();save();if(paint)paintEnsembleArcStudio();};
+  $('ensembleTitleInput').oninput=event=>{arc.title=event.target.value;save();$('ensembleArcTitle').textContent=arc.title||pretty(arc.id);};
+  $('ensembleTitleInput').onchange=()=>paintEnsembleArcStudio();
+  $('ensembleIdInput').onchange=event=>{try{event.target.value=renameEnsembleArc(arc,event.target.value);save();paintEnsembleArcStudio();}
+    catch(error){event.target.value=arc.id;note(esc(error.message));}};
+  arcField('ensembleStatus','status',true);arcField('ensembleCategory','category');
+  $('ensembleSummary').oninput=event=>{arc.summary=event.target.value;save();};
+  body.querySelectorAll('[data-ensemble-cast]').forEach(input=>input.onchange=()=>{
+    const id=input.dataset.ensembleCast;if(input.checked&&!arc.cast.some(row=>row.character===id))arc.cast.push({character:id,role:'supporting'});
+    if(!input.checked){arc.cast=arc.cast.filter(row=>row.character!==id);arc.nodes.forEach(node=>node.cast=node.cast.filter(character=>character!==id));}
+    save();paintEnsembleArcStudio();
+  });
+  body.querySelectorAll('[data-ensemble-role]').forEach(select=>select.onchange=()=>{const row=arc.cast.find(item=>item.character===select.dataset.ensembleRole);if(row)row.role=select.value;save();});
+  $('ensembleEntryRequirements').oninput=event=>{arc.entry_requirements=parseEnsembleRequirements(event.target.value,arc);save();};
+  $('ensembleEntryRequirements').onchange=event=>{event.target.value=ensembleRequirementsText(arc.entry_requirements);save();};
+  $('ensembleAddVariable').onclick=()=>{const id=ensembleUniqueId(arc.variables,'arc_variable');arc.variables.push({id,label:'Arc variable',type:'number',default:0});save();paintEnsembleArcStudio();};
+  body.querySelectorAll('[data-ensemble-variable-label]').forEach(input=>input.oninput=()=>{arc.variables[+input.dataset.ensembleVariableLabel].label=input.value;save();});
+  body.querySelectorAll('[data-ensemble-variable-id]').forEach(input=>input.onchange=()=>{const variable=arc.variables[+input.dataset.ensembleVariableId];input.value=renameEnsembleVariable(arc,variable,input.value);save();paintEnsembleArcStudio();});
+  body.querySelectorAll('[data-ensemble-variable-type]').forEach(select=>select.onchange=()=>{const variable=arc.variables[+select.dataset.ensembleVariableType];variable.type=select.value;
+    if(variable.type==='boolean')variable.default=!!variable.default;else if(variable.type==='number')variable.default=+variable.default||0;else variable.default=String(variable.default??'');save();paintEnsembleArcStudio();});
+  body.querySelectorAll('[data-ensemble-variable-default]').forEach(input=>input.onchange=()=>{const variable=arc.variables[+input.dataset.ensembleVariableDefault];variable.default=ensembleValue(input.value);save();paintEnsembleArcStudio();});
+  body.querySelectorAll('[data-ensemble-remove-variable]').forEach(button=>button.onclick=()=>{arc.variables.splice(+button.dataset.ensembleRemoveVariable,1);save();paintEnsembleArcStudio();});
+  body.querySelectorAll('[data-ensemble-add-node]').forEach(button=>button.onclick=()=>{addEnsembleNode(arc,button.dataset.ensembleAddNode);paintEnsembleArcStudio();});
+  $('ensembleAutoArrange').onclick=()=>{autoArrangeEnsembleArc(arc);save();paintEnsembleArcStudio();};
+  body.querySelectorAll('[data-ensemble-issue-node]').forEach(button=>button.onclick=()=>{if(button.dataset.ensembleIssueNode){ensembleNodeId=button.dataset.ensembleIssueNode;paintEnsembleArcStudio();}});
+  wireEnsembleGraph(arc);const node=activeEnsembleNode(arc);if(!node)return;
+  $('ensembleDuplicateNode').onclick=()=>{duplicateEnsembleNode(arc,node);paintEnsembleArcStudio();};
+  $('ensembleRemoveNode').onclick=()=>{if(!confirm('Remove '+node.title+'? Routes pointing here will remain visible as errors until you reconnect them.'))return;
+    arc.nodes=arc.nodes.filter(item=>item!==node);if(arc.start_node===node.id)arc.start_node=arc.nodes[0]?.id||'';ensembleNodeId=arc.start_node;save();paintEnsembleArcStudio();};
+  $('ensembleNodeTitleInput').oninput=event=>{node.title=event.target.value;save();};$('ensembleNodeTitleInput').onchange=()=>paintEnsembleArcStudio();
+  $('ensembleNodeIdInput').onchange=event=>{try{event.target.value=renameEnsembleNode(arc,node,event.target.value);save();paintEnsembleArcStudio();}
+    catch(error){event.target.value=node.id;note(esc(error.message));}};
+  $('ensembleNodeType').onchange=event=>{node.type=event.target.value;if(node.type==='ending')node.routes=[];save();paintEnsembleArcStudio();};
+  $('ensembleNodeStatus').onchange=event=>{node.implementation_status=event.target.value;save();paintEnsembleArcStudio();};
+  [['ensembleNodeLocation','location'],['ensembleNodeDay','day'],['ensembleNodeBlock','block']].forEach(([id,key])=>$(id).onchange=event=>{node[key]=event.target.value;save();paintEnsembleArcStudio();});
+  $('ensembleNodeStart').onchange=event=>{if(event.target.checked)arc.start_node=node.id;else if(arc.start_node===node.id)arc.start_node='';save();paintEnsembleArcStudio();};
+  $('ensembleNodeSummary').oninput=event=>{node.summary=event.target.value;save();};
+  $('ensembleNodeLines').oninput=event=>{node.lines=parseEnsembleLines(event.target.value);save();};
+  $('ensembleNodeLines').onchange=event=>{event.target.value=ensembleLinesText(node.lines);save();};
+  $('ensembleNodeRequires').oninput=event=>{node.requires=parseEnsembleRequirements(event.target.value,arc);save();};
+  $('ensembleNodeRequires').onchange=event=>{event.target.value=ensembleRequirementsText(node.requires);save();};
+  $('ensembleNodeEffects').oninput=event=>{node.effects=parseEnsembleEffects(event.target.value,arc);save();};
+  $('ensembleNodeEffects').onchange=event=>{event.target.value=ensembleEffectsText(node.effects);save();};
+  body.querySelectorAll('[data-ensemble-node-cast]').forEach(input=>input.onchange=()=>{const id=input.dataset.ensembleNodeCast;
+    if(input.checked&&!node.cast.includes(id))node.cast.push(id);else if(!input.checked)node.cast=node.cast.filter(item=>item!==id);save();paintEnsembleArcStudio();});
+  $('ensembleAddRoute').onclick=()=>{if(node.type==='ending')node.type='scene';node.routes.push({id:ensembleUniqueId(node.routes,'route'),label:'New route',target:'',requires:[],effects:[]});save();paintEnsembleArcStudio();};
+  body.querySelectorAll('[data-ensemble-remove-route]').forEach(button=>button.onclick=()=>{node.routes.splice(+button.dataset.ensembleRemoveRoute,1);save();paintEnsembleArcStudio();});
+  body.querySelectorAll('[data-ensemble-route-label]').forEach(input=>input.oninput=()=>{node.routes[+input.dataset.ensembleRouteLabel].label=input.value;save();});
+  body.querySelectorAll('[data-ensemble-route-target]').forEach(select=>select.onchange=()=>{node.routes[+select.dataset.ensembleRouteTarget].target=select.value;save();paintEnsembleArcStudio();});
+  body.querySelectorAll('[data-ensemble-route-requires]').forEach(input=>{input.oninput=()=>{const route=node.routes[+input.dataset.ensembleRouteRequires];route.requires=parseEnsembleRequirements(input.value,arc);save();};
+    input.onchange=()=>{input.value=ensembleRequirementsText(node.routes[+input.dataset.ensembleRouteRequires].requires);save();};});
+  body.querySelectorAll('[data-ensemble-route-effects]').forEach(input=>{input.oninput=()=>{const route=node.routes[+input.dataset.ensembleRouteEffects];route.effects=parseEnsembleEffects(input.value,arc);save();};
+    input.onchange=()=>{input.value=ensembleEffectsText(node.routes[+input.dataset.ensembleRouteEffects].effects);save();};});
+}
+
+function ensembleStatePreset(arc,preset='fresh'){
+  const state={variables:{},stats:{},flags:{},visited:[]};
+  arc.variables.forEach(variable=>state.variables[variable.id]=variable.default);
+  arc.cast.forEach(row=>{const character=(P.characters||[]).find(item=>item.id===row.character);
+    Object.entries(character?.relationship_defaults||{}).forEach(([key,value])=>state.stats[row.character+'.'+key]=+value||0);});
+  if(preset==='midgame')Object.keys(state.stats).forEach(key=>state.stats[key]=Math.max(50,state.stats[key]));
+  if(preset==='open'){
+    Object.keys(state.stats).forEach(key=>state.stats[key]=100);
+    arc.variables.forEach(variable=>state.variables[variable.id]=variable.type==='boolean'?true:variable.type==='number'?100:variable.default);
+    const rules=[...arc.entry_requirements,...arc.nodes.flatMap(node=>[...node.requires,...node.routes.flatMap(route=>route.requires)])];
+    rules.forEach(rule=>{if(rule.kind==='stat')state.stats[rule.character+'.'+rule.key]=rule.op==='lte'?+rule.value:Math.max(100,+rule.value||0);
+      else if(rule.kind==='variable')state.variables[rule.key]=rule.op==='is_false'?false:rule.value;
+      else state.flags[rule.key]=rule.op==='is_false'?false:rule.value;});
+  }
+  return state;
+}
+function ensembleStateGet(rule,state){
+  if(rule.kind==='stat')return state.stats[rule.character+'.'+rule.key]??0;
+  if(rule.kind==='variable')return state.variables[rule.key];return state.flags[rule.key];
+}
+function ensembleRequirementMet(rule,state){
+  const have=ensembleStateGet(rule,state),want=rule.value;
+  if(rule.op==='is_true')return have===true||(+have||0)>0;
+  if(rule.op==='is_false')return !(have===true||(+have||0)>0);
+  if(rule.op==='gte')return (+have||0)>=(+want||0);if(rule.op==='lte')return (+have||0)<=(+want||0);
+  if(rule.op==='neq')return have!==want;return have===want||String(have)===String(want);
+}
+function ensembleApplyEffects(effects,state){
+  const changes=[];(effects||[]).forEach(effect=>{const key=ensembleRuleKey(effect),before=ensembleStateGet(effect,state);
+    const value=effect.op==='add'?(+before||0)+(+effect.value||0):effect.value;
+    if(effect.kind==='stat')state.stats[key]=value;else if(effect.kind==='variable')state.variables[effect.key]=value;else state.flags[effect.key]=value;
+    changes.push({key,before,value});});return changes;
+}
+function ensemblePlayEnter(arc,nodeId,routeEffects=[]){
+  const node=arc.nodes.find(item=>item.id===nodeId);if(!node)return false;ensemblePlayNodeId=node.id;
+  ensemblePlayLastChanges=[...ensembleApplyEffects(routeEffects,ensemblePlayState),...ensembleApplyEffects(node.effects,ensemblePlayState)];
+  ensemblePlayState.visited.push(node.id);return true;
+}
+function startEnsemblePlaytest(arc,preset='fresh'){
+  ensemblePlayArcId=arc.id;ensemblePlayHistory=[];ensemblePlayState=ensembleStatePreset(arc,preset);
+  ensemblePlayNodeId='';ensemblePlayLastChanges=[];ensemblePlayEnter(arc,arc.start_node);paintEnsemblePlaytest();
+}
+function ensemblePlayRoute(index){
+  const arc=P.ensemble_arcs.find(item=>item.id===ensemblePlayArcId),node=arc?.nodes.find(item=>item.id===ensemblePlayNodeId),route=node?.routes[index];
+  const target=arc?.nodes.find(item=>item.id===route?.target),requirements=[...(route?.requires||[]),...(target?.requires||[])];
+  if(!arc||!route||!target||!requirements.every(rule=>ensembleRequirementMet(rule,ensemblePlayState)))return;
+  ensemblePlayHistory.push({node:ensemblePlayNodeId,state:JSON.parse(JSON.stringify(ensemblePlayState)),changes:JSON.parse(JSON.stringify(ensemblePlayLastChanges))});
+  ensemblePlayEnter(arc,route.target,route.effects);paintEnsemblePlaytest();
+}
+function ensemblePlayStateHtml(arc){
+  const statKeys=['friendship','trust','respect','love'];
+  return '<section class="ensemble-test-state"><h4>Test state</h4><p>Changes here affect this playtest only.</p>'+arc.variables.map(variable=>'<label>'+esc(variable.label)+'<input data-play-variable="'+esc(variable.id)+'" value="'+esc(stateValueText(ensemblePlayState.variables[variable.id]))+'"></label>').join('')+
+    arc.cast.map(row=>{const character=(P.characters||[]).find(item=>item.id===row.character);return '<details><summary>'+esc(character?.name||pretty(row.character))+'</summary>'+statKeys.map(key=>'<label>'+pretty(key)+'<input type="number" data-play-stat="'+esc(row.character+'.'+key)+'" value="'+esc(ensemblePlayState.stats[row.character+'.'+key]??0)+'"></label>').join('')+'</details>';}).join('')+'</section>';
+}
+function paintEnsemblePlaytest(){
+  const arc=P.ensemble_arcs.find(item=>item.id===ensemblePlayArcId),node=arc?.nodes.find(item=>item.id===ensemblePlayNodeId);if(!arc||!node)return;
+  $('ensemblePlaytestTitle').textContent=arc.title+' · playtest';$('ensemblePlaytestBack').disabled=!ensemblePlayHistory.length;
+  const entryUnmet=arc.entry_requirements.filter(rule=>!ensembleRequirementMet(rule,ensemblePlayState));
+  const routeButtons=node.routes.map((route,index)=>{const target=arc.nodes.find(item=>item.id===route.target),unmet=[...route.requires,...(target?.requires||[])].filter(rule=>!ensembleRequirementMet(rule,ensemblePlayState));
+    return '<button data-play-route="'+index+'"'+(unmet.length||!route.target?' disabled':'')+'><b>'+esc(route.label)+'</b><span>'+(
+      !route.target?'No destination':unmet.length?'Locked: '+unmet.map(rule=>ensembleRequirementsText([rule])).join(', '):'Go to '+esc(arc.nodes.find(item=>item.id===route.target)?.title||pretty(route.target)))+'</span></button>';}).join('');
+  const lines=node.lines.length?node.lines.map(line=>'<div class="ensemble-vn-line '+(line.speaker==='__narrator__'?'narrator':'')+'"><b>'+esc(line.speaker==='__narrator__'?'Narration':line.speaker==='player'?'Player':
+    (P.characters||[]).find(item=>item.id===line.speaker)?.name||pretty(line.speaker))+'</b><p>'+esc(line.text)+'</p></div>').join(''):
+    '<div class="ensemble-vn-placeholder">'+esc(node.summary||'No dialogue has been drafted for this node yet.')+'</div>';
+  const changes=ensemblePlayLastChanges.length?'<div class="ensemble-test-changes"><b>State changes</b>'+ensemblePlayLastChanges.map(change=>'<span>'+esc(pretty(change.key))+': '+esc(stateValueText(change.before))+' → '+esc(stateValueText(change.value))+'</span>').join('')+'</div>':'';
+  $('ensemblePlaytestBody').innerHTML='<div class="ensemble-play-layout"><aside class="ensemble-test-nav"><label>Jump to node<select id="ensemblePlayJump">'+arc.nodes.map(item=>'<option value="'+esc(item.id)+'"'+(item.id===node.id?' selected':'')+'>'+esc(item.title)+'</option>').join('')+'</select></label>'+
+    '<div class="ensemble-play-history"><b>Visited</b>'+ensemblePlayState.visited.map((id,index)=>'<span>'+ (index+1)+'. '+esc(arc.nodes.find(item=>item.id===id)?.title||pretty(id))+'</span>').join('')+'</div>'+ensemblePlayStateHtml(arc)+'</aside>'+
+    '<main class="ensemble-vn"><div class="ensemble-vn-slug"><span>'+esc(pretty(node.type))+'</span><b>'+esc(node.title)+'</b><small>'+esc(node.location?placeName(node.location):'Flexible location')+(node.day?' · '+pretty(node.day):'')+(node.block?' · '+pretty(node.block):'')+'</small></div>'+
+    (entryUnmet.length?'<div class="ensemble-entry-warning"><b>Arc entry would currently be locked</b><span>'+esc(entryUnmet.map(rule=>ensembleRequirementsText([rule])).join(' · '))+'</span></div>':'')+
+    '<div class="ensemble-vn-screen">'+lines+'</div>'+changes+'<div class="ensemble-vn-choices">'+(routeButtons||'<div class="ensemble-vn-ending">End of this route</div>')+'</div></main></div>';
+  $('ensemblePlaytestBody').querySelectorAll('[data-play-route]').forEach(button=>button.onclick=()=>ensemblePlayRoute(+button.dataset.playRoute));
+  $('ensemblePlayJump').onchange=event=>{ensemblePlayHistory.push({node:ensemblePlayNodeId,state:JSON.parse(JSON.stringify(ensemblePlayState)),changes:JSON.parse(JSON.stringify(ensemblePlayLastChanges))});ensemblePlayEnter(arc,event.target.value);paintEnsemblePlaytest();};
+  $('ensemblePlaytestBody').querySelectorAll('[data-play-variable]').forEach(input=>input.onchange=()=>{ensemblePlayState.variables[input.dataset.playVariable]=ensembleValue(input.value);paintEnsemblePlaytest();});
+  $('ensemblePlaytestBody').querySelectorAll('[data-play-stat]').forEach(input=>input.onchange=()=>{ensemblePlayState.stats[input.dataset.playStat]=+input.value||0;paintEnsemblePlaytest();});
+}
+
+function openEnsembleArcStudio(){
+  normalizeEnsembleArcs();if(!P.ensemble_arcs.some(arc=>arc.id===ensembleArcId))ensembleArcId=P.ensemble_arcs[0]?.id||'';
+  ensembleNodeId=activeEnsembleArc()?.start_node||'';paintEnsembleArcStudio();$('ensembleArcStudio').showModal();
+}
+function isEnsembleArcPackage(data){return !!data&&data.format==='scenewright.ensemble_arc.v1'&&data.arc&&typeof data.arc==='object';}
+function importEnsembleArcPackage(data){
+  const arc=normalizeEnsembleArc(JSON.parse(JSON.stringify(data.arc)),P.ensemble_arcs.length);
+  arc.id=ensembleUniqueId(P.ensemble_arcs,arc.id);P.ensemble_arcs.push(arc);ensembleArcId=arc.id;ensembleNodeId=arc.start_node;save();return arc;
+}
+function downloadEnsembleArc(arc){
+  const out={format:'scenewright.ensemble_arc.v1',arc:JSON.parse(JSON.stringify(arc))};
+  const url=URL.createObjectURL(new Blob([JSON.stringify(out,null,2)],{type:'application/json'}));
+  Object.assign(document.createElement('a'),{href:url,download:arc.id+'.ensemble-arc.json'}).click();URL.revokeObjectURL(url);
+}
+
+if(typeof document!=='undefined'){
+  $('openEnsembleArcs').onclick=openEnsembleArcStudio;
+  $('openEnsembleArcsFromCharacter').onclick=()=>{$('relationshipArcWorkshop').close();openEnsembleArcStudio();};
+  $('ensembleArcClose').onclick=()=>$('ensembleArcStudio').close();
+  $('ensemblePlaytestClose').onclick=()=>$('ensemblePlaytest').close();
+  $('ensembleArcDownload').onclick=()=>{const arc=activeEnsembleArc();if(arc)downloadEnsembleArc(arc);};
+  $('ensembleArcScaffold').onclick=()=>{const arc=activeEnsembleArc();if(!arc)return;const result=scaffoldEnsembleArc(arc);paintAll();paintEnsembleArcStudio();
+    note(result.collisions.length?'Kept existing content with conflicting ids: '+result.collisions.map(esc).join(', ')+'.':
+      'Created '+result.created.length+' scene'+(result.created.length===1?'':'s')+'; '+result.existing.length+' already existed; '+result.skipped.length+' planning-only nodes skipped.');};
+  $('ensembleArcPlay').onclick=()=>{const arc=activeEnsembleArc();if(!arc)return;$('ensemblePlaytestPreset').value='fresh';startEnsemblePlaytest(arc,'fresh');$('ensemblePlaytest').showModal();};
+  $('ensemblePlaytestPreset').onchange=event=>{const arc=P.ensemble_arcs.find(item=>item.id===ensemblePlayArcId);if(arc)startEnsemblePlaytest(arc,event.target.value);};
+  $('ensemblePlaytestRestart').onclick=()=>{const arc=P.ensemble_arcs.find(item=>item.id===ensemblePlayArcId);if(arc)startEnsemblePlaytest(arc,$('ensemblePlaytestPreset').value);};
+  $('ensemblePlaytestBack').onclick=()=>{const previous=ensemblePlayHistory.pop();if(!previous)return;ensemblePlayNodeId=previous.node;ensemblePlayState=previous.state;ensemblePlayLastChanges=previous.changes;paintEnsemblePlaytest();};
+}
+
 /* ---- 12-conditions.js ---- */
 /* ============ conditions ============ */
 const OPS=[['gte','≥'],['lte','≤'],['eq','='],['is_true','is set'],['is_false','is not set']];
@@ -7855,7 +9008,19 @@ function validate(){
       if(!String(r.name||'').trim())add('err','Room "'+(roomId||'?')+'" in '+
         (l.name||id)+' has no display name.',where);
     });
+    if(typeof roomMapIssues==='function')roomMapIssues(l).filter(issue=>issue.severity==='error').forEach(issue=>
+      add('err',issue.message,where+(issue.room?' · '+pretty(issue.room):'')));
   });
+  if(typeof ensembleArcIssues==='function'){
+    const ensembleIds=new Set();
+    (P.ensemble_arcs||[]).forEach(arc=>{
+      const where='Ensemble arc · '+(arc.title||arc.id||'untitled');
+      if(ensembleIds.has(arc.id))add('err','Two ensemble arcs share id "'+arc.id+'".',where);
+      ensembleIds.add(arc.id);
+      ensembleArcIssues(arc).forEach(issue=>add(issue.severity==='error'?'err':'warn',issue.message,
+        where+(issue.node?' · '+pretty(issue.node):'')));
+    });
+  }
   const fixedPlayers=P.characters.filter(isPlayer);
   if(fixedPlayers.length)add('warn','Fixed player sheet'+(fixedPlayers.length===1?'':'s')+' ('+
     fixedPlayers.map(c=>c.name).join(', ')+') will be ignored. Port Alder creates the Player '+
@@ -10045,11 +11210,14 @@ function toJSON(){
     // the runtime needs the room table to resolve one.
     locations:P.locations.map(l=>({id:l.id,name:l.name,background:l.background,
       district:l.district,type:l.type||'',
-      outside_room:l.outside_room||'',discovery:l.discovery||{},access:l.access||{},
+      outside_room:l.outside_room||residenceEntranceId(l)||'',discovery:l.discovery||{},access:l.access||{},
       residents:l.residents||[],housing:l.housing||null,
       rooms:(l.rooms||[]).map(r=>({id:r.id,name:r.name,access:r.access||'',
-        navigation:r.navigation||{},actions:r.actions||[]})),
+        navigation:effectiveRoomNavigation(l,r),actions:r.actions||[]})),
       travel_node:l.travel_node!==false})),
+    // Authoring-only branching plans remain separate from scaffolded runtime
+    // conversations and quests, so drafts can be playtested without shipping.
+    ensemble_arcs:JSON.parse(JSON.stringify(P.ensemble_arcs||[])),
     // The declared state contract — types, starting values and ceilings.
     registry:stateRegistry(),
     conversations:pick('conversation').map(c=>Object.assign({id:c.id,title:c.title},
@@ -10177,6 +11345,8 @@ async function pickFiles(){
       try{
         const txt=await f.text(),d=JSON.parse(txt);
         if(d.format==='scenewright.project'){restoreProject(d.project);ok.push(f.name+' (project)');continue;}
+        if(typeof isEnsembleArcPackage==='function'&&isEnsembleArcPackage(d)){
+          const arc=importEnsembleArcPackage(d);ok.push(f.name+' (ensemble arc: '+arc.title+')');continue;}
         if(isLocationPackage(d)){const r=importLocations(d);
           if(r.custom){ok.push(f.name+' — '+customLocationImportSummary(r));continue;}
           ok.push(f.name+' — '+r.count+' locations, '+r.rooms+' rooms, '+r.districts+' districts'+
@@ -10234,6 +11404,8 @@ $('pasteGo').onclick=()=>{
     try{
       const d=JSON.parse(b);
       if(d.format==='scenewright.project'){restoreProject(d.project);ok.push('project file');return;}
+      if(typeof isEnsembleArcPackage==='function'&&isEnsembleArcPackage(d)){
+        const arc=importEnsembleArcPackage(d);ok.push('ensemble arc: '+arc.title);return;}
       if(isLocationPackage(d)){const r=importLocations(d);
         if(r.custom){ok.push(customLocationImportSummary(r));return;}
         ok.push(r.count+' locations, '+r.rooms+' rooms');return;}
@@ -10257,6 +11429,8 @@ document.addEventListener('drop',async e=>{
     try{
       const d=JSON.parse(await f.text());
       if(d.format==='scenewright.project'){restoreProject(d.project);ok.push(f.name+' (project)');continue;}
+      if(typeof isEnsembleArcPackage==='function'&&isEnsembleArcPackage(d)){
+        const arc=importEnsembleArcPackage(d);ok.push(f.name+' (ensemble arc: '+arc.title+')');continue;}
       if(isLocationPackage(d)){const r=importLocations(d);
         if(r.custom){ok.push(f.name+' — '+customLocationImportSummary(r));continue;}
         ok.push(f.name+' — '+r.count+' locations, '+r.rooms+' rooms'+

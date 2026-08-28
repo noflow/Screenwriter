@@ -27,11 +27,14 @@ function toJSON(){
     // the runtime needs the room table to resolve one.
     locations:P.locations.map(l=>({id:l.id,name:l.name,background:l.background,
       district:l.district,type:l.type||'',
-      outside_room:l.outside_room||'',discovery:l.discovery||{},access:l.access||{},
+      outside_room:l.outside_room||residenceEntranceId(l)||'',discovery:l.discovery||{},access:l.access||{},
       residents:l.residents||[],housing:l.housing||null,
       rooms:(l.rooms||[]).map(r=>({id:r.id,name:r.name,access:r.access||'',
-        navigation:r.navigation||{},actions:r.actions||[]})),
+        navigation:effectiveRoomNavigation(l,r),actions:r.actions||[]})),
       travel_node:l.travel_node!==false})),
+    // Authoring-only branching plans remain separate from scaffolded runtime
+    // conversations and quests, so drafts can be playtested without shipping.
+    ensemble_arcs:JSON.parse(JSON.stringify(P.ensemble_arcs||[])),
     // The declared state contract — types, starting values and ceilings.
     registry:stateRegistry(),
     conversations:pick('conversation').map(c=>Object.assign({id:c.id,title:c.title},
@@ -159,6 +162,8 @@ async function pickFiles(){
       try{
         const txt=await f.text(),d=JSON.parse(txt);
         if(d.format==='scenewright.project'){restoreProject(d.project);ok.push(f.name+' (project)');continue;}
+        if(typeof isEnsembleArcPackage==='function'&&isEnsembleArcPackage(d)){
+          const arc=importEnsembleArcPackage(d);ok.push(f.name+' (ensemble arc: '+arc.title+')');continue;}
         if(isLocationPackage(d)){const r=importLocations(d);
           if(r.custom){ok.push(f.name+' — '+customLocationImportSummary(r));continue;}
           ok.push(f.name+' — '+r.count+' locations, '+r.rooms+' rooms, '+r.districts+' districts'+
@@ -216,6 +221,8 @@ $('pasteGo').onclick=()=>{
     try{
       const d=JSON.parse(b);
       if(d.format==='scenewright.project'){restoreProject(d.project);ok.push('project file');return;}
+      if(typeof isEnsembleArcPackage==='function'&&isEnsembleArcPackage(d)){
+        const arc=importEnsembleArcPackage(d);ok.push('ensemble arc: '+arc.title);return;}
       if(isLocationPackage(d)){const r=importLocations(d);
         if(r.custom){ok.push(customLocationImportSummary(r));return;}
         ok.push(r.count+' locations, '+r.rooms+' rooms');return;}
@@ -239,6 +246,8 @@ document.addEventListener('drop',async e=>{
     try{
       const d=JSON.parse(await f.text());
       if(d.format==='scenewright.project'){restoreProject(d.project);ok.push(f.name+' (project)');continue;}
+      if(typeof isEnsembleArcPackage==='function'&&isEnsembleArcPackage(d)){
+        const arc=importEnsembleArcPackage(d);ok.push(f.name+' (ensemble arc: '+arc.title+')');continue;}
       if(isLocationPackage(d)){const r=importLocations(d);
         if(r.custom){ok.push(f.name+' — '+customLocationImportSummary(r));continue;}
         ok.push(f.name+' — '+r.count+' locations, '+r.rooms+' rooms'+

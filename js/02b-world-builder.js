@@ -25,13 +25,7 @@ function openWorldBuilder(){paintWorldBuilder();$('worldMessage').textContent=''
 
 function customLocationsOut(){
   return {format_version:1,package_id:'scenewright_custom_locations',reference_format:'location_id.room_id',
-    locations:P.locations.filter(l=>l.tags?.includes('custom')).map(l=>({id:l.id,name:l.name,
-      district:l.district,type:l.type||'place',travel_node:l.travel_node!==false,
-      outside_room:l.outside_room||'',discovery:l.discovery||{},
-      access:l.access||{always_open:true},residents:l.residents||[],services:l.services||[],
-      rooms:(l.rooms||[]).map(r=>({id:r.id,name:r.name,access:r.access||'shared',
-        navigation:r.navigation||{},actions:r.actions||[]})),
-      notes:l.notes||''}))};
+    locations:P.locations.filter(l=>l.tags?.includes('custom')).map(locationExportRecord)};
 }
 
 function worldNumber(id,fallback){

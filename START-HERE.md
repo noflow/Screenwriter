@@ -125,6 +125,40 @@ outcome should leave unrelated content with that character available. This is th
 right place for a long optional story such as Emma offering a restaurant employee a
 different presentation and uniform path toward a waitress job.
 
+## Multi-character and branching arcs
+
+Choose **Arcs** in the top project toolbar to open the **Ensemble Story Arc Studio**.
+Create as many independent arcs as the project needs, add characters as leads,
+supporting, optional, or opposing roles, and build the story on the visual graph.
+Available node types are Scene, Player choice, Stat/state gate, Quest beat, Time
+delay, Branch merge, Ending, and Placeholder. Drag cards to arrange the authoring
+view or use **Auto arrange**; moving a card does not change story travel.
+
+Select a node to draft `Speaker: line` dialogue, choose the characters present,
+location, day and time, and connect one or more routes. Requirements and effects use
+one readable rule per line. For example:
+
+    emma_rowan.friendship >= 35
+    player.employment.job = restaurant_kitchen
+    waitress_path = true
+    emma_rowan.trust + 5
+
+Arc variables are useful for decisions that belong only to that story. Entry gates
+control discovery of the whole arc. The checker reports missing destinations,
+unreachable nodes, paths that cannot reach an ending, empty dialogue, placeholders,
+missing characters or locations, and character schedule conflicts.
+
+Choose **Playtest** to run the draft in a VN-style window before creating game
+content. Fresh-start, midgame, and all-routes-open presets are available. Test-state
+values can be edited without changing the Screenwriter project; every choice shows
+its state changes. Use **Rewind**, **Restart**, or **Jump to node** to compare branches.
+
+When a node is ready, set its implementation to **Approved**. **Scaffold approved
+nodes** creates ordinary conversations and quests for those nodes while leaving all
+existing authored content untouched. Planning-only placeholders, delays, and merges
+remain in the arc graph. Downloaded `.ensemble-arc.json` files can be shared or
+imported separately from the rest of the project.
+
 Changing a character’s **Display name** does not change their internal id or exported
 filename. Existing schedules, conversations, messages, and quests therefore continue
 to point at the same character.
@@ -148,6 +182,20 @@ Use **Default home routine** to choose the character’s room, activity, and vis
 for each of the seven daily blocks. **Open weekly schedule** handles specific work,
 school, and day-of-week exceptions. If a scheduled commitment has a home placement,
 the Residence section lists that placement alongside the default routine.
+
+Open **Places**, select any location, and choose **Edit visual room map** to change
+the building itself. Each room appears as a draggable box. Selecting one lets you
+edit its name, access rule, available actions, entrance status, and four directional
+arrows. Local arrows can automatically create the matching return arrow; an external
+destination uses a full `location_id.room_id` reference. **Auto arrange** rebuilds
+the visual layout from the arrows without changing travel logic.
+
+The checker below the map reports missing destinations, one-way connections, and
+rooms disconnected from the entrance. Custom room ids can be renamed safely and
+all known story, schedule, routine, entrance, and navigation references follow the
+new id. Canonical game-room ids are read-only. **Download location** writes the
+selected place as a small location patch for review before merging it into the game
+registry.
 
 In **Plan scene**, use **Lasting consequence** to unlock a character's next
 relationship chapter and/or create a named memory when that scene finishes. The
@@ -255,7 +303,7 @@ the value is kept in the save game and respects the range set in World builder.
 
     scenewright.html    the tool — this is the one to open
     index.html          same tool, loading js/ separately, for editing sources
-    js/  css/           the 44 source modules
+    js/  css/           the 47 source modules
     build.py            rebuilds scenewright.html from those sources
     README.md           what each module does
     godot/

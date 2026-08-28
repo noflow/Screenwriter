@@ -21,6 +21,7 @@
       <button class="btn quiet" id="pasteChars" title="Paste character JSON">Paste</button>
     </div>
     <div class="mast-group mast-tools" aria-label="Project tools">
+      <button class="btn quiet" id="openEnsembleArcs">Arcs</button>
       <button class="btn quiet" id="openMap">Map</button>
       <button class="btn quiet" id="openInspect">Inspect</button>
       <button class="btn quiet" id="openMemory">Memory</button>
@@ -497,6 +498,19 @@
   </div>
 </dialog>
 
+<dialog id="roomMapEditor">
+  <div class="sheet-head">
+    <h3 id="roomMapTitle">Room map</h3>
+    <span class="room-map-health" id="roomMapHealth"></span>
+    <span class="sp"></span>
+    <button class="btn" id="roomMapDownload">Download location</button>
+    <button class="btn" id="roomMapAuto">Auto arrange</button>
+    <button class="btn gold" id="roomMapAdd">+ Room</button>
+    <button class="btn" id="roomMapClose">Done</button>
+  </div>
+  <div class="sheet-body room-map-editor-body" id="roomMapBody"></div>
+</dialog>
+
 <dialog id="editor">
   <div class="sheet-head">
     <h3 id="edName">Character</h3>
@@ -512,10 +526,36 @@
   <div class="sheet-head">
     <h3 id="relationshipArcName">Character story arc</h3>
     <span class="sp"></span>
+    <button class="btn" id="openEnsembleArcsFromCharacter">Ensemble arcs</button>
     <button class="btn gold" id="scaffoldRelationshipArcs">Scaffold missing quests</button>
     <button class="btn" id="closeRelationshipArc">Close</button>
   </div>
   <div class="sheet-body arc-workshop-body" id="relationshipArcBody"></div>
+</dialog>
+
+<dialog id="ensembleArcStudio">
+  <div class="sheet-head ensemble-arc-head">
+    <div><span class="ensemble-kicker">Multi-character branching stories</span><h3 id="ensembleArcTitle">Ensemble Story Arc Studio</h3></div>
+    <span class="ensemble-health" id="ensembleArcHealth"></span>
+    <span class="sp"></span>
+    <button class="btn" id="ensembleArcDownload">Download arc</button>
+    <button class="btn" id="ensembleArcScaffold">Scaffold approved nodes</button>
+    <button class="btn gold" id="ensembleArcPlay">Playtest</button>
+    <button class="btn" id="ensembleArcClose">Close</button>
+  </div>
+  <div class="sheet-body ensemble-arc-body" id="ensembleArcBody"></div>
+</dialog>
+
+<dialog id="ensemblePlaytest">
+  <div class="sheet-head ensemble-playtest-head">
+    <div><span class="ensemble-kicker">Isolated draft state</span><h3 id="ensemblePlaytestTitle">Arc Playtest</h3></div>
+    <span class="sp"></span>
+    <label>Preset <select id="ensemblePlaytestPreset"><option value="fresh">Fresh start</option><option value="midgame">Midgame social</option><option value="open">All routes open</option></select></label>
+    <button class="btn" id="ensemblePlaytestRestart">Restart</button>
+    <button class="btn" id="ensemblePlaytestBack">Rewind</button>
+    <button class="btn" id="ensemblePlaytestClose">Back to studio</button>
+  </div>
+  <div class="sheet-body ensemble-playtest-body" id="ensemblePlaytestBody"></div>
 </dialog>
 
 <dialog id="sheet">

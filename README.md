@@ -41,6 +41,15 @@ project overrides so refreshing the game-owned location registry does not erase 
 writer’s choices. Hale Home’s legacy Godot navigation map is shown read-only; the
 newer residences are read directly from the location registry.
 
+Every place now opens a **Visual room map** from the Places panel. The editor lays
+rooms out from their directional exits, supports drag-to-arrange, and edits the
+entrance, room name, access rule, actions, and up/right/down/left destinations.
+It can add, duplicate, and remove rooms, create reciprocal return arrows, report
+missing or one-way connections, and download one location as a reviewable patch.
+Custom-room renames update story locations, schedules, home routines, entrances,
+and connected arrows. Game-owned room ids stay locked so existing saves and content
+references remain stable.
+
 The Character Story Arc Workshop has two parallel systems. **Relationship path**
 keeps the five meter levels, with zero to ten sequential quests at each level.
 Independent character-story tabs add any number of friendship, workplace, career,
@@ -50,6 +59,17 @@ a world-state flag/value, memories, or prerequisite quests. Optional arcs record
 accept/defer/decline behavior and keep unrelated character content available when
 declined. Both systems include planning, readiness checks, linked conversations,
 and one-click scaffolding without deleting authored quests when a plan is shortened.
+
+The global **Ensemble Story Arc Studio** opens from **Arcs** in the project toolbar.
+It plans any number of multi-character stories as visual node graphs instead of fixed
+quest counts. Scene, choice, gate, quest, delay, merge, ending, and placeholder nodes
+can branch and reconnect. Every node owns draft dialogue, cast, location and schedule,
+requirements, effects, routes, and an implementation status. Arc variables and entry
+gates use readable lines such as `emma_rowan.friendship >= 35` or
+`waitress_path = true`. The isolated VN playtester supplies editable relationship
+presets, route locks, state-change previews, node jumping, restarting, and rewind.
+Approved nodes can scaffold normal Screenwriter conversations and quests without
+overwriting existing content; arc files can also be downloaded and imported alone.
 
 Run the focused state/player and quest-workshop regression checks with:
 
@@ -61,6 +81,8 @@ Run the focused state/player and quest-workshop regression checks with:
     node tests/relationship-arc-workshop.test.js
     node tests/character-story-arcs.test.js
     node tests/residence-authoring.test.js
+    node tests/room-map-editor.test.js
+    node tests/ensemble-arc-studio.test.js
 
 ## Layout
 
@@ -70,7 +92,7 @@ Run the focused state/player and quest-workshop regression checks with:
     manifest.json       load order (regenerate by sorting js/ filenames)
     _markup.html        shared markup template with @@CSS@@ / @@JS@@ slots
     css/app.css         all styles
-    js/                 45 modules, loaded in filename order
+    js/                 47 modules, loaded in filename order
 
 ## The modules
 
@@ -87,6 +109,7 @@ Numeric prefixes are load order, not importance.
     04-ollama           engines (Ollama, Pawan.Krd, any OpenAI-compatible), model list
     05-tree             node tree traversal (listAt, transcriptAt)
     06-rail             cast / places / content sidebar
+    06b-room-map-editor visual layout, room details, entrances, and directional exits
     07-setup            setup strip, presence, condition bar
     08-body             paintBody, tree rendering, node editing
     08b-pool            repeatable line pools
@@ -107,6 +130,7 @@ Numeric prefixes are load order, not importance.
     10f-planner          scene planner and outline-first generation
     11-editor           sheet & limits editor
     11b-relationship-arc flexible-length character story planning and quest readiness
+    11c-ensemble-arc   multi-character graph planning, draft VN playtests, scaffolding
     12-conditions       condition rows and evaluation
     13-routes           route enumeration, the walker
     14-graph            flow diagrams

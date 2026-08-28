@@ -180,7 +180,7 @@ function ensureCharacterStoryArcQuest(character,slot){
   return {quest,created:true};
 }
 
-let P={characters:[],locations:[],content:[],districts:[],travel:null,aliases:{},
+let P={characters:[],locations:[],content:[],ensemble_arcs:[],districts:[],travel:null,aliases:{},
   dismissedBundledCharacters:[],residence_overrides:{}};
 let sel=null, selChar=null, selPlace=null, focusPath=[], stageIx=0;
 let mode='play', busy=false, abort=null, fmt='sheets';

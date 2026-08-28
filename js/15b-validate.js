@@ -406,7 +406,19 @@ function validate(){
       if(!String(r.name||'').trim())add('err','Room "'+(roomId||'?')+'" in '+
         (l.name||id)+' has no display name.',where);
     });
+    if(typeof roomMapIssues==='function')roomMapIssues(l).filter(issue=>issue.severity==='error').forEach(issue=>
+      add('err',issue.message,where+(issue.room?' · '+pretty(issue.room):'')));
   });
+  if(typeof ensembleArcIssues==='function'){
+    const ensembleIds=new Set();
+    (P.ensemble_arcs||[]).forEach(arc=>{
+      const where='Ensemble arc · '+(arc.title||arc.id||'untitled');
+      if(ensembleIds.has(arc.id))add('err','Two ensemble arcs share id "'+arc.id+'".',where);
+      ensembleIds.add(arc.id);
+      ensembleArcIssues(arc).forEach(issue=>add(issue.severity==='error'?'err':'warn',issue.message,
+        where+(issue.node?' · '+pretty(issue.node):'')));
+    });
+  }
   const fixedPlayers=P.characters.filter(isPlayer);
   if(fixedPlayers.length)add('warn','Fixed player sheet'+(fixedPlayers.length===1?'':'s')+' ('+
     fixedPlayers.map(c=>c.name).join(', ')+') will be ignored. Port Alder creates the Player '+
