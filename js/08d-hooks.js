@@ -36,13 +36,9 @@ async function draftHook(c,hook){
     '"branches":[{"id":"snake_case","summary":"..."}]}';
 
   try{
-    const r=await fetch(HOST+'/api/chat',{method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({model:$('model').value,stream:false,
-        messages:[{role:'user',content:prompt}],
-        options:{temperature:0.7,num_ctx:parseInt($('ctx').value,10)}})});
-    if(!r.ok)throw new Error('Ollama returned '+r.status);
-    let t=(await r.json()).message?.content||'';
+    // Route through the selected engine (Ollama, Pawan.Krd, or another
+    // OpenAI-compatible provider) instead of silently forcing local Ollama.
+    let t=await askModel(prompt,undefined,true);
     t=t.trim().replace(/^```(?:json)?/i,'').replace(/```$/,'').trim();
     const a=t.indexOf('{'),b=t.lastIndexOf('}');
     const d=JSON.parse(a>=0?t.slice(a,b+1):t);
