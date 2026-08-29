@@ -43,6 +43,7 @@ load('js/12-conditions.js');
 load('js/15-registry.js');
 load('js/15f-contract.js');
 load('js/15b-validate.js');
+load('js/17-authored-in.js');
 load('js/18-authored-out.js');
 load('js/08j-phone-builder.js');
 

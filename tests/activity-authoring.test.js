@@ -84,11 +84,17 @@ vm.runInContext(`
     // Quests and their repeatable activity commonly share an id. They occupy
     // separate runtime collections and must remain separate editor items.
     quests:[{id:'watch_tv_with_mom',title:'Family Evenings',summary:'Spend time together.',
+      discovery:{policy:'offer',source:'family_conversation'},
+      availability:{days:['friday','saturday'],blocks:['evening'],location:'hale_home.living_room'},
+      requirements:[{type:'relationship',character_id:mom.id,meter:'trust',minimum:45}],
       objectives:[{id:'watch_five',text:'Watch TV five times',
         completion:{event:'activity_count_at_least',activity:'watch_tv_with_mom',value:5}},
         {id:'massage_offer',text:'Offer a shoulder massage',
           hidden_until:{event:'activity_count_at_least',activity:'watch_tv_with_mom',value:5},
-          completion:{event:'conversation_node_reached',conversation:'watch_tv_massage',node:'accept'}}]}]
+          completion:{event:'conversation_node_reached',conversation:'watch_tv_massage',node:'accept'}}],
+      branches:[{id:'support_path',condition:{flag:'family.support_path'},
+        effects:[{operation:'unlock_topic',character:mom.id,value:'family_evenings'}]}],
+      completion_effects:[{operation:'add_attribute',attribute:'empathy',value:2}]}]
   };
 
   const report=importAuthored(sheet);
@@ -207,6 +213,17 @@ assert.deepEqual(first.exportedQuest.objectives[0].completion,
   {event:'activity_count_at_least',activity:'watch_tv_with_mom',value:5});
 assert.deepEqual(first.exportedQuest.objectives[1].hidden_until,
   {event:'activity_count_at_least',activity:'watch_tv_with_mom',value:5});
+assert.deepEqual(first.exportedQuest.discovery,{policy:'offer',source:'family_conversation'});
+assert.deepEqual(first.exportedQuest.availability,
+  {days:['friday','saturday'],blocks:['evening'],location:'hale_home.living_room'});
+assert.deepEqual(first.exportedQuest.requirements,
+  [{type:'relationship',character_id:'elena_reyes_hale',meter:'trust',minimum:45}]);
+assert.deepEqual(first.exportedQuest.branches[0],{
+  id:'support_path',condition:{flag:'family.support_path'},
+  effects:[{operation:'unlock_topic',character:'elena_reyes_hale',value:'family_evenings'}]
+});
+assert.deepEqual(first.exportedQuest.completion_effects,
+  [{operation:'add_attribute',attribute:'empathy',value:2}]);
 assert.deepEqual(first.exportedOrdinary.activation.days, ['friday','saturday']);
 
 const baseBeat=first.exportedBeats.find(x=>x.id==='watch_tv_base');

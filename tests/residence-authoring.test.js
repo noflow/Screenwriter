@@ -33,6 +33,10 @@ assert.equal(packageReport.every(row=>row.home&&row.rooms>0&&row.resident),true,
 assert.equal(packageReport.filter(row=>row.home!=='hale_home').every(row=>row.entrance),true,
   'registry-driven NPC homes must declare an entrance');
 assert.equal(new Set(packageReport.map(row=>row.home)).size,13);
+assert.equal(run("P.characters.find(character=>character.id==='claire_donovan').home.district"),'Greyport',
+  'initial bundled sync preserves writer-facing district names');
+assert.equal(run("P.characters.find(character=>character.id==='claire_donovan').home.residence_id"),undefined,
+  'initial bundled sync does not add a legacy residence_id');
 
 assert.equal(run("residenceEntranceId(loc('hale_home'))"),'front_yard');
 assert.equal(run("residenceRoomNavigation(loc('hale_home'),roomOf('hale_home.entryway')).right"),'front_yard');
@@ -86,9 +90,15 @@ assert.equal(moved.character.schedule.fixed_commitments[0].home_placement.room,'
 
 run(`
   importSheet({id:'imported_npc',display_name:'Imported NPC',profile:{age:25},
-    home:{location_id:'new_home',household:[]}});
+    home:{location_id:'new_home',district:'New District Name',residence:'Writer Home Name',household:[]}});
   globalThis.IMPORTED_HOME_LINK=P.locations.find(location=>location.id==='new_home').residents.slice();
+  globalThis.IMPORTED_HOME_LABELS=JSON.stringify(P.characters.find(character=>character.id==='imported_npc').home);
 `);
 assert.equal(Array.from(context.IMPORTED_HOME_LINK).includes('imported_npc'),true);
+const importedHomeLabels=JSON.parse(context.IMPORTED_HOME_LABELS);
+assert.equal(importedHomeLabels.district,'New District Name',
+  'importing a sheet preserves its writer-facing district label');
+assert.equal(importedHomeLabels.residence,'Writer Home Name',
+  'importing a sheet preserves its writer-facing residence label');
 
 console.log('residence authoring regression tests passed');

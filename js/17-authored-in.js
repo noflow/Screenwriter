@@ -184,7 +184,7 @@ function convertConversation(conv,sheet,report,options={}){
       premise:conv.summary||'',
       requires:toRequires(conv.conditions||conv.condition,sheet.id),
       nodes:body,
-      _authored:{type:conv.type,repetition:conv.repetition,activation:act,locRef:act.location,
+      _authored:{source:conv,type:conv.type,repetition:conv.repetition,activation:act,locRef:act.location,
         completion_effects:conv.completion_effects,internal:conv.internal,replayable:conv.replayable}
     });
   };
@@ -227,7 +227,7 @@ function convertQuest(q,sheet,report){
         text:pretty(b.id),
         flag:[b.id,...(b.start_quests||[]).map(x=>'quest_'+x+'_started')].join('; '),
         requires:toRequires(b.condition,sheet.id),
-        nodes:[]
+        nodes:[],_orig:b
       }))}],
       _authored:{branches:q.branches}
     });
@@ -247,7 +247,8 @@ function convertQuest(q,sheet,report){
     stages:stages.length?stages:[{id:'stage_1',title:'Opening',location:'',nodes:[],flag:done,requires:[]}],
     questPlan:{category:q.category||'character_story',summary:q.summary||'',earliestBlock:act.earliest_block||'',
       rewards:'',participants:Array.isArray(q.participants)?q.participants:[],deadline:q.deadline_note||'',event:scheduled},
-    _authored:{category:q.category,failure:q.failure,completion_effects:q.completion_effects,
+    _authored:{source:q,category:q.category,failure:q.failure,completion_effects:q.completion_effects,
+      imported_completion_flag:done,imported_event:scheduled,
       objectives:q.objectives,branches:q.branches,activation:act}
   };
   const at=P.content.findIndex(x=>x.type==='quest'&&x.id===item.id);

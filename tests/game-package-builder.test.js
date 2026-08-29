@@ -19,6 +19,16 @@ run(`
   }
   function slug(value){return String(value||'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');}
   function pretty(value){return String(value||'').replace(/_/g,' ');}
+  function locationPackageView(value){
+    const clean=item=>{
+      if(Array.isArray(item))return item.map(clean);
+      if(item&&typeof item==='object')return Object.fromEntries(Object.entries(item)
+        .filter(([,child])=>child!==null&&child!==''&&(!Array.isArray(child)||child.length))
+        .map(([key,child])=>[key,clean(child)]));
+      return item;
+    };
+    return clean(value);
+  }
   const BUNDLED_CHARACTER_SHEETS=[
     {format_version:1,id:'alexa',display_name:'Alexa'},
     {format_version:1,id:'beth',display_name:'Beth'},
@@ -35,9 +45,9 @@ run(`
       {id:'alexa',name:'Alexa'},
       {id:'beth',name:'Beth Updated'},
       {id:'new_npc',name:'New NPC'}
-    ],locations:[{id:'home',name:'Home',district:'old_town',type:'house',residents:['alexa'],
+    ],locations:[{id:'home',name:'Home',district:'old_town',type:'house',residents:['alexa'],services:[],named_npcs:[],
       background:'bg_home',tags:['package'],editor_layout:{entry:{x:1,y:2}},
-      rooms:[{id:'entry',name:'Entry',access:'shared'}]}]};
+      rooms:[{id:'entry',name:'Entry',access:'shared',actions:[]}]}]};
   function npcs(){return P.characters;}
   function sheetOut(character){return {format_version:1,id:character.id,display_name:character.name};}
   function customLocationsOut(){return {format_version:1,package_id:'scenewright_custom_locations',

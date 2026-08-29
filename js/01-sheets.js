@@ -39,6 +39,7 @@ function residenceRoomNavigation(home,room){
 /** Keeps the character sheet and the location registry's resident list in sync. */
 function linkCharacterHome(character,previousHomeId=''){
   const home=characterHomeLocation(character),nextId=home?.id||'';
+  const moved=!!previousHomeId&&previousHomeId!==nextId;
   if(previousHomeId&&previousHomeId!==nextId){
     const previous=P.locations.find(location=>location.id===previousHomeId);
     if(previous&&Array.isArray(previous.residents))
@@ -50,8 +51,12 @@ function linkCharacterHome(character,previousHomeId=''){
   character.home=character.home||{};
   character.home.location_id=home.id;
   if(character.home.residence_id!==undefined)character.home.residence_id=home.id;
-  character.home.district=home.district||'';
-  character.home.residence=home.name||pretty(home.id);
+  // Importing a canonical sheet must not turn its writer-facing district name
+  // into the registry's internal id. A deliberate move still refreshes both.
+  if(moved||!String(character.home.district||'').trim())
+    character.home.district=home.district||'';
+  if(moved||!String(character.home.residence||'').trim())
+    character.home.residence=home.name||pretty(home.id);
   if(!Array.isArray(character.home.household))character.home.household=[];
   return home;
 }

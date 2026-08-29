@@ -44,8 +44,11 @@ function gamePackageCandidates(options={}){
   if(includeWorld){
     const content=gameLocationPackageOut(),before=typeof BUNDLED_LOCATION_PACKAGE==='undefined'?null:
       BUNDLED_LOCATION_PACKAGE;
+    const same=before&&(typeof locationPackageView==='function'
+      ?packageStable(locationPackageView(content))===packageStable(locationPackageView(before))
+      :packageStable(content)===packageStable(before));
     rows.push({path:'content/world/all_locations.json',kind:'world',id:content.package_id,
-      status:before?(packageStable(content)===packageStable(before)?'unchanged':'updated'):'added',content});
+      status:before?(same?'unchanged':'updated'):'added',content});
     const custom=customLocationsOut();
     if(custom.locations.length)rows.push({path:'content/world/scenewright_custom_locations.json',
       kind:'location_extension',id:custom.package_id,status:'added',content:custom});

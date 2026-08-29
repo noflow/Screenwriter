@@ -135,6 +135,10 @@ function passageGroups(charId){
   return Object.values(groups).filter(g=>g.main);
 }
 
+function sameAuthoredRequirements(source,current,charId){
+  return JSON.stringify(toRequires(source,charId))===JSON.stringify(current||[]);
+}
+
 /** Builds the game's flat node dict from a passage group. */
 function buildNodes(group){
   const nodes={};
@@ -249,15 +253,18 @@ function buildNodes(group){
 function conversationOut(group){
   const {nodes,start}=buildNodes(group);
   const a=group.main._authored||{};
-  const out={
+  const source=a.source||{};
+  const out=Object.assign({},source,{
     id:group.base,
     type:a.type||'standard_topic',
     start_node:start||Object.keys(nodes)[0]||'',
     activation:mergeActivation(a.activation,group.main,a.locRef),
     nodes
-  };
+  });
   if(a.repetition)out.repetition=a.repetition;
-  if(group.main.title)out.title=group.main.title;
+  if(Object.prototype.hasOwnProperty.call(source,'title')||group.main.title!==pretty(group.base))
+    out.title=group.main.title;
+  else delete out.title;
   if(a.internal!==undefined)out.internal=!!a.internal;
   if(a.replayable!==undefined)out.replayable=!!a.replayable;
   if(group.activityId)out.activity_id=group.activityId;
@@ -265,13 +272,18 @@ function conversationOut(group){
   const planned=plannedSceneEffects(group.main.scenePlan);
   const completion=(a.completion_effects||[]).concat(planned);
   if(completion.length)out.completion_effects=completion;
-  const cond=requiresToCondition(group.main.requires);
-  if(cond)out.condition=cond;
+  const sourceCondition=source.conditions||source.condition;
+  if(!sameAuthoredRequirements(sourceCondition,group.main.requires,(group.main.cast||[])[0])){
+    delete out.condition;delete out.conditions;
+    const cond=requiresToCondition(group.main.requires);
+    if(cond)out.condition=cond;
+  }
   return out;
 }
 
 function questOut(c){
   const a=c._authored||{};
+  const source=a.source||{};
   const plan=c.questPlan||{};
   const stages=(c.stages||[]).filter(s=>s.id!=='branch');
   const branchStage=(c.stages||[]).find(s=>s.id==='branch');
@@ -288,14 +300,16 @@ function questOut(c){
 
   const branches=branchStage
     ? (branchStage.nodes[0]?.options||[]).map(o=>{
-        const b={id:o._oid||slug(o.text)};
-        const cond=requiresToCondition(o.requires);
-        if(cond)b.condition=cond;
+        const original=o._orig||(a.branches||[]).find(x=>x.id===(o._oid||slug(o.text)))||{};
+        const b=Object.assign({},original,{id:o._oid||slug(o.text)});
+        if(!sameAuthoredRequirements(original.conditions||original.condition,o.requires,c.character)){
+          delete b.condition;delete b.conditions;
+          const cond=requiresToCondition(o.requires);
+          if(cond)b.condition=cond;
+        }
         const starts=String(o.flag||'').split(';').map(s=>s.trim())
           .filter(s=>/^quest_.+_started$/.test(s)).map(s=>s.slice(6,-8));
-        if(starts.length)b.start_quests=starts;
-        const orig=(a.branches||[]).find(x=>x.id===b.id);
-        if(orig&&orig.set_rules)b.set_rules=orig.set_rules;
+        if(starts.length)b.start_quests=starts;else delete b.start_quests;
         return b;
       })
     : (a.branches||[]);
@@ -305,8 +319,14 @@ function questOut(c){
     .filter(e=>!(e.operation==='set_flag'&&e.key==='quest_'+c.id+'_done'));
   const plannedEffects=flagToEffects(plan.rewards||'');
   if(plan.event)plannedEffects.push({operation:'schedule_event',value:plan.event});
+  const completionUnchanged=String(last?.flag||'')===String(a.imported_completion_flag||'')&&
+    !String(plan.rewards||'').trim()&&
+    JSON.stringify(plan.event||null)===JSON.stringify(a.imported_event||null);
+  const completionEffects=completionUnchanged
+    ?JSON.parse(JSON.stringify(a.completion_effects||[]))
+    :(fx.length?fx:(a.completion_effects||[])).concat(plannedEffects);
 
-  const out={
+  const out=Object.assign({},source,{
     id:c.id,
     category:plan.category||a.category||'character_story',
     title:c.title,
@@ -314,8 +334,8 @@ function questOut(c){
     activation:mergeActivation(a.activation,c,null),
     objectives,
     branches,
-    completion_effects:(fx.length?fx:(a.completion_effects||[])).concat(plannedEffects)
-  };
+    completion_effects:completionEffects
+  });
   if(a.failure)out.failure=a.failure;
   if(c.after){
     out.activation=Object.assign({},out.activation,
@@ -324,10 +344,15 @@ function questOut(c){
     if(plan.earliestBlock)out.activation.earliest_block=plan.earliestBlock;
   }
   if(plan.deadline)out.deadline_note=plan.deadline;
-  const participants=[c.character,...(Array.isArray(plan.participants)?plan.participants:[])].filter(Boolean);
-  if(participants.length)out.participants=[...new Set(participants)];
-  const cond=requiresToCondition(c.requires);
-  if(cond&&!out.activation.event)Object.assign(out.activation,cond);
+  const participants=(Array.isArray(plan.participants)?plan.participants:[]).filter(Boolean);
+  if(participants.length||Object.prototype.hasOwnProperty.call(source,'participants'))
+    out.participants=[...new Set(participants)];
+  else delete out.participants;
+  if(!sameAuthoredRequirements(source.conditions||source.condition,c.requires,c.character)){
+    delete out.condition;delete out.conditions;
+    const cond=requiresToCondition(c.requires);
+    if(cond&&!out.activation.event)Object.assign(out.activation,cond);
+  }
   return out;
 }
 
