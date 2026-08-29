@@ -194,7 +194,7 @@ def sync_game_presentation_catalog():
     if not source:
         if not os.path.isfile(PRESENTATION_MODULE):
             with open(PRESENTATION_MODULE, 'w', encoding='utf-8', newline='') as f:
-                f.write('const BUNDLED_PRESENTATION_ASSET_CATALOG={backgrounds:[],portraits:[],audio:[]};\n')
+                f.write('const BUNDLED_PRESENTATION_ASSET_CATALOG={backgrounds:[],portraits:[],audio:[],vocabulary:{background_variants:[],portrait_expressions:[]}};\n')
         return None
 
     with open(source, encoding='utf-8') as f:
@@ -203,6 +203,15 @@ def sync_game_presentation_catalog():
     audio = package.get('vn_audio')
     if not isinstance(backgrounds, list) or not isinstance(audio, list):
         sys.exit(f'invalid game presentation manifest: {source}')
+    vocabulary = package.get('art_vocabulary')
+    if not isinstance(vocabulary, dict):
+        sys.exit(f'missing art vocabulary in game presentation manifest: {source}')
+    for vocabulary_name in ('background_variants', 'portrait_expressions'):
+        entries = vocabulary.get(vocabulary_name)
+        if not isinstance(entries, list) or not entries or any(
+            not isinstance(entry, dict) or not entry.get('id') or not entry.get('label') for entry in entries
+        ):
+            sys.exit(f'invalid {vocabulary_name} vocabulary in game presentation manifest: {source}')
 
     catalog = {
         'format_version': 1,
@@ -210,6 +219,13 @@ def sync_game_presentation_catalog():
         'backgrounds': [],
         'portraits': [],
         'audio': [],
+        'vocabulary': {
+            name: [
+                {'id': entry['id'], 'label': entry['label']}
+                for entry in vocabulary[name]
+            ]
+            for name in ('background_variants', 'portrait_expressions')
+        },
     }
     for entry in backgrounds:
         if not isinstance(entry, dict) or not entry.get('id'):
@@ -267,7 +283,11 @@ def sync_game_presentation_catalog():
     if previous != generated:
         with open(PRESENTATION_MODULE, 'w', encoding='utf-8', newline='') as f:
             f.write(generated)
-    return len(catalog['backgrounds']), len(catalog['portraits']), len(catalog['audio'])
+    return (
+        len(catalog['backgrounds']), len(catalog['portraits']), len(catalog['audio']),
+        len(catalog['vocabulary']['background_variants']),
+        len(catalog['vocabulary']['portrait_expressions']),
+    )
 
 def main():
     character_count = sync_game_characters()
@@ -314,8 +334,9 @@ def main():
         quests, conversations = content_counts
         print(f"  indexed {quests} global quests and {conversations} global conversations")
     if presentation_counts:
-        backgrounds, portraits, audio = presentation_counts
+        backgrounds, portraits, audio, variants, expressions = presentation_counts
         print(f"  catalogued {backgrounds} VN backgrounds, {portraits} portraits, and {audio} audio cues")
+        print(f"  standardized {variants} planned variants and {expressions} portrait expressions")
 
 if __name__ == '__main__':
     main()

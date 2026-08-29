@@ -88,17 +88,19 @@ with a live 16:10 preview, background/room selection, expressions, portrait vari
 left/center/right/offstage placement, transitions, music, ambience, sound effects,
 and freeform direction notes. A **direct** control on each dialogue line opens that
 exact cue. Port Alder renders the authored portrait, expression-matched pose,
-position, background variant, transition, music, ambience, and sound-effect cues.
-Missing optional audio assets remain safely silent until their files are added.
+position, background variant, and transition cues. The runtime retains future audio
+support, but this project currently has no audio catalog; the Director keeps those
+controls dormant unless an existing scene imports audio direction.
 Imported unknown presentation and dialogue-node fields are merged back on export so
 opening a scene in the Director never strips newer game metadata.
 
 **build.py** also creates a portable presentation catalog from the neighboring
 Godot project's content/presentation/vn_art.json and every character's asset_refs.
-The Director uses that catalog for background coverage, portrait, variant, music,
-ambience, and sound-effect selectors. Registered ids are clearly identified;
-choosing **Custom id…** remains available for assets being authored, and unresolved
-custom values stay visibly marked until the game catalog contains them. Set
+The Director uses that catalog for background coverage, portraits, expressions, and
+variants. Registered art is distinguished from twelve standardized planned looks,
+so a writer may stage rain, night, winter, or another future asset while Godot safely
+uses the base image. Choosing **Custom id…** remains available, and unresolved custom
+values stay visibly marked until the game catalog contains them. Set
 SCENEWRIGHT_GAME_PRESENTATION when the game checkout is not beside Screenwriter.
 
 The project toolbar’s **Build** button creates deployable Port Alder content packages.

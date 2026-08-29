@@ -30,6 +30,11 @@ const bundledCatalog = JSON.parse(run('JSON.stringify(BUNDLED_PRESENTATION_ASSET
 assert.equal(bundledCatalog.source_package_id, 'port_alder_vn_art');
 assert.ok(bundledCatalog.backgrounds.length >= 17);
 assert.ok(bundledCatalog.portraits.length >= 15);
+assert.equal(bundledCatalog.audio.length, 0);
+assert.equal(bundledCatalog.vocabulary.background_variants.length, 12);
+assert.equal(bundledCatalog.vocabulary.portrait_expressions.length, 14);
+assert.equal(run('sceneDirectorAudioConfigured()'), false);
+assert.equal(run('sceneDirectorConversationUsesAudio({sceneDirection:{},nodes:[]})'), false);
 
 run(`
   function plannedSceneEffects(){ return []; }
@@ -99,22 +104,30 @@ run([
   "const cueEntry={node:{speaker:'test_npc'}};",
   "globalThis.CATALOG_RESULT=JSON.stringify({",
   "background:sceneDirectorBackgroundAsset('test_cafe.window_table')?.id,",
-  "variants:sceneDirectorVariantAssets('test_cafe.window_table').map(item=>item.id),",
+  "variants:sceneDirectorVariantAssets('test_cafe.window_table'),",
+  "expressions:sceneDirectorExpressionVocabulary().map(item=>item.id),",
+  "expressionStatus:sceneDirectorExpressionStatus('amused',cueEntry),",
   "portraits:sceneDirectorPortraitAssets(cueEntry).map(item=>item.id),",
   "music:sceneDirectorAudioAssets('music',null).map(item=>item.id),",
   "ambience:sceneDirectorAudioAssets('ambience',null).map(item=>item.id),",
   "sfx:sceneDirectorAudioAssets('sfx',cueEntry).map(item=>item.id),",
+  "audioConfigured:sceneDirectorAudioConfigured(),",
   "known:sceneDirectorAssetControl('Music','quiet_piano','music','stage','music',cueEntry,'test_cafe.window_table','Inherit'),",
   "custom:sceneDirectorAssetControl('Music','typo_theme','music','stage','music',cueEntry,'test_cafe.window_table','Inherit')",
   "});"
 ].join('\n'));
 const catalog = JSON.parse(context.CATALOG_RESULT);
 assert.equal(catalog.background, 'test_cafe.window_table');
-assert.deepEqual(catalog.variants, ['rain']);
+assert.equal(catalog.variants.find(item=>item.id==='rain').registered, true);
+assert.equal(catalog.variants.find(item=>item.id==='winter').planned, true);
+assert.equal(catalog.variants.length, 12);
+assert.equal(catalog.expressions.length, 14);
+assert.equal(catalog.expressionStatus.state, 'planned');
 assert.deepEqual(catalog.portraits, ['default','smile']);
 assert.deepEqual(catalog.music, ['quiet_piano']);
 assert.deepEqual(catalog.ambience, ['window_rain']);
 assert.deepEqual(catalog.sfx, ['cup_down','npc_chime']);
+assert.equal(catalog.audioConfigured, true);
 assert.match(catalog.known, /quiet_piano[^]*selected/);
 assert.match(catalog.known, /Registered music/);
 assert.match(catalog.custom, /value="__custom__" selected/);
