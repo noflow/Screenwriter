@@ -32,7 +32,7 @@ assert.deepEqual(summary, {
   total:33,
   backgrounds:24,
   portraits:9,
-  statuses:{missing:13,placeholder:20,in_progress:0,review:0,ready:0}
+  statuses:{missing:13,placeholder:18,in_progress:2,review:0,ready:0}
 });
 
 run(`
@@ -45,17 +45,20 @@ run(`
   globalThis.ALL_MARKUP=artworkBacklogMarkup('all');
   globalThis.BG_MARKUP=artworkBacklogMarkup('background');
   globalThis.ACTIVE_MARKUP=artworkBacklogMarkup('active');
+  globalThis.READY_MARKUP=artworkBacklogMarkup('ready');
 `);
 const resolutions = JSON.parse(context.ART_RESOLUTIONS);
-assert.equal(resolutions.bedroom.state, 'placeholder');
-assert.equal(resolutions.bedroom.text, 'Registered placeholder');
+assert.equal(resolutions.bedroom.state, 'registered');
+assert.equal(resolutions.bedroom.text, 'Production background registered');
 assert.equal(resolutions.street.state, 'missing');
-assert.equal(resolutions.elena.state, 'placeholder');
+assert.equal(resolutions.elena.state, 'registered');
 assert.match(context.ALL_MARKUP, /Opening Morning at Hale Home/);
 assert.match(context.ALL_MARKUP, /33 prioritized assets/);
 assert.match(context.ALL_MARKUP, /Elena Reyes Hale portrait set/);
 assert.match(context.ALL_MARKUP, /Audio is intentionally outside this production plan/);
 assert.doesNotMatch(context.BG_MARKUP, /data-art-kind="portrait_set"/);
-assert.match(context.ACTIVE_MARKUP, /No tasks match this view/);
+assert.match(context.ACTIVE_MARKUP, /2 tasks/);
+assert.match(context.ACTIVE_MARKUP, /Elena Reyes Hale portrait set/);
+assert.match(context.READY_MARKUP, /No tasks match this view/);
 
 console.log('Artwork backlog regression tests passed');

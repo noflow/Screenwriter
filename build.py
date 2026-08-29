@@ -262,7 +262,7 @@ def sync_game_presentation_catalog():
             for entry in refs.get('portraits', []):
                 if not isinstance(entry, dict) or not entry.get('id'):
                     continue
-                row = {key: entry[key] for key in ('id', 'path', 'accent', 'anchor') if key in entry}
+                row = {key: entry[key] for key in ('id', 'path', 'accent', 'anchor', 'credit') if key in entry}
                 row['character_id'] = character_id
                 row['asset_status'] = entry.get('status') or (
                     'placeholder' if '_fallback_portrait' in str(entry.get('path', '')) else 'registered'
