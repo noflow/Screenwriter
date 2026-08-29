@@ -34,6 +34,7 @@
  "js/11-editor.js",
  "js/11b-relationship-arc.js",
  "js/11c-ensemble-arc.js",
+ "js/11d-scene-director.js",
  "js/12-conditions.js",
  "js/13-routes.js",
  "js/14-graph.js",

@@ -45,6 +45,7 @@ function renderList(list,path){
       return '<div class="node'+(narr?' narr':'')+(pcline?' pcline':'')+'" data-p="'+p.join('.')+'"><div class="tools">'+
         '<button data-act="up">↑</button><button data-act="down">↓</button>'+
         '<button data-act="addline">+line</button>'+
+        '<button data-act="direct">direct</button>'+
         '<button data-act="fork">fork</button><button data-act="narrate">narrate</button>'+
         '<button data-act="jump">jump</button><button data-act="del">del</button>'+
         (cur().type==='activity'?'<label class="success-toggle'+(n.activitySuccess?' on':'')+'" '+
@@ -175,6 +176,7 @@ function wireTree(){
 }
 
 function act(a,p){
+  if(a==='direct'){openSceneDirector(cur()?.uid,p);return;}
   const list=listAt(p.slice(0,-1)),i=p[p.length-1];
   if(a==='del')list.splice(i,1);
   if(a==='up'&&i>0)list.splice(i-1,0,list.splice(i,1)[0]);

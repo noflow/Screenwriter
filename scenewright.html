@@ -585,6 +585,44 @@
   @media(max-width:850px){.continuity-summary{grid-template-columns:repeat(2,1fr)}
     .continuity-impact{grid-template-columns:1fr}.continuity-toolbar{align-items:stretch;flex-direction:column}}
 
+  /* VN scene director */
+  dialog#sceneDirector:not(#map):not(#sched){width:min(98vw,1500px);max-width:none;height:min(94vh,930px);max-height:none}
+  dialog#sceneDirector[open]{display:flex;flex-direction:column}
+  .scene-director-head{min-height:68px;padding:9px 17px}.scene-director-head>div:first-child{display:grid;gap:1px}
+  .scene-director-kicker{color:#7ec0ba;font:8px var(--util);letter-spacing:.17em;text-transform:uppercase}
+  .scene-director-head h3{margin:0}.scene-director-head>label{display:grid;gap:3px;min-width:250px;color:var(--ash);font:8px var(--util);letter-spacing:.1em;text-transform:uppercase}
+  .scene-director-head select{min-width:250px;padding:5px 7px;border:1px solid var(--edge);border-radius:5px;background:var(--curtain);font:10px var(--body);text-transform:none;letter-spacing:0}
+  .scene-director-body{flex:1;min-height:0;padding:0!important;overflow:hidden!important}
+  .scene-director-layout{display:grid;grid-template-columns:235px minmax(520px,1fr) 390px;height:100%;min-height:0}
+  .scene-cue-list{min-height:0;padding:13px 10px 28px;border-right:1px solid var(--edge);overflow-y:auto;background:rgba(7,13,20,.42)}
+  .scene-cue-list header{display:flex;align-items:center;gap:8px;padding:2px 4px 10px;color:var(--brass);font:8px var(--util);letter-spacing:.13em;text-transform:uppercase}
+  .scene-cue-list header b{flex:1}.scene-cue-list header span{color:var(--ash)}
+  .scene-cue{display:grid;grid-template-columns:24px 1fr;gap:2px 7px;width:100%;margin-bottom:5px;padding:8px;border:1px solid rgba(230,237,243,.08);border-radius:6px;color:var(--ash);background:rgba(230,237,243,.025);text-align:left;cursor:pointer}
+  .scene-cue:hover{border-color:rgba(126,192,186,.33);background:rgba(126,192,186,.05)}.scene-cue.on{border-color:rgba(215,180,111,.58);background:rgba(215,180,111,.08);box-shadow:inset 2px 0 var(--brass)}
+  .scene-cue>span{grid-row:1/3;display:grid;place-items:center;width:22px;height:22px;border-radius:50%;color:#7ec0ba;background:rgba(126,192,186,.1);font:8px var(--util)}
+  .scene-cue b{overflow:hidden;color:var(--paper);font:9px var(--util);text-overflow:ellipsis;white-space:nowrap}.scene-cue small{overflow:hidden;font:8px var(--body);text-overflow:ellipsis;white-space:nowrap}
+  .scene-director-main{display:grid;grid-template-rows:minmax(0,1fr) auto;min-width:0;min-height:0;padding:18px;background:radial-gradient(circle at 50% 4%,rgba(64,100,124,.2),transparent 58%),#0c141c}
+  .scene-director-preview{display:grid;place-items:center;min-height:0}.scene-screen{position:relative;width:min(100%,830px);aspect-ratio:16/10;min-height:390px;overflow:hidden;border:1px solid rgba(220,231,241,.16);border-radius:12px;background:radial-gradient(circle at 72% 22%,rgba(141,185,218,.22),transparent 32%),linear-gradient(155deg,#29455a 0%,#1b3445 38%,#101b26 100%);box-shadow:0 24px 60px rgba(0,0,0,.42),inset 0 -150px 160px rgba(0,0,0,.34)}
+  .scene-screen:before{content:'';position:absolute;inset:0;background:linear-gradient(130deg,transparent 0 58%,rgba(215,180,111,.06) 58% 60%,transparent 60%),linear-gradient(180deg,transparent 62%,rgba(2,7,11,.72));pointer-events:none}
+  .scene-screen-atmosphere{position:absolute;z-index:3;top:14px;left:17px;display:grid;gap:3px;color:#c5d5de;font:8px var(--util);letter-spacing:.12em;text-transform:uppercase;text-shadow:0 2px 8px #000}
+  .scene-screen-atmosphere b{color:#7ec0ba;font-weight:400}.scene-portrait{position:absolute;z-index:2;bottom:119px;width:160px;text-align:center;filter:saturate(.7);opacity:.78;transform-origin:bottom center}
+  .scene-portrait.left{left:4%}.scene-portrait.center{left:50%;transform:translateX(-50%)}.scene-portrait.right{right:4%}.scene-portrait.speaking{z-index:4;filter:none;opacity:1}.scene-portrait.center.speaking{transform:translateX(-50%) scale(1.05)}.scene-portrait.left.speaking,.scene-portrait.right.speaking{transform:scale(1.05)}
+  .scene-portrait-figure{display:grid;place-items:center;width:128px;height:235px;margin:0 auto;border:1px solid color-mix(in srgb,var(--portrait),#fff 18%);border-radius:62% 62% 22% 22% / 42% 42% 17% 17%;color:#091019;background:linear-gradient(145deg,color-mix(in srgb,var(--portrait),#fff 18%),color-mix(in srgb,var(--portrait),#101720 35%));box-shadow:0 15px 36px rgba(0,0,0,.36)}
+  .scene-portrait-figure span{font:58px var(--display);opacity:.62}.scene-portrait b,.scene-portrait small{display:block;margin-top:4px;text-shadow:0 2px 8px #000}.scene-portrait b{font:9px var(--util);letter-spacing:.08em;text-transform:uppercase}.scene-portrait small{margin-top:2px;color:#a9bac5;font:7.5px var(--util);text-transform:uppercase}
+  .scene-dialogue{position:absolute;z-index:6;right:17px;bottom:17px;left:17px;min-height:94px;padding:13px 16px;border:1px solid rgba(126,192,186,.25);border-radius:9px;background:rgba(8,18,27,.9);box-shadow:0 10px 30px rgba(0,0,0,.32);backdrop-filter:blur(8px)}
+  .scene-dialogue b{display:block;margin-bottom:5px;color:#7ec0ba;font:8px var(--util);letter-spacing:.1em;text-transform:uppercase}.scene-dialogue p{margin:0;font-size:15px;line-height:1.48}.scene-dialogue.narration{text-align:center;font-style:italic}.scene-dialogue.narration b{display:none}
+  .scene-cue-strip{position:absolute;z-index:7;right:21px;bottom:119px;display:flex;justify-content:flex-end;gap:4px;max-width:70%;flex-wrap:wrap}.scene-cue-strip span,.scene-offstage{padding:4px 6px;border:1px solid rgba(215,180,111,.2);border-radius:10px;color:#d2c29d;background:rgba(7,14,20,.72);font:7px var(--util);text-transform:uppercase}
+  .scene-offstage{position:absolute;z-index:5;right:17px;top:14px}.scene-director-step{display:flex;align-items:center;justify-content:center;gap:16px;padding-top:13px}.scene-director-step span{min-width:55px;color:var(--ash);font:8px var(--util);text-align:center}
+  .scene-director-controls{min-height:0;padding:15px 15px 35px;border-left:1px solid var(--edge);overflow-y:auto;background:linear-gradient(160deg,rgba(30,45,59,.56),rgba(8,15,22,.4))}
+  .scene-director-controls section+section{margin-top:13px;padding-top:13px;border-top:1px solid var(--edge)}.scene-director-controls h4{margin:0 0 11px;color:var(--brass);font:9px var(--util);letter-spacing:.14em;text-transform:uppercase}
+  .scene-director-controls .field{margin-bottom:9px}.scene-director-controls .field label{font-size:8px}.scene-director-controls .field input,.scene-director-controls .field select,.scene-director-controls .field textarea{padding:6px 7px;font-size:11px}.scene-director-controls .field textarea{min-height:54px}
+  .scene-director-section-head{display:flex;align-items:center;gap:8px}.scene-director-section-head h4{flex:1}.scene-director-section-head button{border:0;color:var(--ash);background:none;font:7.5px var(--util);text-transform:uppercase;cursor:pointer}.scene-director-section-head button:hover{color:var(--rose)}
+  .scene-line-summary{display:grid;gap:3px;margin-bottom:10px;padding:8px 9px;border-radius:6px;background:rgba(230,237,243,.04)}.scene-line-summary b{color:#7ec0ba;font:8px var(--util);text-transform:uppercase}.scene-line-summary span{overflow:hidden;color:#b8c5ce;font-size:10px;text-overflow:ellipsis;white-space:nowrap}
+  .scene-runtime-note{margin:5px 0 0;padding:8px 9px;border:1px solid rgba(126,192,186,.15);border-radius:6px;color:#8da0ad;background:rgba(126,192,186,.045);font:7.5px var(--util);line-height:1.55}.scene-runtime-note b{color:#7ec0ba}
+  .scene-director-empty{display:grid;place-content:center;justify-items:center;gap:6px;min-height:240px;padding:24px;color:var(--ash);text-align:center}.scene-director-empty b{color:var(--paper);font:22px var(--display)}.scene-director-empty span{font:9px var(--util)}
+  @media(max-width:1150px){.scene-director-layout{grid-template-columns:190px minmax(470px,1fr) 335px}.scene-screen{min-height:350px}.scene-portrait{width:135px}.scene-portrait-figure{width:110px;height:205px}}
+  @media(max-width:850px){dialog#sceneDirector:not(#map):not(#sched){width:99vw;height:96vh}.scene-director-layout{grid-template-columns:155px minmax(430px,1fr) 310px}.scene-director-head>label{min-width:190px}.scene-director-head select{min-width:190px}.scene-director-main{padding:12px}}
+
   .weekt{width:100%;border-collapse:collapse;font-size:11px}
   .weekt th{font-family:var(--util);font-size:8px;letter-spacing:.13em;text-transform:uppercase;
     color:var(--brass);padding:5px 4px;text-align:left;border-bottom:1px solid var(--edge)}
@@ -1060,6 +1098,7 @@
     </div>
     <div class="mast-group mast-tools" aria-label="Project tools">
       <button class="btn quiet" id="openEnsembleArcs">Arcs</button>
+      <button class="btn quiet" id="openSceneDirector" title="Stage dialogue, portraits, backgrounds, and sound cues">Director</button>
       <button class="btn quiet" id="openScheduleWorkshop">Schedules</button>
       <button class="btn quiet" id="openMap">Map</button>
       <button class="btn quiet" id="openInspect">Inspect</button>
@@ -1546,6 +1585,16 @@
       </section>
     </div>
   </div>
+</dialog>
+
+<dialog id="sceneDirector">
+  <div class="sheet-head scene-director-head">
+    <div><span class="scene-director-kicker">Visual novel staging</span><h3>Scene Director</h3></div>
+    <label>Conversation <select id="sceneDirectorConversation" aria-label="Conversation"></select></label>
+    <span class="sp"></span>
+    <button class="btn" id="sceneDirectorClose">Done</button>
+  </div>
+  <div class="sheet-body scene-director-body" id="sceneDirectorBody"></div>
 </dialog>
 
 <dialog id="roomMapEditor">
@@ -3770,6 +3819,7 @@ function renderList(list,path){
       return '<div class="node'+(narr?' narr':'')+(pcline?' pcline':'')+'" data-p="'+p.join('.')+'"><div class="tools">'+
         '<button data-act="up">↑</button><button data-act="down">↓</button>'+
         '<button data-act="addline">+line</button>'+
+        '<button data-act="direct">direct</button>'+
         '<button data-act="fork">fork</button><button data-act="narrate">narrate</button>'+
         '<button data-act="jump">jump</button><button data-act="del">del</button>'+
         (cur().type==='activity'?'<label class="success-toggle'+(n.activitySuccess?' on':'')+'" '+
@@ -3900,6 +3950,7 @@ function wireTree(){
 }
 
 function act(a,p){
+  if(a==='direct'){openSceneDirector(cur()?.uid,p);return;}
   const list=listAt(p.slice(0,-1)),i=p[p.length-1];
   if(a==='del')list.splice(i,1);
   if(a==='up'&&i>0)list.splice(i-1,0,list.splice(i,1)[0]);
@@ -8521,6 +8572,280 @@ if(typeof document!=='undefined'){
   $('ensemblePlaytestBack').onclick=()=>{const previous=ensemblePlayHistory.pop();if(!previous)return;ensemblePlayNodeId=previous.node;ensemblePlayState=previous.state;ensemblePlayLastChanges=previous.changes;paintEnsemblePlaytest();};
 }
 
+/* ---- 11d-scene-director.js ---- */
+/* ============ VN scene director ============ */
+const SCENE_DIRECTOR_TRANSITIONS=['','cut','fade','dissolve','wipe_left','wipe_right'];
+const SCENE_DIRECTOR_POSITIONS=['','left','center','right','offstage'];
+const SCENE_DIRECTOR_EXPRESSIONS=['neutral','happy','warm','amused','playful','surprised',
+  'thoughtful','concerned','sad','angry','embarrassed','nervous','flirty','tired'];
+const SCENE_DIRECTOR_NODE_FIELDS=['portrait','background_variant','position','transition',
+  'music','ambience','sfx'];
+const SCENE_DIRECTOR_SCENE_FIELDS=['transition','music','ambience','notes'];
+
+let sceneDirectorUid='',sceneDirectorPath='';
+
+function cloneSceneDirection(value){
+  return value&&typeof value==='object'&&!Array.isArray(value)
+    ?JSON.parse(JSON.stringify(value)):{};
+}
+
+/** Converts a game's optional conversation.presentation block into editable data.
+    `_orig` retains future fields this version of the editor does not know yet. */
+function sceneDirectionFromAuthored(presentation){
+  if(!presentation||typeof presentation!=='object'||Array.isArray(presentation))return undefined;
+  const out={_orig:cloneSceneDirection(presentation)};
+  SCENE_DIRECTOR_SCENE_FIELDS.forEach(key=>{
+    if(Object.prototype.hasOwnProperty.call(presentation,key))out[key]=presentation[key];
+  });
+  return out;
+}
+
+function normalizeSceneDirection(conversation){
+  if(!conversation.sceneDirection||typeof conversation.sceneDirection!=='object'||
+     Array.isArray(conversation.sceneDirection))conversation.sceneDirection={};
+  SCENE_DIRECTOR_SCENE_FIELDS.forEach(key=>{
+    if(conversation.sceneDirection[key]===undefined)conversation.sceneDirection[key]='';
+  });
+  return conversation.sceneDirection;
+}
+
+/** Merges writer changes over the imported block, deleting a modeled cue only when
+    the writer deliberately clears it. Unknown presentation keys survive. */
+function sceneDirectionToAuthored(direction,source){
+  if(!direction)return source&&typeof source==='object'&&Object.keys(source).length
+    ?cloneSceneDirection(source):undefined;
+  const out=Object.assign({},cloneSceneDirection(direction._orig),cloneSceneDirection(source));
+  SCENE_DIRECTOR_SCENE_FIELDS.forEach(key=>{
+    const value=direction[key];
+    if(value!==undefined&&value!==null&&String(value).trim()!=='')out[key]=value;
+    else delete out[key];
+  });
+  return Object.keys(out).length?out:undefined;
+}
+
+/** Node cues are direct game fields. Portrait and background_variant already render
+    in Port Alder; the remaining cues are forward-compatible direction metadata. */
+function lineStageFromAuthored(node){
+  if(!node||typeof node!=='object')return undefined;
+  const hasCue=SCENE_DIRECTOR_NODE_FIELDS.some(key=>Object.prototype.hasOwnProperty.call(node,key));
+  if(!hasCue)return undefined;
+  const out={};
+  SCENE_DIRECTOR_NODE_FIELDS.forEach(key=>{
+    if(Object.prototype.hasOwnProperty.call(node,key))out[key]=node[key];
+  });
+  return out;
+}
+
+function normalizeLineStage(line){
+  if(!line.stage||typeof line.stage!=='object'||Array.isArray(line.stage))line.stage={};
+  SCENE_DIRECTOR_NODE_FIELDS.forEach(key=>{
+    if(line.stage[key]===undefined)line.stage[key]='';
+  });
+  return line.stage;
+}
+
+function applyLineStageToAuthored(stage,node){
+  if(!stage)return node;
+  SCENE_DIRECTOR_NODE_FIELDS.forEach(key=>{
+    const value=stage[key];
+    if(value!==undefined&&value!==null&&String(value).trim()!=='')node[key]=value;
+    else delete node[key];
+  });
+  return node;
+}
+
+function sceneDirectorConversations(){
+  return (P.content||[]).filter(item=>item.type==='conversation');
+}
+
+function sceneDirectorConversation(){
+  return sceneDirectorConversations().find(item=>item.uid===sceneDirectorUid)||null;
+}
+
+function sceneDirectorLines(conversation){
+  const out=[];
+  const scan=(list,path)=>{
+    (list||[]).forEach((node,index)=>{
+      const nodePath=path.concat(index);
+      if(node.type==='line')out.push({node,path:nodePath,key:nodePath.join('.')});
+      if(node.type==='choice'||node.type==='gate')
+        (node.options||[]).forEach((option,optionIndex)=>scan(option.nodes,nodePath.concat(optionIndex)));
+    });
+  };
+  scan(conversation?.nodes||[],[]);
+  return out;
+}
+
+function sceneDirectorEntry(){
+  const conversation=sceneDirectorConversation();
+  const lines=sceneDirectorLines(conversation);
+  return lines.find(entry=>entry.key===sceneDirectorPath)||lines[0]||null;
+}
+
+function sceneDirectorCharacterColor(character){
+  return character?.color||character?.asset_refs?.portraits?.[0]?.accent||'#8db9da';
+}
+
+function sceneDirectorCharacterOptions(conversation){
+  const ids=[...(conversation.cast||[])];
+  sceneDirectorLines(conversation).forEach(({node})=>{
+    if(node.speaker&&node.speaker!=='__narrator__'&&!ids.includes(node.speaker))ids.push(node.speaker);
+  });
+  return ids.filter(id=>id!=='player'&&id!=='__player__'&&id!=='__narrator__');
+}
+
+function sceneDirectorTransitionOptions(current,inheritLabel='Inherit scene'){
+  return SCENE_DIRECTOR_TRANSITIONS.map((value,index)=>'<option value="'+esc(value)+'"'+
+    (value===current?' selected':'')+'>'+esc(index?pretty(value):inheritLabel)+'</option>').join('');
+}
+
+function sceneDirectorPositionOptions(current){
+  return SCENE_DIRECTOR_POSITIONS.map((value,index)=>'<option value="'+esc(value)+'"'+
+    (value===current?' selected':'')+'>'+esc(index?'Portrait '+pretty(value):'Automatic position')+'</option>').join('');
+}
+
+function sceneDirectorPortraitOptions(entry){
+  const character=chr(entry?.node?.speaker),current=normalizeLineStage(entry.node).portrait||'';
+  const portraits=Array.isArray(character?.asset_refs?.portraits)?character.asset_refs.portraits:[];
+  const known=portraits.some(item=>item.id===current);
+  return '<option value=""'+(!current?' selected':'')+'>Automatic / default</option>'+
+    (current&&!known?'<option value="'+esc(current)+'" selected>Custom · '+esc(current)+'</option>':'')+
+    portraits.map(item=>'<option value="'+esc(item.id||'default')+'"'+
+      ((item.id||'default')===current?' selected':'')+'>'+esc(pretty(item.id||'default'))+'</option>').join('');
+}
+
+function sceneDirectorCueLabel(entry,index){
+  const speaker=chr(entry.node.speaker)?.name||pretty(entry.node.speaker||'Narration');
+  const excerpt=String(entry.node.text||'Empty line').replace(/\s+/g,' ').slice(0,52);
+  return '<button class="scene-cue'+(entry.key===sceneDirectorPath?' on':'')+'" data-scene-cue="'+
+    esc(entry.key)+'"><span>'+(index+1)+'</span><b>'+esc(speaker)+'</b><small>'+esc(excerpt)+'</small></button>';
+}
+
+function sceneDirectorPreviewMarkup(){
+  const conversation=sceneDirectorConversation(),entry=sceneDirectorEntry();
+  if(!conversation||!entry)return '<div class="scene-director-empty">Add a dialogue line to stage this scene.</div>';
+  const line=entry.node,stage=normalizeLineStage(line),direction=normalizeSceneDirection(conversation);
+  const speaker=chr(line.speaker),narrator=line.speaker==='__narrator__';
+  const cast=sceneDirectorCharacterOptions(conversation);
+  const speakerPosition=SCENE_DIRECTOR_POSITIONS.includes(stage.position)&&stage.position
+    ?stage.position:'center';
+  const automatic=['left','center','right'];
+  const openPositions=automatic.filter(position=>position!==speakerPosition);
+  const orderedCast=line.speaker&&cast.includes(line.speaker)
+    ?[line.speaker].concat(cast.filter(id=>id!==line.speaker)):cast.slice();
+  const stagedCast=orderedCast.slice(0,3);
+  const hiddenCast=Math.max(0,cast.length-stagedCast.length);
+  let supportingIndex=0;
+  const cards=stagedCast.map(id=>{
+    const character=chr(id)||{id,name:pretty(id)},active=id===line.speaker;
+    const position=active?speakerPosition:(openPositions[supportingIndex++%openPositions.length]||'left');
+    if(position==='offstage')return '';
+    const expression=active?(line.emotion||'neutral'):'neutral';
+    return '<div class="scene-portrait '+esc(position)+(active?' speaking':'')+'" style="--portrait:'+esc(sceneDirectorCharacterColor(character))+'">'+
+      '<div class="scene-portrait-figure"><span>'+esc((character.name||'?').slice(0,1))+'</span></div><b>'+esc(character.name||pretty(id))+
+      '</b><small>'+esc(expression)+(active&&stage.portrait?' · '+esc(stage.portrait):'')+'</small></div>';
+  }).join('');
+  const location=conversation.location?placeName(conversation.location):'Unplaced scene';
+  const variant=stage.background_variant||'';
+  const cueBits=[stage.transition||direction.transition,stage.music||direction.music,
+    stage.ambience||direction.ambience,stage.sfx].filter(Boolean);
+  return '<div class="scene-screen" data-scene-location="'+esc(conversation.location||'')+'">'+
+    '<div class="scene-screen-atmosphere"><span>'+esc(location)+'</span>'+
+    (variant?'<b>Variant · '+esc(pretty(variant))+'</b>':'')+'</div>'+cards+
+    ((speakerPosition==='offstage'&&!narrator)||hiddenCast?'<div class="scene-offstage">'+
+      (speakerPosition==='offstage'&&!narrator?esc(speaker?.name||pretty(line.speaker))+' · offstage':'')+
+      (speakerPosition==='offstage'&&!narrator&&hiddenCast?' · ':'')+(hiddenCast?'+'+hiddenCast+' cast offstage':'')+'</div>':'')+
+    '<div class="scene-dialogue'+(narrator?' narration':'')+'"><b>'+esc(narrator?'Narration':speaker?.name||pretty(line.speaker))+
+    (line.emotion?' · '+esc(line.emotion):'')+'</b><p>'+dress(line.text||'Empty dialogue line')+'</p></div>'+
+    (cueBits.length?'<div class="scene-cue-strip">'+cueBits.map(bit=>'<span>'+esc(pretty(bit))+'</span>').join('')+'</div>':'')+
+    '</div>';
+}
+
+function renderSceneDirectorPreview(){
+  const target=$('sceneDirectorPreview');if(target)target.innerHTML=sceneDirectorPreviewMarkup();
+}
+
+function paintSceneDirector(){
+  const conversations=sceneDirectorConversations(),selector=$('sceneDirectorConversation');
+  selector.innerHTML=conversations.map(item=>'<option value="'+esc(item.uid)+'"'+
+    (item.uid===sceneDirectorUid?' selected':'')+'>'+esc(item.title||pretty(item.id))+'</option>').join('');
+  const body=$('sceneDirectorBody'),conversation=sceneDirectorConversation();
+  if(!conversation){
+    body.innerHTML='<div class="scene-director-empty"><b>No conversations yet.</b><span>Create or import a conversation before opening the director.</span></div>';
+    return;
+  }
+  const direction=normalizeSceneDirection(conversation),lines=sceneDirectorLines(conversation);
+  if(!lines.some(entry=>entry.key===sceneDirectorPath))sceneDirectorPath=lines[0]?.key||'';
+  const entry=sceneDirectorEntry(),stage=entry?normalizeLineStage(entry.node):null;
+  const lineIndex=Math.max(0,lines.findIndex(item=>item.key===sceneDirectorPath));
+  const expression=entry?.node?.emotion||'';
+  body.innerHTML='<div class="scene-director-layout">'+
+    '<aside class="scene-cue-list"><header><b>Cue sheet</b><span>'+lines.length+' line'+(lines.length===1?'':'s')+'</span></header>'+lines.map(sceneDirectorCueLabel).join('')+'</aside>'+
+    '<main class="scene-director-main"><section class="scene-director-preview" id="sceneDirectorPreview">'+sceneDirectorPreviewMarkup()+'</section>'+
+    '<div class="scene-director-step"><button class="btn" data-scene-step="-1"'+(lineIndex<=0?' disabled':'')+'>← Previous cue</button><span>'+(lines.length?lineIndex+1:0)+' / '+lines.length+'</span><button class="btn" data-scene-step="1"'+(lineIndex>=lines.length-1?' disabled':'')+'>Next cue →</button></div></main>'+
+    '<aside class="scene-director-controls"><section><h4>Scene</h4><div class="field"><label>Background / room</label><select data-scene-base="location">'+placeOptions(conversation.location)+'</select></div>'+
+    '<div class="two"><div class="field"><label>Opening transition</label><select data-scene-direction="transition">'+sceneDirectorTransitionOptions(direction.transition,'Runtime default')+'</select></div><div class="field"><label>Music cue</label><input type="text" data-scene-direction="music" value="'+esc(direction.music)+'" placeholder="track id"></div></div>'+
+    '<div class="field"><label>Ambience</label><input type="text" data-scene-direction="ambience" value="'+esc(direction.ambience)+'" placeholder="rain, café room tone, traffic…"></div>'+
+    '<div class="field"><label>Director notes</label><textarea data-scene-direction="notes" placeholder="Lighting, pacing, camera, or performance notes">'+esc(direction.notes)+'</textarea></div></section>'+
+    (entry?'<section><div class="scene-director-section-head"><h4>Selected cue</h4><button data-scene-reset>Clear overrides</button></div>'+
+      '<div class="scene-line-summary"><b>'+esc(chr(entry.node.speaker)?.name||pretty(entry.node.speaker))+'</b><span>'+esc(entry.node.text||'Empty dialogue line')+'</span></div>'+
+      '<div class="two"><div class="field"><label>Expression</label><input type="text" list="sceneDirectorExpressions" data-scene-line="emotion" value="'+esc(expression)+'" placeholder="neutral"></div><div class="field"><label>Portrait</label><select data-scene-stage="portrait">'+sceneDirectorPortraitOptions(entry)+'</select></div></div>'+
+      '<datalist id="sceneDirectorExpressions">'+SCENE_DIRECTOR_EXPRESSIONS.map(value=>'<option value="'+esc(value)+'"></option>').join('')+'</datalist>'+
+      '<div class="two"><div class="field"><label>Position</label><select data-scene-stage="position">'+sceneDirectorPositionOptions(stage.position)+'</select></div><div class="field"><label>Transition</label><select data-scene-stage="transition">'+sceneDirectorTransitionOptions(stage.transition)+'</select></div></div>'+
+      '<div class="field"><label>Background variant</label><input type="text" data-scene-stage="background_variant" value="'+esc(stage.background_variant)+'" placeholder="inherit · night · rain"></div>'+
+      '<div class="two"><div class="field"><label>Music override</label><input type="text" data-scene-stage="music" value="'+esc(stage.music)+'" placeholder="inherit"></div><div class="field"><label>Ambience override</label><input type="text" data-scene-stage="ambience" value="'+esc(stage.ambience)+'" placeholder="inherit"></div></div>'+
+      '<div class="field"><label>Sound effect</label><input type="text" data-scene-stage="sfx" value="'+esc(stage.sfx)+'" placeholder="door_close, phone_buzz…"></div>'+
+      '<p class="scene-runtime-note"><b>Live now:</b> portrait and background variant. Position, transitions, music, ambience, and SFX are saved as runtime-ready cues for the next presentation pass.</p></section>':'<section class="scene-director-empty">Write a line before adding cue direction.</section>')+'</aside></div>';
+  wireSceneDirector();
+}
+
+function wireSceneDirector(){
+  const conversation=sceneDirectorConversation(),entry=sceneDirectorEntry();if(!conversation)return;
+  $('sceneDirectorBody').querySelectorAll('[data-scene-cue]').forEach(button=>button.onclick=()=>{
+    sceneDirectorPath=button.dataset.sceneCue;paintSceneDirector();
+  });
+  $('sceneDirectorBody').querySelectorAll('[data-scene-step]').forEach(button=>button.onclick=()=>{
+    const lines=sceneDirectorLines(conversation),index=lines.findIndex(item=>item.key===sceneDirectorPath);
+    const next=lines[index+Number(button.dataset.sceneStep)];if(next){sceneDirectorPath=next.key;paintSceneDirector();}
+  });
+  $('sceneDirectorBody').querySelectorAll('[data-scene-base]').forEach(control=>control.onchange=()=>{
+    conversation[control.dataset.sceneBase]=control.value;save();renderSceneDirectorPreview();
+  });
+  $('sceneDirectorBody').querySelectorAll('[data-scene-direction]').forEach(control=>{
+    const update=()=>{normalizeSceneDirection(conversation)[control.dataset.sceneDirection]=control.value;save();renderSceneDirectorPreview();};
+    control.oninput=update;control.onchange=update;
+  });
+  $('sceneDirectorBody').querySelectorAll('[data-scene-stage]').forEach(control=>{
+    const update=()=>{normalizeLineStage(entry.node)[control.dataset.sceneStage]=control.value;save();renderSceneDirectorPreview();};
+    control.oninput=update;control.onchange=update;
+  });
+  $('sceneDirectorBody').querySelectorAll('[data-scene-line]').forEach(control=>{
+    const update=()=>{entry.node[control.dataset.sceneLine]=control.value.trim().toLowerCase();save();renderSceneDirectorPreview();};
+    control.oninput=update;control.onchange=update;
+  });
+  const reset=$('sceneDirectorBody').querySelector('[data-scene-reset]');
+  if(reset)reset.onclick=()=>{entry.node.stage={};save();paintSceneDirector();};
+}
+
+function openSceneDirector(conversationUid,path){
+  const conversations=sceneDirectorConversations();
+  if(!conversations.length){note('Create or import a conversation before opening the Scene Director.',true);return;}
+  const requested=conversations.find(item=>item.uid===conversationUid);
+  sceneDirectorUid=(requested||((cur()?.type==='conversation')?cur():null)||conversations[0]).uid;
+  const lines=sceneDirectorLines(sceneDirectorConversation());
+  sceneDirectorPath=Array.isArray(path)?path.join('.'):(String(path||''));
+  if(!lines.some(entry=>entry.key===sceneDirectorPath))sceneDirectorPath=lines[0]?.key||'';
+  paintSceneDirector();$('sceneDirector').showModal();
+}
+
+$('openSceneDirector').onclick=()=>openSceneDirector();
+$('sceneDirectorConversation').onchange=()=>{
+  sceneDirectorUid=$('sceneDirectorConversation').value;
+  sceneDirectorPath=sceneDirectorLines(sceneDirectorConversation())[0]?.key||'';
+  paintSceneDirector();
+};
+$('sceneDirectorClose').onclick=()=>{$('sceneDirector').close();paintBody();};
+
 /* ---- 12-conditions.js ---- */
 /* ============ conditions ============ */
 const OPS=[['gte','≥'],['lte','≤'],['eq','='],['is_true','is set'],['is_false','is not set']];
@@ -11408,12 +11733,14 @@ function convertConversation(conv,sheet,report,options={}){
       if(n.stage_direction)
         out.push({type:'line',speaker:'__narrator__',text:'*'+n.stage_direction+'*',
           emotion:'',activitySuccess:!n.line&&completesActivity(n),
+          stage:n.line?undefined:(typeof lineStageFromAuthored==='function'?lineStageFromAuthored(n):undefined),
           _nid:n.line?id+'__sd':id,_orig:n.line?null:n});
 
       if(n.line){
         if(n.speaker)cast.add(n.speaker);
         out.push({type:'line',speaker:n.speaker||'__narrator__',text:n.line,
           emotion:(n.emotion||n.expression||'').toLowerCase(),
+          stage:typeof lineStageFromAuthored==='function'?lineStageFromAuthored(n):undefined,
           activitySuccess:completesActivity(n),_nid:id,_orig:n});
       }
 
@@ -11457,6 +11784,8 @@ function convertConversation(conv,sheet,report,options={}){
       cast:[],
       start:isMain&&(act.event==='new_game_started'),
       premise:conv.summary||'',
+      sceneDirection:typeof sceneDirectionFromAuthored==='function'
+        ?sceneDirectionFromAuthored(conv.presentation):undefined,
       requires:toRequires(conv.conditions||conv.condition,sheet.id),
       nodes:body,
       _authored:{source:conv,type:conv.type,repetition:conv.repetition,activation:act,locRef:act.location,
@@ -11791,6 +12120,7 @@ function buildNodes(group){
           body.stage_direction=String(n.text||'').replace(/^\*|\*$/g,'');}
         else{delete body.stage_direction;body.speaker=n.speaker;body.line=n.text;
           if(n.emotion)body.expression=n.emotion; else delete body.expression;}
+        if(typeof applyLineStageToAuthored==='function')applyLineStageToAuthored(n.stage,body);
         if(n._orig&&Object.prototype.hasOwnProperty.call(n._orig,'next'))body.next=n._orig.next;
         else delete body.next;
         if(group.activityId){
@@ -11871,6 +12201,9 @@ function conversationOut(group){
   if(a.replayable!==undefined)out.replayable=!!a.replayable;
   if(group.activityId)out.activity_id=group.activityId;
   if(group.main.premise)out.summary=group.main.premise;
+  const presentation=typeof sceneDirectionToAuthored==='function'
+    ?sceneDirectionToAuthored(group.main.sceneDirection,source.presentation):source.presentation;
+  if(presentation)out.presentation=presentation;else delete out.presentation;
   const planned=plannedSceneEffects(group.main.scenePlan);
   const completion=(a.completion_effects||[]).concat(planned);
   if(completion.length)out.completion_effects=completion;

@@ -133,12 +133,14 @@ function convertConversation(conv,sheet,report,options={}){
       if(n.stage_direction)
         out.push({type:'line',speaker:'__narrator__',text:'*'+n.stage_direction+'*',
           emotion:'',activitySuccess:!n.line&&completesActivity(n),
+          stage:n.line?undefined:(typeof lineStageFromAuthored==='function'?lineStageFromAuthored(n):undefined),
           _nid:n.line?id+'__sd':id,_orig:n.line?null:n});
 
       if(n.line){
         if(n.speaker)cast.add(n.speaker);
         out.push({type:'line',speaker:n.speaker||'__narrator__',text:n.line,
           emotion:(n.emotion||n.expression||'').toLowerCase(),
+          stage:typeof lineStageFromAuthored==='function'?lineStageFromAuthored(n):undefined,
           activitySuccess:completesActivity(n),_nid:id,_orig:n});
       }
 
@@ -182,6 +184,8 @@ function convertConversation(conv,sheet,report,options={}){
       cast:[],
       start:isMain&&(act.event==='new_game_started'),
       premise:conv.summary||'',
+      sceneDirection:typeof sceneDirectionFromAuthored==='function'
+        ?sceneDirectionFromAuthored(conv.presentation):undefined,
       requires:toRequires(conv.conditions||conv.condition,sheet.id),
       nodes:body,
       _authored:{source:conv,type:conv.type,repetition:conv.repetition,activation:act,locRef:act.location,

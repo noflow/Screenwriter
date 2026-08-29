@@ -189,6 +189,7 @@ function buildNodes(group){
           body.stage_direction=String(n.text||'').replace(/^\*|\*$/g,'');}
         else{delete body.stage_direction;body.speaker=n.speaker;body.line=n.text;
           if(n.emotion)body.expression=n.emotion; else delete body.expression;}
+        if(typeof applyLineStageToAuthored==='function')applyLineStageToAuthored(n.stage,body);
         if(n._orig&&Object.prototype.hasOwnProperty.call(n._orig,'next'))body.next=n._orig.next;
         else delete body.next;
         if(group.activityId){
@@ -269,6 +270,9 @@ function conversationOut(group){
   if(a.replayable!==undefined)out.replayable=!!a.replayable;
   if(group.activityId)out.activity_id=group.activityId;
   if(group.main.premise)out.summary=group.main.premise;
+  const presentation=typeof sceneDirectionToAuthored==='function'
+    ?sceneDirectionToAuthored(group.main.sceneDirection,source.presentation):source.presentation;
+  if(presentation)out.presentation=presentation;else delete out.presentation;
   const planned=plannedSceneEffects(group.main.scenePlan);
   const completion=(a.completion_effects||[]).concat(planned);
   if(completion.length)out.completion_effects=completion;

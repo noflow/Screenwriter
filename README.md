@@ -82,6 +82,16 @@ presets, route locks, state-change previews, node jumping, restarting, and rewin
 Approved nodes can scaffold normal Screenwriter conversations and quests without
 overwriting existing content; arc files can also be downloaded and imported alone.
 
+The project toolbar’s **Director** button opens a visual-novel Scene Director for
+every authored conversation. Its cue sheet includes dialogue inside every branch,
+with a live 16:10 preview, background/room selection, expressions, portrait variants,
+left/center/right/offstage placement, transitions, music, ambience, sound effects,
+and freeform direction notes. A **direct** control on each dialogue line opens that
+exact cue. Port Alder currently renders the authored portrait and background variant;
+the remaining cues are retained as forward-compatible runtime presentation fields.
+Imported unknown presentation and dialogue-node fields are merged back on export so
+opening a scene in the Director never strips newer game metadata.
+
 The project toolbar’s **Build** button creates deployable Port Alder content packages.
 It can include the complete character/world set or only files that differ from the
 built-in game snapshot. A preflight report blocks broken references, lists warnings,
@@ -114,6 +124,7 @@ Run the focused state/player and quest-workshop regression checks with:
     node tests/game-package-builder.test.js
     node tests/schedule-workshop.test.js
     node tests/continuity-dashboard.test.js
+    node tests/scene-director.test.js
 
 ## Layout
 
@@ -123,7 +134,7 @@ Run the focused state/player and quest-workshop regression checks with:
     manifest.json       load order (regenerate by sorting js/ filenames)
     _markup.html        shared markup template with @@CSS@@ / @@JS@@ slots
     css/app.css         all styles
-    js/                 49 modules, loaded in filename order
+    js/                 52 modules, loaded in filename order
 
 ## The modules
 
@@ -164,6 +175,7 @@ Numeric prefixes are load order, not importance.
     11-editor           sheet & limits editor
     11b-relationship-arc flexible-length character story planning and quest readiness
     11c-ensemble-arc   multi-character graph planning, draft VN playtests, scaffolding
+    11d-scene-director visual dialogue cue sheet, staging controls, and live VN preview
     12-conditions       condition rows and evaluation
     13-routes           route enumeration, the walker
     14-graph            flow diagrams
