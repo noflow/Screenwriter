@@ -987,6 +987,34 @@
   .ensemble-vn-line{max-width:78%;padding:12px 14px;border:1px solid rgba(126,192,186,.17);border-radius:9px;background:rgba(15,28,38,.87)}.ensemble-vn-line:nth-child(even){margin-left:auto}.ensemble-vn-line b{display:block;margin-bottom:4px;color:#7ec0ba;font:8px var(--util);letter-spacing:.1em;text-transform:uppercase}.ensemble-vn-line p{margin:0;font-size:15px;line-height:1.5}.ensemble-vn-line.narrator{max-width:100%;margin:0;color:#aebbc4;background:transparent;text-align:center;font-style:italic}.ensemble-vn-line.narrator b{display:none}.ensemble-vn-placeholder{align-self:center;color:#8496a3;text-align:center;font-style:italic}.ensemble-vn-choices{display:grid;gap:7px;width:min(720px,100%);margin:0 auto}.ensemble-vn-choices button{display:grid;gap:2px;padding:11px 14px;border:1px solid rgba(126,192,186,.25);border-radius:7px;color:#dce8ec;background:rgba(32,67,74,.22);text-align:left;cursor:pointer}.ensemble-vn-choices button:hover:not(:disabled){border-color:#7ec0ba;background:rgba(32,87,87,.32)}.ensemble-vn-choices button:disabled{opacity:.42;cursor:not-allowed}.ensemble-vn-choices button span{color:#8295a3;font:8px var(--util)}.ensemble-vn-ending{padding:14px;border:1px solid rgba(143,176,138,.28);border-radius:7px;color:var(--sage);text-align:center}.ensemble-test-changes{display:flex;flex-wrap:wrap;gap:5px;margin:-7px 0 12px}.ensemble-test-changes b,.ensemble-test-changes span{padding:5px 7px;border-radius:5px;font:8px var(--util)}.ensemble-test-changes b{color:#7ec0ba}.ensemble-test-changes span{color:#aebbc4;background:rgba(126,192,186,.08)}
   @media(max-width:1100px){.ensemble-layout{grid-template-columns:180px minmax(820px,1fr)}.ensemble-workspace{grid-template-columns:minmax(520px,1fr) 360px}.ensemble-cast-grid{grid-template-columns:repeat(3,minmax(155px,1fr))}}
   @media(max-width:820px){dialog#ensembleArcStudio:not(#map):not(#sched),dialog#ensemblePlaytest:not(#map):not(#sched){width:99vw;height:96vh}.ensemble-layout{grid-template-columns:150px minmax(760px,1fr)}.ensemble-play-layout{grid-template-columns:210px minmax(520px,1fr)}.ensemble-vn{padding:15px}.ensemble-vn-line{max-width:92%}}
+
+  /* Game Package Builder */
+  dialog#gamePackageBuilder:not(#map):not(#sched){width:min(94vw,1080px);max-width:none;height:min(90vh,850px);max-height:none}
+  dialog#gamePackageBuilder[open]{display:flex;flex-direction:column}.package-builder-head>div:first-child{display:grid;gap:1px}.package-builder-head h3{margin:0}.package-kicker{color:#7ec0ba;font:8px var(--util);letter-spacing:.17em;text-transform:uppercase}
+  .package-builder-body{display:flex;flex:1;min-height:0;flex-direction:column;padding:0;overflow:hidden}.package-settings{padding:16px 20px 11px;border-bottom:1px solid var(--edge);background:linear-gradient(150deg,rgba(25,49,59,.42),rgba(22,28,39,.2))}.package-setting-grid{display:grid;grid-template-columns:1.3fr .55fr 1.2fr;gap:10px}.package-settings .field{margin-bottom:9px}.package-settings textarea{min-height:48px;resize:vertical}
+  .package-choice-row{display:flex;flex-wrap:wrap;gap:7px 18px;margin:2px 0 9px}.package-choice-row label{display:flex;align-items:center;gap:6px;color:#afbec7;font:8.5px var(--util)}.package-choice-row input{width:auto}
+  .package-summary{display:grid;grid-template-columns:repeat(6,1fr);border-bottom:1px solid var(--edge);background:rgba(6,12,18,.36)}.package-summary>div{display:grid;justify-items:center;gap:1px;padding:11px 6px;border-right:1px solid var(--edge)}.package-summary>div:last-child{border-right:0}.package-summary b{color:#dce6eb;font:19px var(--display)}.package-summary span{color:#7f939f;font:7.5px var(--util);letter-spacing:.08em;text-transform:uppercase}.package-summary .good b{color:var(--sage)}.package-summary .bad b{color:var(--rose)}
+  .package-report{display:grid;grid-template-columns:1.15fr .85fr;gap:0;flex:1;min-height:0;overflow:hidden}.package-report>section{min-height:0;padding:15px 17px 24px;overflow-y:auto}.package-report>section+section{border-left:1px solid var(--edge);background:rgba(6,12,18,.22)}.package-report h4{margin:0 0 9px;color:var(--brass);font:8.5px var(--util);letter-spacing:.15em;text-transform:uppercase}
+  .package-file-list,.package-issue-list{display:grid;gap:6px}.package-file{display:grid;grid-template-columns:65px 1fr;gap:2px 8px;padding:9px 10px;border:1px solid rgba(220,231,241,.1);border-radius:7px;background:rgba(8,14,21,.3)}.package-file-status{grid-row:1/3;align-self:center;padding:4px 5px;border-radius:4px;color:#94a6b1;background:rgba(148,166,177,.09);font:7px var(--util);letter-spacing:.08em;text-align:center;text-transform:uppercase}.package-file b{overflow:hidden;color:#cedae1;font:9px var(--util);text-overflow:ellipsis;white-space:nowrap}.package-file small{color:#768b98;font:7.5px var(--util)}.package-file.added .package-file-status{color:#83c8bc;background:rgba(70,148,133,.13)}.package-file.updated .package-file-status{color:#d7b46f;background:rgba(180,131,45,.13)}.package-file.removed .package-file-status{color:#d19aa6;background:rgba(164,68,87,.13)}.package-file.unchanged{opacity:.62}
+  .package-issue{display:grid;grid-template-columns:57px 1fr;gap:8px;padding:8px 9px;border:1px solid rgba(215,180,111,.17);border-radius:6px;color:#b9aa8e;background:rgba(111,79,24,.08)}.package-issue>b{color:#c8a866;font:7px var(--util);letter-spacing:.08em;text-transform:uppercase}.package-issue span{font-size:9px;line-height:1.4}.package-issue small{display:block;margin-top:2px;color:#7d8c96;font:7.5px var(--util)}.package-issue.blocker{border-color:rgba(196,119,142,.25);color:#c8a2ab;background:rgba(110,41,55,.09)}.package-issue.blocker>b{color:var(--rose)}.package-clean{padding:16px;border:1px solid rgba(143,176,138,.2);border-radius:7px;color:var(--sage);background:rgba(70,102,61,.08);font:9px var(--util);text-align:center}
+  .package-footer{display:flex;align-items:center;gap:12px;min-height:61px;padding:10px 18px;border-top:1px solid var(--edge);background:rgba(8,14,21,.72)}.package-footer span{flex:1}.package-footer .btn{min-width:190px}.package-footer .btn:disabled{opacity:.42;cursor:not-allowed}
+  @media(max-width:760px){dialog#gamePackageBuilder:not(#map):not(#sched){width:98vw;height:95vh}.package-setting-grid,.package-report{grid-template-columns:1fr}.package-summary{grid-template-columns:repeat(3,1fr)}.package-report{overflow-y:auto}.package-report>section{overflow:visible}.package-report>section+section{border-top:1px solid var(--edge);border-left:0}.package-footer{align-items:stretch;flex-direction:column}.package-footer .btn{width:100%}}
+
+  /* NPC Schedule Workshop */
+  dialog#scheduleWorkshop:not(#map):not(#sched){width:min(98vw,1500px);max-width:none;height:min(95vh,940px);max-height:none}dialog#scheduleWorkshop[open]{display:flex;flex-direction:column}.schedule-workshop-head>div:first-child{display:grid;gap:1px}.schedule-workshop-head h3{margin:0}.schedule-kicker{color:#7ec0ba;font:8px var(--util);letter-spacing:.17em;text-transform:uppercase}.schedule-workshop-body{flex:1;min-height:0;padding:0;overflow:hidden}
+  .schedule-workshop-layout{display:grid;grid-template-columns:235px minmax(980px,1fr);height:100%;min-height:0}.schedule-workshop-sidebar{padding:12px 9px 25px;border-right:1px solid var(--edge);overflow-y:auto;background:rgba(7,13,20,.42)}.schedule-sidebar-title{display:flex;align-items:end;margin:0 3px 10px;color:var(--brass);font:8px var(--util);letter-spacing:.14em;text-transform:uppercase}.schedule-sidebar-title span{flex:1}.schedule-sidebar-title small{color:#728692;font-size:7px;letter-spacing:0;text-transform:none}
+  .schedule-character-row{display:grid;grid-template-columns:25px 1fr;align-items:stretch;margin-bottom:5px;border:1px solid rgba(220,231,241,.09);border-radius:7px;background:rgba(12,20,29,.34)}.schedule-character-row.active{border-color:rgba(201,162,39,.5);background:rgba(201,162,39,.07)}.schedule-character-row>label{display:grid;place-items:center;border-right:1px solid rgba(220,231,241,.07)}.schedule-character-row input{width:auto}.schedule-character-row button{display:grid;grid-template-columns:1fr auto;gap:2px 5px;padding:8px 9px;border:0;color:#c8d4db;background:transparent;text-align:left;cursor:pointer}.schedule-character-row button b{overflow:hidden;font-size:9.5px;text-overflow:ellipsis;white-space:nowrap}.schedule-character-row button span{grid-column:1/-1;color:#7f939f;font:7px var(--util)}.schedule-character-row button small{grid-column:2;grid-row:1;color:#758994;font:7px var(--util)}
+  .schedule-workshop-main{display:grid;grid-template-rows:auto minmax(0,1fr);min-width:0;min-height:0}.schedule-workshop-tabs{display:flex;gap:3px;padding:8px 13px;border-bottom:1px solid var(--edge);background:rgba(14,23,32,.62)}.schedule-workshop-tabs button{padding:7px 12px;border:1px solid transparent;border-radius:5px;color:#879aa6;background:transparent;font:8px var(--util);letter-spacing:.06em;text-transform:uppercase;cursor:pointer}.schedule-workshop-tabs button:hover{color:#c9d6dd;background:rgba(220,231,241,.04)}.schedule-workshop-tabs button.active{border-color:rgba(126,192,186,.3);color:#d9e8e8;background:rgba(56,117,116,.18)}.schedule-workshop-content{min-height:0;overflow-y:auto}
+  .schedule-character-summary{display:grid;grid-template-columns:minmax(260px,1.6fr) repeat(4,minmax(95px,.55fr));border-bottom:1px solid var(--edge);background:linear-gradient(145deg,rgba(42,63,74,.3),rgba(17,25,35,.2))}.schedule-character-summary>div{display:grid;align-content:center;gap:2px;min-height:72px;padding:10px 15px;border-right:1px solid var(--edge)}.schedule-character-summary>div:last-child{border-right:0}.schedule-character-summary span{color:#758a97;font:7px var(--util);letter-spacing:.11em;text-transform:uppercase}.schedule-character-summary b{color:#dbe5e9;font:18px var(--display)}.schedule-character-summary div:not(:first-child){justify-items:center}.schedule-character-summary small{color:#8ea0aa;font:8px var(--util)}
+  .schedule-week-layout{display:grid;grid-template-columns:minmax(680px,1fr) 320px;min-height:670px}.schedule-week-layout>main{min-width:0;padding:14px 14px 28px;border-right:1px solid var(--edge)}.schedule-workshop-grid-scroll{overflow:auto;border:1px solid var(--edge);border-radius:9px;background:rgba(5,10,16,.28)}.schedule-workshop-grid{width:100%;min-width:720px;border-collapse:collapse;table-layout:fixed}.schedule-workshop-grid th,.schedule-workshop-grid td{padding:0;border-right:1px solid rgba(220,231,241,.07);border-bottom:1px solid rgba(220,231,241,.07)}.schedule-workshop-grid tr:last-child>*{border-bottom:0}.schedule-workshop-grid tr>*:last-child{border-right:0}.schedule-workshop-grid thead th:first-child{width:96px}.schedule-workshop-grid th>button{width:100%;min-height:34px;padding:5px;border:0;color:#8295a1;background:rgba(16,26,36,.7);font:7px var(--util);text-transform:uppercase;cursor:pointer}.schedule-workshop-grid tbody th>button{text-align:left}.schedule-workshop-grid th>button:hover{color:#d2dee3;background:rgba(126,192,186,.08)}
+  .schedule-workshop-cell{position:relative;display:grid;align-content:start;gap:2px;width:100%;min-height:77px;padding:8px 7px 14px;border:0;color:#718591;background:rgba(8,14,21,.24);text-align:left;cursor:pointer}.schedule-workshop-cell:hover{background:rgba(126,192,186,.07)}.schedule-workshop-cell.selected{z-index:1;box-shadow:inset 0 0 0 2px var(--brass);background:rgba(201,162,39,.1)}.schedule-workshop-cell.committed{background:rgba(73,106,116,.16)}.schedule-workshop-cell.busy{background:rgba(133,67,82,.16)}.schedule-workshop-cell b{display:-webkit-box;overflow:hidden;color:#c2d0d7;font-size:8.5px;line-height:1.25;-webkit-box-orient:vertical;-webkit-line-clamp:2}.schedule-workshop-cell small{display:-webkit-box;overflow:hidden;color:#738995;font:6.8px var(--util);line-height:1.25;-webkit-box-orient:vertical;-webkit-line-clamp:2}.schedule-workshop-cell em{padding-top:3px;color:#7ec0ba;font:6.5px var(--util);font-style:normal}.schedule-workshop-cell i{position:absolute;right:5px;bottom:4px;color:#d7b46f;font:6px var(--util);font-style:normal;text-transform:uppercase}.schedule-workshop-cell.day-off:before{content:'off';position:absolute;right:4px;top:3px;color:#8fb08a;font:5.5px var(--util);text-transform:uppercase}.schedule-workshop-cell>span{align-self:center;justify-self:center;color:#50636f;font:7px var(--util)}
+  .schedule-grid-legend{display:flex;flex-wrap:wrap;gap:6px 14px;padding:10px 4px;color:#8396a1;font:7px var(--util)}.schedule-grid-legend span:before{content:'';display:inline-block;width:7px;height:7px;margin-right:5px;border-radius:2px;background:#526d75}.schedule-grid-legend .busy:before{background:#85505d}.schedule-grid-legend .public:before{background:#4b8d89}.schedule-grid-legend .preferred:before{background:#bd944b}.schedule-grid-legend .day-off:before{background:#738d6e}
+  .schedule-workshop-inspector{padding:14px 14px 32px;overflow-y:auto;background:linear-gradient(155deg,rgba(21,34,45,.45),rgba(8,14,21,.25))}.schedule-layer-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:14px}.schedule-layer-tabs button{padding:7px 4px;border:1px solid var(--edge);border-radius:5px;color:#7f929e;background:rgba(7,13,20,.3);font:7px var(--util);cursor:pointer}.schedule-layer-tabs button.active{border-color:rgba(126,192,186,.38);color:#d8e7e8;background:rgba(57,111,111,.24)}.schedule-workshop-inspector .field{margin-bottom:9px}.schedule-workshop-inspector select,.schedule-workshop-inspector input{min-width:0}.schedule-busy-check{display:flex;align-items:center;gap:6px;padding:8px;border:1px solid rgba(196,119,142,.16);border-radius:6px;color:#a8b5bd;font:7.5px var(--util)}.schedule-busy-check input{width:auto}.schedule-selection-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:11px}.schedule-selection-actions .btn{min-width:0}.schedule-selection-actions .btn:disabled{opacity:.4}.schedule-preferred-editor{margin-bottom:13px;padding:12px;border:1px solid rgba(215,180,111,.2);border-radius:7px;background:rgba(100,72,25,.09)}.schedule-preferred-editor b{color:#d7b46f;font-size:10px}.schedule-preferred-editor p{margin:5px 0 0;color:#9b917d;font-size:8px;line-height:1.45}
+  .schedule-template-panel,.schedule-days-off{margin-top:13px;border:1px solid var(--edge);border-radius:7px;background:rgba(7,13,20,.25)}.schedule-template-panel summary,.schedule-days-off summary{padding:9px;color:#aebdc6;font:8px var(--util);cursor:pointer}.schedule-template-panel>p,.schedule-days-off>p{margin:0;padding:0 9px 9px;color:#788c97;font-size:7.5px;line-height:1.4}.schedule-template-list{display:grid;gap:5px;padding:0 8px 9px}.schedule-template-list button{display:grid;grid-template-columns:1fr auto;gap:4px;padding:7px 8px;border:1px solid rgba(220,231,241,.1);border-radius:5px;color:#b8c7ce;background:rgba(220,231,241,.025);font-size:8px;text-align:left;cursor:pointer}.schedule-template-list button:hover{border-color:rgba(126,192,186,.3)}.schedule-template-list button span{color:#718691;font:6.5px var(--util)}.schedule-days-off>div{display:grid;grid-template-columns:1fr 1fr;gap:4px;padding:0 8px 9px}.schedule-days-off label{display:flex;align-items:center;gap:4px;color:#8fa0aa;font:7px var(--util)}.schedule-days-off input{width:auto}
+  .schedule-group-head{display:grid;grid-template-columns:1fr minmax(300px,.8fr);gap:20px;align-items:center;padding:18px 21px;border-bottom:1px solid var(--edge);background:rgba(32,50,61,.23)}.schedule-group-head>div{display:grid;gap:2px}.schedule-group-head span{color:#7ec0ba;font:7px var(--util);text-transform:uppercase}.schedule-group-head b{font:22px var(--display)}.schedule-group-head small,.schedule-group-head p{color:#8497a2;font-size:8px;line-height:1.5}.schedule-group-grid{display:grid;grid-template-columns:repeat(3,minmax(250px,1fr));gap:9px;padding:16px 18px 30px}.schedule-group-slot{display:grid;grid-template-columns:27px 1fr;gap:4px 7px;padding:11px;border:1px solid rgba(143,176,138,.2);border-radius:8px;background:rgba(62,92,55,.07)}.schedule-group-slot.blocked{border-color:rgba(196,119,142,.18);background:rgba(100,43,55,.06)}.schedule-group-slot.variable{border-style:dashed}.schedule-group-slot>span{grid-row:1/3;color:#6f8390;font:7px var(--util)}.schedule-group-slot>b{font-size:10px}.schedule-group-slot>div{display:flex;gap:8px;color:#8799a3;font:6.8px var(--util)}.schedule-group-slot em{font-style:normal}.schedule-group-slot details{grid-column:1/-1;margin-top:4px;padding-top:6px;border-top:1px solid rgba(220,231,241,.07)}.schedule-group-slot summary{color:#7b909b;font:7px var(--util);cursor:pointer}.schedule-group-slot details p{display:flex;margin:5px 0 0;color:#8799a3;font-size:7.5px}.schedule-group-slot details p b{flex:1}.schedule-group-slot details p span{color:#6f8490}
+  .schedule-issue-report{padding:17px 20px 32px}.schedule-issue-summary{display:flex;gap:9px;margin-bottom:12px}.schedule-issue-summary>*{padding:6px 9px;border-radius:5px;color:#9cabaf;background:rgba(220,231,241,.05);font:8px var(--util)}.schedule-issue-summary b{color:var(--rose);background:rgba(196,119,142,.1)}.schedule-issue-report>button{display:grid;grid-template-columns:62px 1fr;gap:8px;width:100%;margin-bottom:6px;padding:9px 10px;border:1px solid rgba(220,231,241,.1);border-radius:6px;color:#abb9c1;background:rgba(7,13,20,.28);font-size:9px;text-align:left;cursor:pointer}.schedule-issue-report>button>b{font:7px var(--util);text-transform:uppercase}.schedule-issue-report>button.error>b{color:var(--rose)}.schedule-issue-report>button.warning>b{color:#d7b46f}.schedule-issue-report>button.info>b{color:#7ec0ba}.schedule-issue-report>button small{display:block;margin-top:2px;color:#70848f;font:7px var(--util)}.schedule-empty{display:grid;place-content:center;justify-items:center;min-height:480px;color:#8094a0;text-align:center}.schedule-empty b{color:#c6d3d9;font:22px var(--display)}.schedule-empty p{max-width:470px;font-size:9px;line-height:1.5}.schedule-empty.clear b{color:var(--sage)}
+  @media(max-width:1100px){.schedule-workshop-layout{grid-template-columns:190px minmax(880px,1fr)}.schedule-week-layout{grid-template-columns:minmax(620px,1fr) 290px}.schedule-group-grid{grid-template-columns:repeat(2,minmax(260px,1fr))}}
+  @media(max-width:760px){dialog#scheduleWorkshop:not(#map):not(#sched){width:99vw;height:96vh}.schedule-workshop-layout{grid-template-columns:150px minmax(810px,1fr)}.schedule-character-summary{grid-template-columns:minmax(230px,1.5fr) repeat(4,90px)}.schedule-week-layout{grid-template-columns:minmax(570px,1fr) 270px}}
 </style>
 
 <header class="masthead">
@@ -1004,9 +1032,11 @@
     </div>
     <div class="mast-group mast-tools" aria-label="Project tools">
       <button class="btn quiet" id="openEnsembleArcs">Arcs</button>
+      <button class="btn quiet" id="openScheduleWorkshop">Schedules</button>
       <button class="btn quiet" id="openMap">Map</button>
       <button class="btn quiet" id="openInspect">Inspect</button>
       <button class="btn quiet" id="openMemory">Memory</button>
+      <button class="btn quiet" id="openGamePackage">Build</button>
       <button class="btn quiet" id="openExport">Export</button>
     </div>
     <div class="mast-engine">
@@ -1139,6 +1169,15 @@
     <p class="hint" style="margin-top:10px">Click cells to select. Click a day or block heading to take
       the whole row or column. Shift-click extends. Empty means free and at home.</p>
   </div>
+</dialog>
+
+<dialog id="scheduleWorkshop">
+  <div class="sheet-head schedule-workshop-head">
+    <div><span class="schedule-kicker">NPC time and availability</span><h3>Schedule Workshop</h3></div>
+    <span class="sp"></span>
+    <button class="btn" id="scheduleWorkshopClose">Close</button>
+  </div>
+  <div class="sheet-body schedule-workshop-body" id="scheduleWorkshopBody"></div>
 </dialog>
 
 <dialog id="paste">
@@ -1552,6 +1591,36 @@
     <button class="btn" id="closeSheet">Close</button>
   </div>
   <div class="sheet-body"><textarea id="dump" spellcheck="false" readonly></textarea></div>
+</dialog>
+
+<dialog id="gamePackageBuilder">
+  <div class="sheet-head package-builder-head">
+    <div><span class="package-kicker">Port Alder deployment</span><h3>Game Package Builder</h3></div>
+    <span class="sp"></span>
+    <button class="btn" id="gamePackageRefresh">Recheck</button>
+    <button class="btn" id="gamePackageClose">Close</button>
+  </div>
+  <div class="sheet-body package-builder-body">
+    <section class="package-settings">
+      <div class="package-setting-grid">
+        <div class="field"><label for="gamePackageId">Package id</label><input id="gamePackageId" value="port_alder_story_content"></div>
+        <div class="field"><label for="gamePackageVersion">Package version</label><input id="gamePackageVersion" value="1" inputmode="numeric"></div>
+        <div class="field"><label for="gamePackageScope">Files to include</label><select id="gamePackageScope"><option value="changed">Only new and changed files</option><option value="full">Complete game content package</option></select></div>
+      </div>
+      <div class="field"><label for="gamePackageNotes">Release notes</label><textarea id="gamePackageNotes" rows="2" placeholder="What changed in this content build?"></textarea></div>
+      <div class="package-choice-row">
+        <label><input type="checkbox" id="gamePackageCharacters" checked> Character sheets, quests, conversations, and texts</label>
+        <label><input type="checkbox" id="gamePackageWorld" checked> World locations and room navigation</label>
+      </div>
+      <p class="hint">Screenwriter drafts only become playable after they are scaffolded into character-owned quests or conversations. The importer previews every file and creates backups before replacing anything.</p>
+    </section>
+    <div class="package-summary" id="gamePackageSummary"></div>
+    <div class="package-report" id="gamePackageReport"></div>
+    <div class="package-footer">
+      <span id="gamePackageMessage" class="hint"></span>
+      <button class="btn gold" id="gamePackageDownload">Download game package</button>
+    </div>
+  </div>
 </dialog>
 
 <script>
@@ -3915,6 +3984,361 @@ $('scClear').onclick=()=>{
   setSchedule(c,g);paintSchedule();paintPresence();paintBody();
 };
 $('closeSched').onclick=()=>{$('sched').close();paintAll();};
+
+/* ---- 08ca-schedule-workshop.js ---- */
+/* ============ project-wide NPC Schedule Workshop ============ */
+const SCHEDULE_ROTATION_DAYS=Object.freeze([
+  'rotation_day_1','rotation_day_2','rotation_day_3','rotation_day_4',
+  'first_day_off','second_day_off','third_day_off'
+]);
+const SCHEDULE_CATEGORIES=Object.freeze([
+  'work','school','home','health','errands','social','hobby','personal','travel','other'
+]);
+const SCHEDULE_TEMPLATES=Object.freeze({
+  college_week:{name:'College weekdays',days:['monday','tuesday','wednesday','thursday','friday'],
+    blocks:['morning','lunch','afternoon'],activity:'classes',label:'Attending classes',category:'school',unavailable:true},
+  office_week:{name:'Weekday job',days:['monday','tuesday','wednesday','thursday','friday'],
+    blocks:['morning','lunch','afternoon'],activity:'work_shift',label:'Working',category:'work',unavailable:true},
+  restaurant_week:{name:'Restaurant evenings',days:['wednesday','thursday','friday','saturday','sunday'],
+    blocks:['afternoon','evening','late_evening'],activity:'restaurant_shift',label:'Working a restaurant shift',category:'work',unavailable:true},
+  weekend_shift:{name:'Weekend job',days:['saturday','sunday'],blocks:['morning','lunch','afternoon','evening'],
+    activity:'weekend_shift',label:'Working a weekend shift',category:'work',unavailable:true},
+  four_on_three_off:{name:'Four on, three off',days:['rotation_day_1','rotation_day_2','rotation_day_3','rotation_day_4'],
+    blocks:['early_morning','morning','lunch','afternoon'],activity:'rotating_shift',label:'Working a rotating shift',
+    category:'work',unavailable:true,rotation:'four_on_three_off'}
+});
+
+let swCharacterId='',swTab='week',swLayer='fixed',swSelected=new Set(),swLast='',swGroup=new Set();
+
+const scheduleWorkshopCharacter=()=>npcs().find(character=>character.id===swCharacterId)||null;
+const scheduleDayLabel=day=>({first_day_off:'First day off',second_day_off:'Second day off',
+  third_day_off:'Third day off'}[day]||pretty(day));
+
+function scheduleWorkshopDays(character){
+  const found=[];
+  ['fixed_commitments','public_presence'].forEach(key=>(character?.schedule?.[key]||[])
+    .forEach(entry=>(entry.days||[]).forEach(day=>{if(!found.includes(day))found.push(day);})));
+  const rotating=found.some(day=>SCHEDULE_ROTATION_DAYS.includes(day))||!!character?.schedule?.rotation;
+  const weekly=found.some(day=>DAYS.includes(day));
+  if(rotating&&!weekly)return SCHEDULE_ROTATION_DAYS.slice();
+  if(rotating)return DAYS.concat(SCHEDULE_ROTATION_DAYS.filter(day=>found.includes(day)));
+  return DAYS.slice();
+}
+
+function schedulePublicGrid(character){
+  return scheduleGrid({home:character.home,schedule:{fixed_commitments:
+    character.schedule?.public_presence||[]}});
+}
+
+function schedulePreferenceMatches(character,day,block){
+  const preferences=character?.schedule?.preferred_social_blocks||[];
+  return preferences.includes(block)||preferences.includes(day+'_'+block);
+}
+
+function setSchedulePreferenceCells(character,keys,enabled){
+  character.schedule=character.schedule||{};
+  const days=scheduleWorkshopDays(character),preferences=new Set(character.schedule.preferred_social_blocks||[]);
+  // Expand a broad block preference before changing one cell, so the remaining
+  // days keep their previous meaning.
+  [...new Set(keys.map(key=>key.split('|')[1]))].forEach(block=>{
+    if(!preferences.has(block))return;
+    preferences.delete(block);days.forEach(day=>preferences.add(day+'_'+block));
+  });
+  keys.forEach(key=>{
+    const [day,block]=key.split('|'),token=day+'_'+block;
+    enabled?preferences.add(token):preferences.delete(token);
+  });
+  // Weekly all-day columns compress back to the runtime's supported broad form.
+  if(days.length===DAYS.length)BLOCKS.forEach(block=>{
+    if(DAYS.every(day=>preferences.has(day+'_'+block))){
+      DAYS.forEach(day=>preferences.delete(day+'_'+block));preferences.add(block);
+    }
+  });
+  character.schedule.preferred_social_blocks=[...preferences];
+}
+
+function scheduleEntryIssues(character,entries,source){
+  const issues=[],occupied=new Map();
+  (entries||[]).forEach((entry,index)=>{
+    const where=(source==='public'?'Public presence ':'Commitment ')+(index+1);
+    if(!(entry.days||[]).length)issues.push({severity:'error',message:where+' has no days.'});
+    if(!(entry.blocks||[]).length)issues.push({severity:'error',message:where+' has no activity blocks.'});
+    (entry.blocks||[]).filter(block=>!BLOCKS.includes(block)).forEach(block=>
+      issues.push({severity:'error',message:where+' uses unknown block '+pretty(block)+'.'}));
+    if(!String(entry.activity||'').trim())issues.push({severity:'warning',message:where+' has no activity id.'});
+    const location=String(entry.location||'');
+    if(!location)issues.push({severity:'error',message:where+' has no location.'});
+    else if(!loc(locPart(location)))issues.push({severity:'error',message:where+' uses missing location '+location+'.'});
+    else if(!roomPart(location)&&!entry.home_placement)
+      issues.push({severity:'warning',message:where+' should point to an exact room.'});
+    else if(roomPart(location)&&!roomOf(location))
+      issues.push({severity:'error',message:where+' uses missing room '+location+'.'});
+    (entry.days||[]).forEach(day=>(entry.blocks||[]).forEach(block=>{
+      const key=day+'|'+block;
+      if(occupied.has(key))issues.push({severity:'error',message:where+' overlaps '+occupied.get(key)+' at '+
+        scheduleDayLabel(day)+' · '+pretty(block)+'.'});
+      else occupied.set(key,where);
+    }));
+  });
+  return {issues,occupied};
+}
+
+function scheduleWorkshopIssues(character){
+  const fixed=scheduleEntryIssues(character,character.schedule?.fixed_commitments||[],'fixed');
+  const publicRows=scheduleEntryIssues(character,character.schedule?.public_presence||[],'public');
+  const issues=fixed.issues.concat(publicRows.issues),days=scheduleWorkshopDays(character);
+  publicRows.occupied.forEach((where,key)=>{
+    if(fixed.occupied.has(key))issues.push({severity:'warning',message:where+' is hidden by '+fixed.occupied.get(key)+
+      ' at '+scheduleDayLabel(key.split('|')[0])+' · '+pretty(key.split('|')[1])+'.'});
+  });
+  (character.schedule?.preferred_social_blocks||[]).forEach(token=>{
+    const broad=BLOCKS.includes(token),matches=broad?days.map(day=>day+'|'+token):days.flatMap(day=>
+      BLOCKS.filter(block=>token===day+'_'+block).map(block=>day+'|'+block));
+    if(!matches.length)issues.push({severity:'warning',message:'Preferred social time "'+pretty(token)+'" is not a valid slot for this schedule.'});
+    matches.filter(key=>fixed.occupied.has(key)&&scheduleGrid(character)[key]?.unavailable).forEach(key=>
+      issues.push({severity:'warning',message:'Preferred social time '+scheduleDayLabel(key.split('|')[0])+' · '+
+        pretty(key.split('|')[1])+' conflicts with a busy commitment.'}));
+  });
+  const busy=Object.values(scheduleGrid(character)).filter(cell=>cell.unavailable).length;
+  if(!busy)issues.push({severity:'warning',message:'No unavailable work, school, or personal commitments are defined.'});
+  if(!(character.schedule?.preferred_social_blocks||[]).length)
+    issues.push({severity:'info',message:'No preferred date or hangout times are defined.'});
+  if(!(character.schedule?.public_presence||[]).length)
+    issues.push({severity:'info',message:'No public-presence windows are defined for organic encounters.'});
+  return issues;
+}
+
+function scheduleGroupAvailability(characters){
+  const rows=[];
+  DAYS.forEach((day,dayIndex)=>BLOCKS.forEach((block,blockIndex)=>{
+    let busy=0,preferred=0,variable=0;const details=[];
+    characters.forEach(character=>{
+      const rotating=scheduleWorkshopDays(character).some(value=>SCHEDULE_ROTATION_DAYS.includes(value));
+      const slot=availability(character,day,block);
+      if(rotating&&!scheduleGrid(character)[day+'|'+block])variable++;
+      else if(!slot.free)busy++;
+      if(schedulePreferenceMatches(character,day,block))preferred++;
+      details.push({character:character.id,free:slot.free,variable:rotating&&!scheduleGrid(character)[day+'|'+block],
+        preferred:schedulePreferenceMatches(character,day,block),why:slot.why});
+    });
+    rows.push({day,block,busy,preferred,variable,details,
+      score:busy*100+variable*20-preferred*5+dayIndex+blockIndex/10});
+  }));
+  return rows.sort((left,right)=>left.score-right.score);
+}
+
+function applyScheduleTemplate(character,templateId,location){
+  const template=SCHEDULE_TEMPLATES[templateId];if(!template)return 0;
+  const grid=scheduleGrid(character);
+  template.days.forEach(day=>template.blocks.forEach(block=>{
+    const key=day+'|'+block,prior=grid[key]||{};
+    grid[key]={activity:template.activity,location,unavailable:template.unavailable,
+      _meta:Object.assign({},prior._meta||{},{label:template.label,category:template.category})};
+  }));
+  character.schedule=character.schedule||{};
+  character.schedule.fixed_commitments=gridToCommitments(grid,character);
+  if(template.rotation){character.schedule.rotation=template.rotation;character.schedule.days_off=['variable'];}
+  return template.days.length*template.blocks.length;
+}
+
+function scheduleWorkshopSummary(character){
+  const fixed=scheduleGrid(character),publicGrid=schedulePublicGrid(character),days=scheduleWorkshopDays(character);
+  let preferred=0;days.forEach(day=>BLOCKS.forEach(block=>{
+    if(schedulePreferenceMatches(character,day,block))preferred++;
+  }));
+  return {busy:Object.values(fixed).filter(cell=>cell.unavailable).length,
+    flexible:Object.values(fixed).filter(cell=>!cell.unavailable).length,
+    public:Object.keys(publicGrid).length,preferred,issues:scheduleWorkshopIssues(character).length};
+}
+
+function scheduleWorkshopSidebarHtml(){
+  return '<aside class="schedule-workshop-sidebar"><div class="schedule-sidebar-title"><span>Characters</span><small>check to compare</small></div>'+npcs().map(character=>{
+    const summary=scheduleWorkshopSummary(character),active=character.id===swCharacterId;
+    return '<div class="schedule-character-row'+(active?' active':'')+'"><label><input type="checkbox" data-sw-group="'+
+      esc(character.id)+'"'+(swGroup.has(character.id)?' checked':'')+' title="Include in group availability"></label><button data-sw-character="'+
+      esc(character.id)+'"><b>'+esc(character.name)+'</b><span>'+summary.busy+' busy · '+summary.public+' public · '+summary.preferred+
+      ' preferred</span><small>'+summary.issues+' note'+(summary.issues===1?'':'s')+'</small></button></div>';
+  }).join('')+'</aside>';
+}
+
+function scheduleGridCellHtml(character,day,block,fixed,publicGrid){
+  const key=day+'|'+block,commitment=fixed[key],presence=publicGrid[key],preferred=schedulePreferenceMatches(character,day,block),
+    dayOff=(character.schedule?.days_off||[]).includes(day),selected=swSelected.has(key);
+  const classes=['schedule-workshop-cell',selected?'selected':'',commitment?'committed':'',
+    commitment?.unavailable?'busy':'',presence?'public':'',preferred?'preferred':'',dayOff?'day-off':''].filter(Boolean).join(' ');
+  return '<td><button class="'+classes+'" data-sw-slot="'+key+'" title="'+esc(scheduleDayLabel(day)+' · '+pretty(block))+'">'+
+    (commitment?'<b>'+esc(commitment._meta?.label||pretty(commitment.activity||'commitment'))+'</b><small>'+esc(commitment.location?placeName(commitment.location):'No location')+'</small>':'')+
+    (presence?'<em>'+esc(presence._meta?.label||pretty(presence.activity||'public presence'))+'</em>':'')+
+    (preferred?'<i>preferred</i>':'')+(!commitment&&!presence&&!preferred?'<span>free</span>':'')+'</button></td>';
+}
+
+function scheduleWorkshopGridHtml(character){
+  const fixed=scheduleGrid(character),publicGrid=schedulePublicGrid(character),days=scheduleWorkshopDays(character);
+  return '<div class="schedule-workshop-grid-scroll"><table class="schedule-workshop-grid"><thead><tr><th></th>'+BLOCKS.map(block=>
+    '<th><button data-sw-col="'+block+'">'+esc(pretty(block))+'</button></th>').join('')+'</tr></thead><tbody>'+days.map(day=>
+      '<tr><th><button data-sw-row="'+day+'">'+esc(scheduleDayLabel(day))+'</button></th>'+BLOCKS.map(block=>
+        scheduleGridCellHtml(character,day,block,fixed,publicGrid)).join('')+'</tr>').join('')+'</tbody></table></div>';
+}
+
+function scheduleSelectedValue(character){
+  if(swSelected.size!==1)return null;
+  const key=[...swSelected][0];
+  if(swLayer==='fixed')return scheduleGrid(character)[key]||null;
+  if(swLayer==='public')return schedulePublicGrid(character)[key]||null;
+  return null;
+}
+
+function scheduleWorkshopInspectorHtml(character){
+  const value=scheduleSelectedValue(character),days=scheduleWorkshopDays(character),rotation=days.some(day=>SCHEDULE_ROTATION_DAYS.includes(day));
+  return '<aside class="schedule-workshop-inspector"><div class="schedule-layer-tabs">'+[
+    ['fixed','Commitment'],['public','Public presence'],['preferred','Preferred time']].map(([id,label])=>
+      '<button data-sw-layer="'+id+'" class="'+(swLayer===id?'active':'')+'">'+label+'</button>').join('')+'</div>'+(
+    swLayer==='preferred'?'<div class="schedule-preferred-editor"><b>Preferred dates and hangouts</b><p>Selected slots become times this character prefers. Selecting an existing preferred slot and applying removes it.</p></div>':
+    '<div class="field"><label>Activity id</label><input id="swActivity" value="'+esc(value?.activity||'')+'" placeholder="work_shift"></div>'+
+    '<div class="field"><label>Player-facing label</label><input id="swLabel" value="'+esc(value?._meta?.label||'')+'" placeholder="Working at the restaurant"></div>'+
+    '<div class="field"><label>Category</label><select id="swCategory">'+SCHEDULE_CATEGORIES.map(category=>
+      '<option value="'+category+'"'+((value?._meta?.category||'other')===category?' selected':'')+'>'+pretty(category)+'</option>').join('')+'</select></div>'+
+    '<div class="field"><label>Exact location and room</label><select id="swLocation">'+placeOptions(value?.location||'')+'</select></div>'+
+    '<label class="schedule-busy-check"><input type="checkbox" id="swUnavailable"'+(swLayer==='fixed'&&(value?.unavailable??true)?' checked':'')+
+      (swLayer==='public'?' disabled':'')+'> Cannot accept dates or stop to socialize</label>')+
+    '<div class="schedule-selection-actions"><button class="btn gold" id="swApply"'+(!swSelected.size?' disabled':'')+'>'+
+      (swLayer==='preferred'?'Toggle preferred':'Apply to '+swSelected.size+' slot'+(swSelected.size===1?'':'s'))+'</button><button class="btn" id="swClear"'+
+      (!swSelected.size?' disabled':'')+'>Clear selected</button></div><div id="swMessage" class="hint"></div>'+
+    '<details class="schedule-template-panel"><summary>Fill from a schedule template</summary><p>Templates add or update their normal slots and preserve everything else. Choose an exact room first.</p>'+
+      '<div class="schedule-template-list">'+Object.entries(SCHEDULE_TEMPLATES).map(([id,template])=>
+        '<button data-sw-template="'+id+'"><b>'+esc(template.name)+'</b><span>'+template.days.length+' days · '+template.blocks.length+' blocks</span></button>').join('')+'</div></details>'+
+    '<details class="schedule-days-off" open><summary>Days off</summary><div>'+days.map(day=>'<label><input type="checkbox" data-sw-day-off="'+day+'"'+
+      ((character.schedule?.days_off||[]).includes(day)?' checked':'')+'>'+esc(scheduleDayLabel(day))+'</label>').join('')+'</div>'+
+      (rotation?'<p>This character uses a seven-day rotation. Runtime dates resolve rotation days automatically.</p>':'')+'</details></aside>';
+}
+
+function scheduleWeekHtml(character){
+  const summary=scheduleWorkshopSummary(character);
+  return '<div class="schedule-character-summary"><div><span>Character</span><b>'+esc(character.name)+'</b><small>'+esc(character.profile?.occupation||pretty(character.profile?.role||''))+'</small></div>'+
+    '<div><span>Busy</span><b>'+summary.busy+'</b></div><div><span>Flexible commitments</span><b>'+summary.flexible+'</b></div><div><span>Public windows</span><b>'+summary.public+'</b></div><div><span>Preferred slots</span><b>'+summary.preferred+'</b></div></div>'+
+    '<div class="schedule-week-layout"><main>'+scheduleWorkshopGridHtml(character)+'<div class="schedule-grid-legend"><span class="busy">Busy commitment</span><span class="flex">Flexible commitment</span><span class="public">Public encounter</span><span class="preferred">Preferred social time</span><span class="day-off">Day off</span></div></main>'+scheduleWorkshopInspectorHtml(character)+'</div>';
+}
+
+function scheduleGroupHtml(){
+  const characters=npcs().filter(character=>swGroup.has(character.id));
+  if(!characters.length)return '<div class="schedule-empty"><b>Choose characters to compare</b><p>Use the checkboxes in the left column, then the best shared times will be ranked here.</p></div>';
+  const rows=scheduleGroupAvailability(characters);
+  return '<div class="schedule-group-head"><div><span>Comparing</span><b>'+characters.length+' characters</b><small>'+characters.map(character=>character.name).join(' · ')+'</small></div>'+
+    '<p>Times are ranked by fewest busy or rotating schedules, then by how many characters prefer the slot.</p></div><div class="schedule-group-grid">'+rows.map((row,index)=>
+      '<div class="schedule-group-slot'+(row.busy?' blocked':'')+(row.variable?' variable':'')+'"><span>#'+(index+1)+'</span><b>'+esc(pretty(row.day))+' · '+esc(pretty(row.block))+'</b>'+
+      '<div><em>'+row.busy+' busy</em><em>'+row.variable+' rotating</em><em>'+row.preferred+' prefer it</em></div><details><summary>Everyone</summary>'+row.details.map(detail=>{
+        const character=characters.find(item=>item.id===detail.character);
+        return '<p><b>'+esc(character?.name||pretty(detail.character))+'</b><span>'+esc(detail.variable?'rotating schedule':detail.free?detail.preferred?'free · preferred':'free':detail.why)+'</span></p>';
+      }).join('')+'</details></div>').join('')+'</div>';
+}
+
+function scheduleIssuesHtml(){
+  const rows=npcs().flatMap(character=>scheduleWorkshopIssues(character).map(issue=>({...issue,character})));
+  if(!rows.length)return '<div class="schedule-empty clear"><b>All schedules pass</b><p>No conflicts or missing references were found.</p></div>';
+  const rank={error:0,warning:1,info:2};rows.sort((a,b)=>rank[a.severity]-rank[b.severity]||a.character.name.localeCompare(b.character.name));
+  return '<div class="schedule-issue-report"><div class="schedule-issue-summary"><b>'+rows.filter(row=>row.severity==='error').length+' errors</b><span>'+rows.filter(row=>row.severity==='warning').length+' warnings</span><span>'+rows.filter(row=>row.severity==='info').length+' notes</span></div>'+rows.map(row=>
+    '<button data-sw-issue-character="'+esc(row.character.id)+'" class="'+row.severity+'"><b>'+esc(row.severity)+'</b><span>'+esc(row.message)+'<small>'+esc(row.character.name)+'</small></span></button>').join('')+'</div>';
+}
+
+function paintScheduleWorkshop(){
+  const body=$('scheduleWorkshopBody'),character=scheduleWorkshopCharacter()||npcs()[0];
+  if(!character){body.innerHTML='<div class="schedule-empty"><b>No NPC sheets loaded</b></div>';return;}
+  swCharacterId=character.id;if(!swGroup.size)swGroup.add(character.id);
+  body.innerHTML='<div class="schedule-workshop-layout">'+scheduleWorkshopSidebarHtml()+'<section class="schedule-workshop-main"><nav class="schedule-workshop-tabs">'+[
+    ['week','Character schedule'],['group','Group availability'],['issues','Conflict report']].map(([id,label])=>
+      '<button data-sw-tab="'+id+'" class="'+(swTab===id?'active':'')+'">'+label+'</button>').join('')+'</nav><div class="schedule-workshop-content">'+
+    (swTab==='week'?scheduleWeekHtml(character):swTab==='group'?scheduleGroupHtml():scheduleIssuesHtml())+'</div></section></div>';
+  wireScheduleWorkshop();
+}
+
+function scheduleSelectSlot(key,shift){
+  if(shift&&swLast){
+    const character=scheduleWorkshopCharacter(),days=scheduleWorkshopDays(character),[d1,b1]=swLast.split('|'),[d2,b2]=key.split('|');
+    const dr=[days.indexOf(d1),days.indexOf(d2)].sort((a,b)=>a-b),br=[BLOCKS.indexOf(b1),BLOCKS.indexOf(b2)].sort((a,b)=>a-b);
+    if(dr[0]>=0&&br[0]>=0)for(let day=dr[0];day<=dr[1];day++)for(let block=br[0];block<=br[1];block++)swSelected.add(days[day]+'|'+BLOCKS[block]);
+  }else{swSelected.has(key)?swSelected.delete(key):swSelected.add(key);swLast=key;}
+  paintScheduleWorkshop();
+}
+
+function applyScheduleWorkshopSelection(clear=false){
+  const character=scheduleWorkshopCharacter();if(!character||!swSelected.size)return;
+  const keys=[...swSelected];character.schedule=character.schedule||{};
+  if(swLayer==='preferred'){
+    const enabled=!clear&&!keys.every(key=>schedulePreferenceMatches(character,...key.split('|')));
+    setSchedulePreferenceCells(character,keys,enabled);
+  }else{
+    const publicLayer=swLayer==='public',grid=publicLayer?schedulePublicGrid(character):scheduleGrid(character);
+    if(!clear){
+      const location=$('swLocation').value,activity=slug($('swActivity').value||'')||slug(location);
+      if(!location||!activity){
+        $('swMessage').textContent='Choose an exact location and enter an activity before applying these slots.';
+        return;
+      }
+    }
+    keys.forEach(key=>{
+      if(clear){delete grid[key];return;}
+      const previous=grid[key]||{},location=$('swLocation').value,activity=slug($('swActivity').value||'')||slug(location);
+      grid[key]={activity,location,unavailable:publicLayer?false:$('swUnavailable').checked,
+        _meta:Object.assign({},previous._meta||{},{label:$('swLabel').value.trim()||pretty(activity),category:$('swCategory').value})};
+    });
+    const entries=gridToCommitments(grid,character);
+    if(publicLayer)character.schedule.public_presence=entries.map(entry=>Object.assign(entry,{unavailable:false}));
+    else character.schedule.fixed_commitments=entries;
+  }
+  save();paintScheduleWorkshop();
+}
+
+function wireScheduleWorkshop(){
+  const character=scheduleWorkshopCharacter();
+  $('scheduleWorkshopBody').querySelectorAll('[data-sw-character]').forEach(button=>button.onclick=()=>{
+    swCharacterId=button.dataset.swCharacter;swSelected.clear();swLast='';swTab='week';paintScheduleWorkshop();
+  });
+  $('scheduleWorkshopBody').querySelectorAll('[data-sw-group]').forEach(input=>input.onchange=()=>{
+    input.checked?swGroup.add(input.dataset.swGroup):swGroup.delete(input.dataset.swGroup);paintScheduleWorkshop();
+  });
+  $('scheduleWorkshopBody').querySelectorAll('[data-sw-tab]').forEach(button=>button.onclick=()=>{
+    swTab=button.dataset.swTab;paintScheduleWorkshop();
+  });
+  $('scheduleWorkshopBody').querySelectorAll('[data-sw-issue-character]').forEach(button=>button.onclick=()=>{
+    swCharacterId=button.dataset.swIssueCharacter;swTab='week';swSelected.clear();paintScheduleWorkshop();
+  });
+  if(swTab!=='week')return;
+  $('scheduleWorkshopBody').querySelectorAll('[data-sw-slot]').forEach(button=>button.onclick=event=>
+    scheduleSelectSlot(button.dataset.swSlot,event.shiftKey));
+  $('scheduleWorkshopBody').querySelectorAll('[data-sw-row]').forEach(button=>button.onclick=()=>{
+    const keys=BLOCKS.map(block=>button.dataset.swRow+'|'+block),all=keys.every(key=>swSelected.has(key));
+    keys.forEach(key=>all?swSelected.delete(key):swSelected.add(key));paintScheduleWorkshop();
+  });
+  $('scheduleWorkshopBody').querySelectorAll('[data-sw-col]').forEach(button=>button.onclick=()=>{
+    const keys=scheduleWorkshopDays(character).map(day=>day+'|'+button.dataset.swCol),all=keys.every(key=>swSelected.has(key));
+    keys.forEach(key=>all?swSelected.delete(key):swSelected.add(key));paintScheduleWorkshop();
+  });
+  $('scheduleWorkshopBody').querySelectorAll('[data-sw-layer]').forEach(button=>button.onclick=()=>{
+    swLayer=button.dataset.swLayer;paintScheduleWorkshop();
+  });
+  $('swApply').onclick=()=>applyScheduleWorkshopSelection(false);
+  $('swClear').onclick=()=>applyScheduleWorkshopSelection(true);
+  $('scheduleWorkshopBody').querySelectorAll('[data-sw-day-off]').forEach(input=>input.onchange=()=>{
+    const values=new Set(character.schedule.days_off||[]);input.checked?values.add(input.dataset.swDayOff):values.delete(input.dataset.swDayOff);
+    character.schedule.days_off=[...values];save();paintScheduleWorkshop();
+  });
+  $('scheduleWorkshopBody').querySelectorAll('[data-sw-template]').forEach(button=>button.onclick=()=>{
+    const location=$('swLocation')?.value||'';
+    if(!location){$('swMessage').textContent='Choose an exact location and room before filling a template.';return;}
+    const count=applyScheduleTemplate(character,button.dataset.swTemplate,location);save();swSelected.clear();paintScheduleWorkshop();note('Filled '+count+' schedule slots for '+esc(character.name)+'.');
+  });
+}
+
+function openScheduleWorkshop(characterId=''){
+  const character=npcs().find(item=>item.id===characterId)||npcs()[0];if(!character)return raise('Import an NPC character sheet first.');
+  swCharacterId=character.id;swSelected.clear();swLast='';if(!swGroup.size)swGroup.add(character.id);
+  paintScheduleWorkshop();$('scheduleWorkshop').showModal();
+}
+
+if(typeof document!=='undefined'){
+  $('openScheduleWorkshop').onclick=()=>openScheduleWorkshop();
+  $('scheduleWorkshopClose').onclick=()=>{$('scheduleWorkshop').close();paintAll();};
+}
 
 /* ---- 08d-hooks.js ---- */
 /* ---- draft a quest from a hook ---- */
@@ -11466,6 +11890,208 @@ $('exportSheets').onclick=()=>{
 $('addPlace').onclick=()=>{P.locations.push({id:'place_'+(P.locations.length+1),name:'New location',
   district:DISTRICTS[0]?.id||'',background:'',rooms:[],residents:[],services:[],tags:['custom'],notes:''});
   selPlace=P.locations.length-1;save();paintAll()};
+
+/* ---- 19a-package-builder.js ---- */
+/* ============ deployable Port Alder game packages ============ */
+const GAME_PACKAGE_FORMAT='scenewright.game_package';
+const GAME_PACKAGE_TARGET='port_alder_godot';
+
+const packageClone=value=>JSON.parse(JSON.stringify(value));
+const packageStable=value=>JSON.stringify(orderedJson(value));
+const packageText=value=>JSON.stringify(value,null,2)+'\n';
+
+function gameLocationPackageOut(){
+  const source=typeof BUNDLED_LOCATION_PACKAGE==='undefined'?{}:BUNDLED_LOCATION_PACKAGE;
+  return {
+    format_version:source.format_version||1,
+    package_id:source.package_id||'port_alder_all_locations',
+    reference_format:source.reference_format||'location_id.room_id',
+    districts:packageClone(typeof DISTRICTS==='undefined'?(P.districts||[]):DISTRICTS),
+    travel_rules:packageClone(typeof TRAVEL==='undefined'?(P.travel||{}):(TRAVEL||{})),
+    legacy_aliases:packageClone(typeof ALIASES==='undefined'?(P.aliases||{}):ALIASES),
+    locations:P.locations.filter(location=>location.tags?.includes('package')).map(location=>{
+      const out=packageClone(location);
+      ['background','tags','notes','editor_layout'].forEach(key=>delete out[key]);
+      out.rooms=(location.rooms||[]).map(room=>{
+        const clean=packageClone(room);
+        delete clean.editor_layout;
+        if(!clean.navigation||!Object.keys(clean.navigation).length)delete clean.navigation;
+        return clean;
+      });
+      return out;
+    })
+  };
+}
+
+function gamePackageCandidates(options={}){
+  const includeCharacters=options.characters!==false,includeWorld=options.world!==false;
+  const rows=[];
+  if(includeCharacters){
+    const canonical=new Map((typeof BUNDLED_CHARACTER_SHEETS==='undefined'?[]:
+      BUNDLED_CHARACTER_SHEETS).map(sheet=>[sheet.id,sheet]));
+    npcs().slice().sort((a,b)=>a.id.localeCompare(b.id)).forEach(character=>{
+      const content=sheetOut(character),before=canonical.get(character.id);
+      rows.push({path:'characters/'+character.id+'.character',kind:'character',id:character.id,
+        status:before?(packageStable(content)===packageStable(before)?'unchanged':'updated'):'added',content});
+    });
+  }
+  if(includeWorld){
+    const content=gameLocationPackageOut(),before=typeof BUNDLED_LOCATION_PACKAGE==='undefined'?null:
+      BUNDLED_LOCATION_PACKAGE;
+    rows.push({path:'content/world/all_locations.json',kind:'world',id:content.package_id,
+      status:before?(packageStable(content)===packageStable(before)?'unchanged':'updated'):'added',content});
+    const custom=customLocationsOut();
+    if(custom.locations.length)rows.push({path:'content/world/scenewright_custom_locations.json',
+      kind:'location_extension',id:custom.package_id,status:'added',content:custom});
+  }
+  return rows;
+}
+
+function gamePackageRemovedPaths(options={}){
+  if(options.scope!=='full'||options.characters===false||
+     typeof BUNDLED_CHARACTER_SHEETS==='undefined')return [];
+  const current=new Set(npcs().map(character=>character.id));
+  return BUNDLED_CHARACTER_SHEETS.filter(sheet=>!current.has(sheet.id))
+    .map(sheet=>'characters/'+sheet.id+'.character').sort();
+}
+
+function gamePackagePlan(options={}){
+  const scope=options.scope==='full'?'full':'changed',all=gamePackageCandidates(options);
+  return {scope,all,files:scope==='full'?all:all.filter(file=>file.status!=='unchanged'),
+    removed_paths:gamePackageRemovedPaths({...options,scope}),
+    expected_paths:all.map(file=>file.path).sort()};
+}
+
+async function gamePackageHash(text){
+  const bytes=new TextEncoder().encode(text);
+  if(globalThis.crypto?.subtle){
+    const digest=await globalThis.crypto.subtle.digest('SHA-256',bytes);
+    return [...new Uint8Array(digest)].map(value=>value.toString(16).padStart(2,'0')).join('');
+  }
+  // Old local browsers can still build packages. The importer recognises this
+  // integrity fallback, while current browsers always produce SHA-256.
+  let hash=2166136261;
+  bytes.forEach(value=>{hash^=value;hash=Math.imul(hash,16777619);});
+  return 'fnv1a-'+(hash>>>0).toString(16).padStart(8,'0');
+}
+
+async function finalizeGamePackage(plan,options={},validation={blockers:[],warnings:[]}){
+  const files=[];
+  for(const candidate of plan.files){
+    const content_text=packageText(candidate.content);
+    files.push({path:candidate.path,kind:candidate.kind,id:candidate.id,
+      operation:candidate.status==='added'?'add':'replace',status:candidate.status,
+      checksum:await gamePackageHash(content_text),content_text});
+  }
+  const packageId=slug(options.package_id||'port_alder_story_content');
+  const version=Math.max(1,parseInt(options.version,10)||1);
+  const manifest={file_count:files.length,
+    expected_paths:plan.expected_paths,removed_paths:plan.removed_paths,
+    removal_policy:'report_only',files:files.map(file=>({path:file.path,kind:file.kind,id:file.id,
+      operation:file.operation,status:file.status,checksum:file.checksum}))};
+  manifest.checksum=await gamePackageHash(JSON.stringify(manifest.files));
+  return {format:GAME_PACKAGE_FORMAT,format_version:1,target:GAME_PACKAGE_TARGET,
+    package_id:packageId,version,scope:plan.scope,created_at:new Date().toISOString(),
+    notes:String(options.notes||'').trim(),source:{tool:'Scenewright',
+      character_signature:typeof BUNDLED_CHARACTER_SIGNATURE==='undefined'?'':BUNDLED_CHARACTER_SIGNATURE,
+      location_signature:typeof BUNDLED_LOCATION_SIGNATURE==='undefined'?'':BUNDLED_LOCATION_SIGNATURE},
+    validation:{blockers:validation.blockers.length,warnings:validation.warnings.length},
+    manifest,files};
+}
+
+function gamePackageValidation(){
+  const blockers=[],warnings=[],seen=new Set();
+  const add=(severity,message,where)=>{
+    const key=severity+'\u0000'+message+'\u0000'+where;if(seen.has(key))return;seen.add(key);
+    (severity==='blocker'?blockers:warnings).push({message,where});
+  };
+  if(typeof validate==='function')validate().forEach(issue=>{
+    if(issue.sev==='err')add('blocker',issue.msg,issue.where||'Validate');
+    else if(issue.sev==='warn')add('warning',issue.msg,issue.where||'Validate');
+  });
+  if(typeof godotCheck==='function')godotCheck().issues.forEach(issue=>{
+    if(issue.sev==='fatal')add('blocker',issue.msg,issue.where||'Godot');
+    else if(issue.sev==='err'||issue.sev==='warn')add('warning',issue.msg,issue.where||'Godot');
+  });
+  if(typeof portAlderCheck==='function')portAlderCheck().forEach(issue=>{
+    if(issue.sev==='err')add('blocker',issue.msg,issue.where||'Port Alder');
+    else if(issue.sev==='warn')add('warning',issue.msg,issue.where||'Port Alder');
+  });
+  (P.ensemble_arcs||[]).forEach(arc=>{
+    const remaining=(arc.nodes||[]).filter(node=>node.implementation_status!=='implemented').length;
+    if(remaining)add('warning',remaining+' planning node'+(remaining===1?' is':'s are')+
+      ' not scaffolded into playable content.',arc.title||arc.id);
+  });
+  return {blockers,warnings};
+}
+
+function gamePackageOptionsFromUI(){
+  return {package_id:$('gamePackageId').value,version:$('gamePackageVersion').value,
+    scope:$('gamePackageScope').value,notes:$('gamePackageNotes').value,
+    characters:$('gamePackageCharacters').checked,world:$('gamePackageWorld').checked};
+}
+
+function gamePackageStatusLabel(status){
+  return status==='added'?'new':status;
+}
+
+function paintGamePackageBuilder(){
+  const options=gamePackageOptionsFromUI(),validation=gamePackageValidation(),plan=gamePackagePlan(options);
+  const counts=plan.all.reduce((out,file)=>{out[file.status]=(out[file.status]||0)+1;return out;},{});
+  const invalidId=!slug(options.package_id)||slug(options.package_id)!==String(options.package_id||'').trim();
+  const noKinds=!options.characters&&!options.world,blocked=validation.blockers.length||invalidId||noKinds||!plan.files.length;
+  $('gamePackageSummary').innerHTML='<div><b>'+plan.files.length+'</b><span>files in build</span></div>'+
+    '<div><b>'+String(counts.added||0)+'</b><span>new</span></div><div><b>'+String(counts.updated||0)+'</b><span>updated</span></div>'+
+    '<div><b>'+String(counts.unchanged||0)+'</b><span>unchanged</span></div><div><b>'+plan.removed_paths.length+'</b><span>removals reported</span></div>'+
+    '<div class="'+(validation.blockers.length?'bad':'good')+'"><b>'+validation.blockers.length+'</b><span>blocking issues</span></div>';
+  const fileRows=plan.all.map(file=>'<div class="package-file '+file.status+'"><span class="package-file-status">'+
+    esc(gamePackageStatusLabel(file.status))+'</span><b>'+esc(file.path)+'</b><small>'+esc(pretty(file.kind))+
+    (options.scope==='changed'&&file.status==='unchanged'?' · omitted from changed-only build':'')+'</small></div>').join('');
+  const removed=plan.removed_paths.map(path=>'<div class="package-file removed"><span class="package-file-status">removed</span><b>'+esc(path)+
+    '</b><small>reported only · importer will not delete it</small></div>').join('');
+  const issueRows=validation.blockers.concat(validation.warnings).map((issue,index)=>{
+    const severity=index<validation.blockers.length?'blocker':'warning';
+    return '<div class="package-issue '+severity+'"><b>'+severity+'</b><span>'+esc(issue.message)+
+      '<small>'+esc(issue.where||'Project')+'</small></span></div>';
+  }).join('');
+  $('gamePackageReport').innerHTML='<section><h4>Deployment preview</h4><div class="package-file-list">'+
+    (fileRows+removed||'<p class="empty">No files match this build.</p>')+'</div></section><section><h4>Preflight report</h4><div class="package-issue-list">'+
+    (invalidId?'<div class="package-issue blocker"><b>blocker</b><span>Package id must use lowercase words joined by underscores.</span></div>':'')+
+    (noKinds?'<div class="package-issue blocker"><b>blocker</b><span>Choose at least one content group.</span></div>':'')+
+    (issueRows||'<div class="package-clean">All deployment checks passed.</div>')+'</div></section>';
+  $('gamePackageDownload').disabled=!!blocked;
+  $('gamePackageMessage').textContent=validation.blockers.length?
+    'Fix the blocking issues before building.':!plan.files.length?
+      'No new or changed files were found. Choose Complete game content package to make a full build.':
+      'Ready. Godot will preview and back up these files before import.';
+  return {options,validation,plan,blocked};
+}
+
+function openGamePackageBuilder(){paintGamePackageBuilder();$('gamePackageBuilder').showModal();}
+
+async function downloadGamePackage(){
+  const state=paintGamePackageBuilder();if(state.blocked)return;
+  const button=$('gamePackageDownload');button.disabled=true;button.textContent='Building…';
+  try{
+    const data=await finalizeGamePackage(state.plan,state.options,state.validation);
+    const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)+'\n'],{type:'application/json'}));
+    Object.assign(document.createElement('a'),{href:url,
+      download:data.package_id+'-v'+data.version+'.screenwriter-package'}).click();
+    URL.revokeObjectURL(url);$('gamePackageMessage').textContent='Package built with '+data.files.length+
+      ' verified file'+(data.files.length===1?'':'s')+'.';
+  }catch(error){$('gamePackageMessage').textContent='Could not build package: '+error.message;}
+  finally{button.textContent='Download game package';paintGamePackageBuilder();}
+}
+
+if(typeof document!=='undefined'){
+  $('openGamePackage').onclick=openGamePackageBuilder;
+  $('gamePackageClose').onclick=()=>$('gamePackageBuilder').close();
+  $('gamePackageRefresh').onclick=paintGamePackageBuilder;
+  ['gamePackageScope','gamePackageCharacters','gamePackageWorld']
+    .forEach(id=>$(id).onchange=paintGamePackageBuilder);
+  ['gamePackageId','gamePackageVersion'].forEach(id=>$(id).oninput=paintGamePackageBuilder);
+  $('gamePackageDownload').onclick=downloadGamePackage;
+}
 
 /* ---- 20-boot.js ---- */
 /* ============ misc ============ */

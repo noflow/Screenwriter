@@ -22,9 +22,11 @@
     </div>
     <div class="mast-group mast-tools" aria-label="Project tools">
       <button class="btn quiet" id="openEnsembleArcs">Arcs</button>
+      <button class="btn quiet" id="openScheduleWorkshop">Schedules</button>
       <button class="btn quiet" id="openMap">Map</button>
       <button class="btn quiet" id="openInspect">Inspect</button>
       <button class="btn quiet" id="openMemory">Memory</button>
+      <button class="btn quiet" id="openGamePackage">Build</button>
       <button class="btn quiet" id="openExport">Export</button>
     </div>
     <div class="mast-engine">
@@ -157,6 +159,15 @@
     <p class="hint" style="margin-top:10px">Click cells to select. Click a day or block heading to take
       the whole row or column. Shift-click extends. Empty means free and at home.</p>
   </div>
+</dialog>
+
+<dialog id="scheduleWorkshop">
+  <div class="sheet-head schedule-workshop-head">
+    <div><span class="schedule-kicker">NPC time and availability</span><h3>Schedule Workshop</h3></div>
+    <span class="sp"></span>
+    <button class="btn" id="scheduleWorkshopClose">Close</button>
+  </div>
+  <div class="sheet-body schedule-workshop-body" id="scheduleWorkshopBody"></div>
 </dialog>
 
 <dialog id="paste">
@@ -570,6 +581,36 @@
     <button class="btn" id="closeSheet">Close</button>
   </div>
   <div class="sheet-body"><textarea id="dump" spellcheck="false" readonly></textarea></div>
+</dialog>
+
+<dialog id="gamePackageBuilder">
+  <div class="sheet-head package-builder-head">
+    <div><span class="package-kicker">Port Alder deployment</span><h3>Game Package Builder</h3></div>
+    <span class="sp"></span>
+    <button class="btn" id="gamePackageRefresh">Recheck</button>
+    <button class="btn" id="gamePackageClose">Close</button>
+  </div>
+  <div class="sheet-body package-builder-body">
+    <section class="package-settings">
+      <div class="package-setting-grid">
+        <div class="field"><label for="gamePackageId">Package id</label><input id="gamePackageId" value="port_alder_story_content"></div>
+        <div class="field"><label for="gamePackageVersion">Package version</label><input id="gamePackageVersion" value="1" inputmode="numeric"></div>
+        <div class="field"><label for="gamePackageScope">Files to include</label><select id="gamePackageScope"><option value="changed">Only new and changed files</option><option value="full">Complete game content package</option></select></div>
+      </div>
+      <div class="field"><label for="gamePackageNotes">Release notes</label><textarea id="gamePackageNotes" rows="2" placeholder="What changed in this content build?"></textarea></div>
+      <div class="package-choice-row">
+        <label><input type="checkbox" id="gamePackageCharacters" checked> Character sheets, quests, conversations, and texts</label>
+        <label><input type="checkbox" id="gamePackageWorld" checked> World locations and room navigation</label>
+      </div>
+      <p class="hint">Screenwriter drafts only become playable after they are scaffolded into character-owned quests or conversations. The importer previews every file and creates backups before replacing anything.</p>
+    </section>
+    <div class="package-summary" id="gamePackageSummary"></div>
+    <div class="package-report" id="gamePackageReport"></div>
+    <div class="package-footer">
+      <span id="gamePackageMessage" class="hint"></span>
+      <button class="btn gold" id="gamePackageDownload">Download game package</button>
+    </div>
+  </div>
 </dialog>
 
 @@JS@@

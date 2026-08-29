@@ -41,6 +41,15 @@ project overrides so refreshing the game-owned location registry does not erase 
 writer’s choices. Hale Home’s legacy Godot navigation map is shown read-only; the
 newer residences are read directly from the location registry.
 
+The project toolbar’s **Schedules** button opens a project-wide NPC Schedule Workshop.
+It edits ordinary Monday–Sunday routines and rotating four-on/three-off shifts, with
+all seven daily activity blocks. Commitments, flexible activities, public encounter
+windows, preferred date times, and days off appear together without being flattened
+into one type. Writers can paint whole rows, columns, or shift-selected ranges; fill
+college, weekday-job, restaurant, weekend, and rotating-shift templates; compare any
+group’s best shared times; and run a conflict report for overlaps, unavailable dating
+times, and missing or inexact room references.
+
 Every place now opens a **Visual room map** from the Places panel. The editor lays
 rooms out from their directional exits, supports drag-to-arrange, and edits the
 entrance, room name, access rule, actions, and up/right/down/left destinations.
@@ -71,6 +80,14 @@ presets, route locks, state-change previews, node jumping, restarting, and rewin
 Approved nodes can scaffold normal Screenwriter conversations and quests without
 overwriting existing content; arc files can also be downloaded and imported alone.
 
+The project toolbar’s **Build** button creates deployable Port Alder content packages.
+It can include the complete character/world set or only files that differ from the
+built-in game snapshot. A preflight report blocks broken references, lists warnings,
+shows every new, updated, unchanged, and reported-removed file, and identifies ensemble
+nodes that have not been scaffolded into playable content. Each embedded file is
+checksummed. The Godot importer previews the same operations and makes recoverable
+backups before applying them; reported removals are never deleted automatically.
+
 Run the focused state/player and quest-workshop regression checks with:
 
     node tests/player-runtime.test.js
@@ -83,6 +100,8 @@ Run the focused state/player and quest-workshop regression checks with:
     node tests/residence-authoring.test.js
     node tests/room-map-editor.test.js
     node tests/ensemble-arc-studio.test.js
+    node tests/game-package-builder.test.js
+    node tests/schedule-workshop.test.js
 
 ## Layout
 
@@ -92,7 +111,7 @@ Run the focused state/player and quest-workshop regression checks with:
     manifest.json       load order (regenerate by sorting js/ filenames)
     _markup.html        shared markup template with @@CSS@@ / @@JS@@ slots
     css/app.css         all styles
-    js/                 47 modules, loaded in filename order
+    js/                 49 modules, loaded in filename order
 
 ## The modules
 
@@ -114,6 +133,7 @@ Numeric prefixes are load order, not importance.
     08-body             paintBody, tree rendering, node editing
     08b-pool            repeatable line pools
     08c-schedule-ui     the 7x7 schedule editor
+    08ca-schedule-workshop project-wide schedules, templates, group times, conflicts
     08d-hooks           draft a quest from a quest_hook
     08e-completion      objective completion editor
     08f-activity        activities and milestones
@@ -143,6 +163,7 @@ Numeric prefixes are load order, not importance.
     17-authored-in      quests/conversations -> editor
     18-authored-out     editor -> quests/conversations
     19-export           export formats, new content, file import
+    19a-package-builder validated full/delta packages for the Port Alder repository
     20-boot             wiring and startup
 
 ## Adding a module

@@ -15,6 +15,7 @@
  "js/08-body.js",
  "js/08b-pool.js",
  "js/08c-schedule-ui.js",
+ "js/08ca-schedule-workshop.js",
  "js/08d-hooks.js",
  "js/08e-completion.js",
  "js/08f-activity.js",
@@ -45,5 +46,6 @@
  "js/17-authored-in.js",
  "js/18-authored-out.js",
  "js/19-export.js",
+ "js/19a-package-builder.js",
  "js/20-boot.js"
 ]

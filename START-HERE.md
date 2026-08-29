@@ -183,6 +183,20 @@ for each of the seven daily blocks. **Open weekly schedule** handles specific wo
 school, and day-of-week exceptions. If a scheduled commitment has a home placement,
 the Residence section lists that placement alongside the default routine.
 
+Use **Schedules** in the top toolbar when planning more than one NPC. The **Character
+schedule** tab shows commitments, public encounter windows, preferred social times,
+and days off on one seven-block grid. Click individual cells, an entire day or time
+column, or Shift-click two cells to select a rectangular range. Choose whether the
+selection is a fixed commitment, a public-presence window, or a preferred date time.
+Every fixed or public entry should use an exact `location.room` destination.
+
+Templates fill common college, weekday, restaurant, weekend, and four-on/three-off
+patterns while preserving unrelated slots. **Group availability** ranks the best
+shared times for the NPCs checked in the character list, including a warning when a
+rotating schedule makes a weekly answer variable. **Conflict report** scans the whole
+cast for overlaps, missing rooms, public windows hidden by work or school, and preferred
+social times that fall inside an unavailable commitment.
+
 Open **Places**, select any location, and choose **Edit visual room map** to change
 the building itself. Each room appears as a draggable box. Selecting one lets you
 edit its name, access rule, available actions, entrance status, and four directional
@@ -303,7 +317,7 @@ the value is kept in the save game and respects the range set in World builder.
 
     scenewright.html    the tool — this is the one to open
     index.html          same tool, loading js/ separately, for editing sources
-    js/  css/           the 47 source modules
+    js/  css/           the 49 source modules
     build.py            rebuilds scenewright.html from those sources
     README.md           what each module does
     godot/
@@ -336,6 +350,13 @@ Export from the tool gives you both shapes: **Port Alder sheets** writes `.chara
 files back in the game schema, including directed dialogue graphs, conditional choices,
 and automatic stat-outcome branches. **Godot JSON** writes the flattened `scenes.json`
 this runtime reads.
+
+For the actual Port Alder project, use **Build** in the top toolbar. Choose a complete
+package or a smaller changed-only package, review the deployment and preflight lists,
+then download the `.screenwriter-package`. In Godot, choose **Project → Tools → Import
+Screenwriter Package…**, select that file, inspect the dry-run preview, and confirm.
+Godot writes only the listed character/world files and creates a timestamped backup
+before replacement. A file reported as removed is kept for manual review.
 
 ---
 
