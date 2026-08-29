@@ -24,7 +24,7 @@ const backlog = JSON.parse(run('JSON.stringify(artworkBacklogData())'));
 assert.equal(backlog.mode, 'room_art_first');
 assert.deepEqual(backlog.active_kinds, ['background']);
 assert.equal(backlog.room_scope.policy, 'all_mapped_rooms');
-assert.equal(backlog.room_scope.completed_locations.length, 8);
+assert.equal(backlog.room_scope.completed_locations.length, 9);
 assert.equal(backlog.audio_in_scope, false);
 assert.equal(backlog.phases.length, 4);
 assert.equal(backlog.phases[0].id, 'opening_morning');
@@ -32,10 +32,10 @@ assert.equal(backlog.phases[0].priority, 1);
 
 const summary = JSON.parse(run('JSON.stringify(artworkBacklogSummary())'));
 assert.deepEqual(summary, {
-  total:46,
-  backgrounds:46,
+  total:52,
+  backgrounds:52,
   portraits:0,
-  statuses:{missing:5,placeholder:0,in_progress:33,review:0,ready:8}
+  statuses:{missing:1,placeholder:0,in_progress:37,review:0,ready:14}
 });
 
 run(`
@@ -45,7 +45,8 @@ run(`
     backyard:artworkBacklogResolution(allArtwork.find(item=>item.id==='hale_home.backyard')),
     street:artworkBacklogResolution(allArtwork.find(item=>item.id==='alder_heights_residential_street.hale_block')),
     lookout:artworkBacklogResolution(allArtwork.find(item=>item.id==='alder_bay_park.lookout')),
-    campus:artworkBacklogResolution(allArtwork.find(item=>item.id==='westshore_campus.courtyard'))
+    campus:artworkBacklogResolution(allArtwork.find(item=>item.id==='westshore_campus.courtyard')),
+    bayview:artworkBacklogResolution(allArtwork.find(item=>item.id==='bayview_cafe.patio'))
   });
   globalThis.ALL_MARKUP=artworkBacklogMarkup('all');
   globalThis.BG_MARKUP=artworkBacklogMarkup('background');
@@ -58,9 +59,10 @@ assert.equal(resolutions.bedroom.text, 'Production background registered');
 assert.equal(resolutions.backyard.state, 'registered');
 assert.equal(resolutions.street.state, 'registered');
 assert.equal(resolutions.lookout.state, 'registered');
-assert.equal(resolutions.campus.state, 'missing');
+assert.equal(resolutions.campus.state, 'registered');
+assert.equal(resolutions.bayview.state, 'missing');
 assert.match(context.ALL_MARKUP, /Opening Morning at Hale Home/);
-assert.match(context.ALL_MARKUP, /46 prioritized assets/);
+assert.match(context.ALL_MARKUP, /52 prioritized assets/);
 assert.match(context.ALL_MARKUP, /Room-first milestone plan/);
 assert.doesNotMatch(context.ALL_MARKUP, /portrait set/);
 assert.match(context.ALL_MARKUP, /Character portraits and audio are intentionally outside the active room-art plan/);
@@ -70,7 +72,11 @@ assert.match(context.ACTIVE_MARKUP, /Hale Home · Backyard/);
 assert.match(context.ACTIVE_MARKUP, /Alder Heights Residential Street · Neighborhood Corner/);
 assert.match(context.ACTIVE_MARKUP, /16 tasks/);
 assert.match(context.ACTIVE_MARKUP, /Forge Fitness · Trainer Office/);
+assert.match(context.ACTIVE_MARKUP, /4 tasks/);
+assert.match(context.ACTIVE_MARKUP, /Westshore Campus · Student Lounge/);
 assert.match(context.READY_MARKUP, /8 tasks/);
 assert.match(context.READY_MARKUP, /Harbor Employment Centre · Interview Room/);
+assert.match(context.READY_MARKUP, /6 tasks/);
+assert.match(context.READY_MARKUP, /Westshore Campus · Career Board/);
 
 console.log('Artwork backlog regression tests passed');
