@@ -66,6 +66,10 @@ function branchTests(){
 
 function paintInspect(){
   const B=$('insBody');
+  if(insTab==='continuity'){
+    paintContinuityDashboard(B);
+    return;
+  }
   if(insTab==='portAlder'){
     const issues=portAlderCheck(),n=s=>issues.filter(i=>i.sev===s).length;
     B.innerHTML='<p class="hint">Checks the sheets and branching scenes against the Port Alder package and dialogue format before export.</p>'+

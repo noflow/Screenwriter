@@ -93,6 +93,24 @@ editor's scene structure automatically, so the model does not need to write JSON
    automatic stat branches, and any gate the current game runtime cannot play.
 5. **Inspect → Validate** to see what needs attention inside the story itself.
 
+## Checking continuity before export
+
+Open **Inspect → Continuity** after adding or changing an arc. The whole-project
+view follows quest prerequisites and follow-ups, conversation objectives, message
+triggers, calendar hooks, character and location references, memories, relationship
+meters, and state flags. Blocking findings identify missing content or circular
+progression. Notes identify state that is only read or only written inside the
+current project so you can confirm whether the game seeds or consumes it elsewhere.
+
+Choose a character to isolate every dependency touching that NPC. Use **Rename or
+removal impact** before changing a stable id: it lists what depends on the selected
+item, what the item affects, and every state value it reads or writes. Display names
+can still be changed freely; this impact check is for internal ids and content that
+may be removed.
+
+The generated global-content index lets the report recognize game-owned quests such
+as Westshore enrollment even though they are not stored in a character sheet.
+
 ## Lasting relationship consequences
 
 Open a character’s sheet to edit their **Social activity preferences** and five

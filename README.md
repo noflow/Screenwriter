@@ -27,6 +27,8 @@ game checkout named `testgodot` or `Testing` is present, `build.py` refreshes
 the one-page build.
 Set `SCENEWRIGHT_GAME_CHARACTERS` to the character directory and
 `SCENEWRIGHT_GAME_LOCATIONS` to the location file when the repositories are not siblings.
+Set `SCENEWRIGHT_GAME_CONTENT` to the game's `content` directory so continuity
+checks can index globally owned quests and conversations in the same setup.
 
 The guided character creator and existing-sheet editor both author Port Alder's
 hangout invitation threshold, preferred non-romantic activities, and exactly five
@@ -88,6 +90,15 @@ nodes that have not been scaffolded into playable content. Each embedded file is
 checksummed. The Godot importer previews the same operations and makes recoverable
 backups before applying them; reported removals are never deleted automatically.
 
+**Inspect → Continuity** builds a read-only dependency index across quests,
+conversations, phone messages, characters, locations, calendar hooks, memories,
+relationship meters, and state flags. It reports missing targets, circular quest or
+message chains, and state values with no project-side writer or reader. Character
+focus reduces the report to one NPC and every item touching their stories. The
+rename/removal impact view shows what depends on a selected item, what it affects,
+and its complete state contract. A generated global-content index recognizes
+game-owned quests and conversations without copying them into character packages.
+
 Run the focused state/player and quest-workshop regression checks with:
 
     node tests/player-runtime.test.js
@@ -102,6 +113,7 @@ Run the focused state/player and quest-workshop regression checks with:
     node tests/ensemble-arc-studio.test.js
     node tests/game-package-builder.test.js
     node tests/schedule-workshop.test.js
+    node tests/continuity-dashboard.test.js
 
 ## Layout
 
@@ -123,6 +135,7 @@ Numeric prefixes are load order, not importance.
     01b-character-creator  guided Port Alder NPC-sheet creator
     02-places           location package, rooms, district grouping, safe project refresh
     02a-game-locations  generated snapshot of the canonical Port Alder registry
+    02b-game-content-index generated ids for game-owned quests and conversations
     02b-world-builder   custom stats plus a location-and-rooms creator
     03-schedule         grid <-> fixed_commitments, availability
     04-ollama           engines (Ollama, Pawan.Krd, any OpenAI-compatible), model list
@@ -158,6 +171,7 @@ Numeric prefixes are load order, not importance.
     15b-validate        the validator
     15c-reach           stat reachability
     15d-simulate        playthrough simulator
+    15da-continuity     project dependency index, continuity findings, impact preview
     15e-inspect         the Inspect dialog
     16-map              story map canvas
     17-authored-in      quests/conversations -> editor

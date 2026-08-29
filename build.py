@@ -13,6 +13,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 
 LOCATION_MODULE = os.path.join(HERE, 'js', '02a-game-locations.js')
 CHARACTER_MODULE = os.path.join(HERE, 'js', '01a-game-characters.js')
+CONTENT_INDEX_MODULE = os.path.join(HERE, 'js', '02b-game-content-index.js')
 
 def game_location_source():
     """Find the canonical registry when the game and tool share a workspace.
@@ -107,9 +108,69 @@ def sync_game_characters():
             f.write(generated)
     return len(sheets)
 
+def game_content_source():
+    """Find Port Alder's global content directory for dependency inspection."""
+    configured = os.environ.get('SCENEWRIGHT_GAME_CONTENT', '').strip()
+    candidates = [configured] if configured else []
+    candidates.extend(os.path.abspath(os.path.join(HERE, '..', directory, 'content'))
+        for directory in ('testgodot', 'Testing'))
+    return next((path for path in candidates if path and os.path.isdir(path)), None)
+
+def sync_game_content_index():
+    """Build a lightweight id/title index for global quests and conversations.
+
+    Screenwriter edits character packages, but those packages may legitimately
+    reference quests or conversations owned by the game's global content. Keeping
+    their ids here lets continuity analysis distinguish an external definition from
+    a genuinely missing follow-up without copying global story data into a project.
+    """
+    source = game_content_source()
+    if not source:
+        if not os.path.isfile(CONTENT_INDEX_MODULE):
+            with open(CONTENT_INDEX_MODULE, 'w', encoding='utf-8', newline='') as f:
+                f.write('const BUNDLED_GAME_CONTENT_INDEX={quests:[],conversations:[]};\n')
+        return None
+
+    index = {'quests': [], 'conversations': []}
+    seen = {key: set() for key in index}
+    for root, _, filenames in os.walk(source):
+        for filename in sorted(name for name in filenames if name.endswith('.json')):
+            path = os.path.join(root, filename)
+            with open(path, encoding='utf-8') as f:
+                package = json.load(f)
+            relative = os.path.relpath(path, source).replace(os.sep, '/')
+            for key in index:
+                for item in package.get(key, []):
+                    item_id = item.get('id') if isinstance(item, dict) else None
+                    if not item_id or item_id in seen[key]:
+                        continue
+                    seen[key].add(item_id)
+                    index[key].append({
+                        'id': item_id,
+                        'title': item.get('title') or item.get('name') or item_id,
+                        'source': relative,
+                    })
+    for rows in index.values():
+        rows.sort(key=lambda item: item['id'])
+    compact = json.dumps(index, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
+    generated = (
+        '/* Generated from Port Alder global content JSON by build.py.\n'
+        '   This is a reference index; global story data remains game-owned. */\n'
+        f'const BUNDLED_GAME_CONTENT_INDEX={compact};\n'
+    )
+    previous = None
+    if os.path.isfile(CONTENT_INDEX_MODULE):
+        with open(CONTENT_INDEX_MODULE, encoding='utf-8') as f:
+            previous = f.read()
+    if previous != generated:
+        with open(CONTENT_INDEX_MODULE, 'w', encoding='utf-8', newline='') as f:
+            f.write(generated)
+    return len(index['quests']), len(index['conversations'])
+
 def main():
     character_count = sync_game_characters()
     location_counts = sync_game_locations()
+    content_counts = sync_game_content_index()
     # Rebuild the manifest from the directory so a new module is picked up
     # just by dropping it in, named for where it should load.
     names = sorted(f for f in os.listdir(os.path.join(HERE, 'js')) if f.endswith('.js'))
@@ -146,6 +207,9 @@ def main():
         print(f"  synced {locations} game locations, {rooms} rooms, {districts} districts")
     if character_count:
         print(f"  synced {character_count} game characters")
+    if content_counts:
+        quests, conversations = content_counts
+        print(f"  indexed {quests} global quests and {conversations} global conversations")
 
 if __name__ == '__main__':
     main()
