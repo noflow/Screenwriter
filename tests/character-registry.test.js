@@ -83,8 +83,9 @@ assert.equal(run('new Set(P.characters.map(character=>character.id)).size'), 15)
 assert.equal(run("P.characters.find(character=>character.id==='elena_reyes_hale').name"),
   'Elena Reyes-Hale');
 assert.equal(run("P.content.some(item=>item.type==='quest'&&item.id==='one_last_summer_movie')"), true);
+assert.equal(run("P.content.some(item=>item.type==='quest'&&item.id==='marcus_student_film')"), true);
 assert.equal(run("P.content.some(item=>item.type==='conversation'&&item.id==='emma_alder_bay_walk')"), true);
-assert.equal(run('allTextMessages().length'), 10);
+assert.equal(run('allTextMessages().length'), 11);
 assert.equal(run('P.characterPackage.count'), 15);
 assert.equal(run('P.characterPackage.signature'), run('BUNDLED_CHARACTER_SIGNATURE'));
 

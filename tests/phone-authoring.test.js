@@ -175,10 +175,10 @@ vm.runInContext(`
   globalThis.ALIGNMENT_ERRORS=validate().filter(issue=>issue.sev==='err').map(issue=>issue.msg);
 `, context);
 
-assert.equal(context.REAL_MESSAGE_COUNT, 10);
+assert.equal(context.REAL_MESSAGE_COUNT, 11);
 assert.deepEqual(Array.from(context.REAL_MESSAGE_OWNERS), [
   'daniel_hale','elena_reyes_hale','elena_reyes_hale','emma_rowan','emma_rowan',
-  'lily_hale','lily_hale','marcus_lee','marcus_lee','rachel_morgan'
+  'lily_hale','lily_hale','marcus_lee','marcus_lee','marcus_lee','rachel_morgan'
 ]);
 for (const row of context.REAL_ROUND_TRIPS) {
   assert.deepEqual(JSON.parse(JSON.stringify(row.exported)), JSON.parse(JSON.stringify(row.source)),
