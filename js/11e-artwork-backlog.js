@@ -5,7 +5,7 @@ function artworkBacklogData(){
   const catalog=sceneDirectorPresentationCatalog();
   const backlog=catalog.backlog;
   return backlog&&typeof backlog==='object'&&!Array.isArray(backlog)
-    ?backlog:{mode:'artwork_first',audio_in_scope:false,allowed_statuses:ARTWORK_BACKLOG_STATUSES,phases:[]};
+    ?backlog:{mode:'room_art_first',active_kinds:['background'],audio_in_scope:false,allowed_statuses:ARTWORK_BACKLOG_STATUSES,phases:[]};
 }
 
 function artworkBacklogAssets(){
@@ -89,6 +89,8 @@ function artworkBacklogAssetMarkup(asset,index){
 
 function artworkBacklogMarkup(filter='all'){
   const backlog=artworkBacklogData(),summary=artworkBacklogSummary();
+  const roomFirst=backlog.mode==='room_art_first';
+  const portraitsActive=(backlog.active_kinds||[]).includes('portrait_set');
   const phaseMarkup=(backlog.phases||[]).map(phase=>{
     const assets=(phase.assets||[]).filter(asset=>artworkBacklogMatches(asset,filter));
     if(!assets.length)return '';
@@ -96,10 +98,10 @@ function artworkBacklogMarkup(filter='all'){
       '<div class="artwork-task-list">'+assets.map(artworkBacklogAssetMarkup).join('')+'</div></section>';
   }).join('');
   const filteredCount=artworkBacklogAssets().filter(({asset})=>artworkBacklogMatches(asset,filter)).length;
-  return '<div class="artwork-backlog-intro"><div><span>Artwork-first milestone plan</span><h4>'+summary.total+' prioritized assets</h4><p>Work from Priority 1 downward. Status lives in the game’s <code>vn_art.json</code>; rebuild Screenwriter after changing it.</p></div>'+
-    '<div class="artwork-summary"><span><b>'+summary.backgrounds+'</b> backgrounds</span><span><b>'+summary.portraits+'</b> portrait sets</span><span class="missing"><b>'+summary.statuses.missing+'</b> missing</span><span class="placeholder"><b>'+summary.statuses.placeholder+'</b> placeholders</span><span class="active"><b>'+(summary.statuses.in_progress+summary.statuses.review)+'</b> active</span><span class="ready"><b>'+summary.statuses.ready+'</b> ready</span></div></div>'+
+  return '<div class="artwork-backlog-intro"><div><span>'+(roomFirst?'Room-first milestone plan':'Artwork milestone plan')+'</span><h4>'+summary.total+' prioritized assets</h4><p>'+(roomFirst?'Complete each location’s base room art before producing variants. ':'Work from Priority 1 downward. ')+'Status lives in the game’s <code>vn_art.json</code>; rebuild Screenwriter after changing it.</p></div>'+
+    '<div class="artwork-summary"><span><b>'+summary.backgrounds+'</b> backgrounds</span>'+(portraitsActive?'<span><b>'+summary.portraits+'</b> portrait sets</span>':'')+'<span class="missing"><b>'+summary.statuses.missing+'</b> missing</span><span class="placeholder"><b>'+summary.statuses.placeholder+'</b> placeholders</span><span class="active"><b>'+(summary.statuses.in_progress+summary.statuses.review)+'</b> active</span><span class="ready"><b>'+summary.statuses.ready+'</b> ready</span></div></div>'+
     (phaseMarkup||'<div class="artwork-backlog-empty"><b>No tasks match this view.</b><span>'+filteredCount+' artwork tasks shown</span></div>')+
-    '<footer class="artwork-backlog-note">Audio is intentionally outside this production plan. Director remains ready for visual staging while the game is artwork-first.</footer>';
+    '<footer class="artwork-backlog-note">Character portraits and audio are intentionally outside the active room-art plan. Their existing data and assets remain available to Director.</footer>';
 }
 
 function paintArtworkBacklog(){
