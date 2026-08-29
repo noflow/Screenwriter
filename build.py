@@ -14,6 +14,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 LOCATION_MODULE = os.path.join(HERE, 'js', '02a-game-locations.js')
 CHARACTER_MODULE = os.path.join(HERE, 'js', '01a-game-characters.js')
 CONTENT_INDEX_MODULE = os.path.join(HERE, 'js', '02b-game-content-index.js')
+PRESENTATION_MODULE = os.path.join(HERE, 'js', '02c-game-presentation-assets.js')
 
 def game_location_source():
     """Find the canonical registry when the game and tool share a workspace.
@@ -167,10 +168,112 @@ def sync_game_content_index():
             f.write(generated)
     return len(index['quests']), len(index['conversations'])
 
+def game_presentation_source():
+    """Find the canonical Port Alder VN presentation manifest."""
+    configured = os.environ.get('SCENEWRIGHT_GAME_PRESENTATION', '').strip()
+    candidates = [configured] if configured else []
+    candidates.extend(os.path.abspath(os.path.join(HERE, '..', directory,
+        'content', 'presentation', 'vn_art.json')) for directory in ('testgodot', 'Testing'))
+    return next((path for path in candidates if path and os.path.isfile(path)), None)
+
+def _presentation_audio_type(entry):
+    """Normalize the runtime bus/type metadata into Director cue categories."""
+    explicit = str(entry.get('cue_type') or entry.get('type') or '').strip().lower()
+    if explicit in ('music', 'ambience', 'sfx'):
+        return explicit
+    bus = str(entry.get('bus') or '').strip().lower()
+    if bus == 'music':
+        return 'music'
+    if bus == 'ambience':
+        return 'ambience'
+    return 'sfx'
+
+def sync_game_presentation_catalog():
+    """Bundle registered VN backgrounds, variants, portraits, and audio cue ids."""
+    source = game_presentation_source()
+    if not source:
+        if not os.path.isfile(PRESENTATION_MODULE):
+            with open(PRESENTATION_MODULE, 'w', encoding='utf-8', newline='') as f:
+                f.write('const BUNDLED_PRESENTATION_ASSET_CATALOG={backgrounds:[],portraits:[],audio:[]};\n')
+        return None
+
+    with open(source, encoding='utf-8') as f:
+        package = json.load(f)
+    backgrounds = package.get('vn_backgrounds')
+    audio = package.get('vn_audio')
+    if not isinstance(backgrounds, list) or not isinstance(audio, list):
+        sys.exit(f'invalid game presentation manifest: {source}')
+
+    catalog = {
+        'format_version': 1,
+        'source_package_id': package.get('package_id', ''),
+        'backgrounds': [],
+        'portraits': [],
+        'audio': [],
+    }
+    for entry in backgrounds:
+        if not isinstance(entry, dict) or not entry.get('id'):
+            sys.exit(f'invalid background entry in game presentation manifest: {source}')
+        catalog['backgrounds'].append({
+            key: entry[key] for key in ('id', 'location', 'room', 'path', 'variants', 'credit')
+            if key in entry
+        })
+    for entry in audio:
+        if not isinstance(entry, dict) or not entry.get('id'):
+            sys.exit(f'invalid audio entry in game presentation manifest: {source}')
+        row = {key: entry[key] for key in ('id', 'path', 'bus', 'loop', 'credit') if key in entry}
+        row['cue_type'] = _presentation_audio_type(entry)
+        catalog['audio'].append(row)
+
+    character_source = game_character_source()
+    if character_source:
+        for filename in sorted(name for name in os.listdir(character_source) if name.endswith('.character')):
+            path = os.path.join(character_source, filename)
+            with open(path, encoding='utf-8') as f:
+                sheet = json.load(f)
+            character_id = sheet.get('id')
+            if not character_id:
+                continue
+            refs = sheet.get('asset_refs') if isinstance(sheet.get('asset_refs'), dict) else {}
+            for entry in refs.get('portraits', []):
+                if not isinstance(entry, dict) or not entry.get('id'):
+                    continue
+                row = {key: entry[key] for key in ('id', 'path', 'accent', 'anchor') if key in entry}
+                row['character_id'] = character_id
+                catalog['portraits'].append(row)
+            for entry in refs.get('audio', []):
+                if not isinstance(entry, dict) or not entry.get('id'):
+                    continue
+                row = {key: entry[key] for key in ('id', 'path', 'bus', 'loop', 'credit') if key in entry}
+                row['character_id'] = character_id
+                row['cue_type'] = _presentation_audio_type(entry)
+                catalog['audio'].append(row)
+
+    catalog['backgrounds'].sort(key=lambda item: item['id'])
+    catalog['portraits'].sort(key=lambda item: (item['character_id'], item['id']))
+    catalog['audio'].sort(key=lambda item: (item.get('cue_type', ''), item.get('character_id', ''), item['id']))
+    compact = json.dumps(catalog, ensure_ascii=False, separators=(',', ':')).replace('</', '<\\/')
+    signature = hashlib.sha256(compact.encode('utf-8')).hexdigest()[:16]
+    generated = (
+        '/* Generated from Port Alder VN art and character asset references by build.py.\n'
+        '   Edit the game manifest or character sheets, not this snapshot. */\n'
+        f"const BUNDLED_PRESENTATION_ASSET_SIGNATURE='{signature}';\n"
+        f'const BUNDLED_PRESENTATION_ASSET_CATALOG={compact};\n'
+    )
+    previous = None
+    if os.path.isfile(PRESENTATION_MODULE):
+        with open(PRESENTATION_MODULE, encoding='utf-8') as f:
+            previous = f.read()
+    if previous != generated:
+        with open(PRESENTATION_MODULE, 'w', encoding='utf-8', newline='') as f:
+            f.write(generated)
+    return len(catalog['backgrounds']), len(catalog['portraits']), len(catalog['audio'])
+
 def main():
     character_count = sync_game_characters()
     location_counts = sync_game_locations()
     content_counts = sync_game_content_index()
+    presentation_counts = sync_game_presentation_catalog()
     # Rebuild the manifest from the directory so a new module is picked up
     # just by dropping it in, named for where it should load.
     names = sorted(f for f in os.listdir(os.path.join(HERE, 'js')) if f.endswith('.js'))
@@ -210,6 +313,9 @@ def main():
     if content_counts:
         quests, conversations = content_counts
         print(f"  indexed {quests} global quests and {conversations} global conversations")
+    if presentation_counts:
+        backgrounds, portraits, audio = presentation_counts
+        print(f"  catalogued {backgrounds} VN backgrounds, {portraits} portraits, and {audio} audio cues")
 
 if __name__ == '__main__':
     main()

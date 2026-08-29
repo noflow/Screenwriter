@@ -21,15 +21,31 @@ load('js/00-state.js');
 load('js/01-sheets.js');
 load('js/02-places.js');
 load('js/03-schedule.js');
+load('js/02c-game-presentation-assets.js');
 load('js/11d-scene-director.js');
 load('js/17-authored-in.js');
 load('js/18-authored-out.js');
 
+const bundledCatalog = JSON.parse(run('JSON.stringify(BUNDLED_PRESENTATION_ASSET_CATALOG)'));
+assert.equal(bundledCatalog.source_package_id, 'port_alder_vn_art');
+assert.ok(bundledCatalog.backgrounds.length >= 17);
+assert.ok(bundledCatalog.portraits.length >= 15);
+
 run(`
   function plannedSceneEffects(){ return []; }
+  BUNDLED_PRESENTATION_ASSET_CATALOG.backgrounds.push({
+    id:'test_cafe.window_table',path:'res://assets/art/backgrounds/test_cafe/window_table.webp',
+    variants:{rain:'res://assets/art/backgrounds/test_cafe/window_table_rain.webp'}
+  });
+  BUNDLED_PRESENTATION_ASSET_CATALOG.audio.push(
+    {id:'quiet_piano',path:'res://assets/audio/music/quiet_piano.ogg',bus:'Music',cue_type:'music'},
+    {id:'window_rain',path:'res://assets/audio/ambience/window_rain.ogg',bus:'Ambience',cue_type:'ambience'},
+    {id:'cup_down',path:'res://assets/audio/sfx/cup_down.ogg',bus:'UI',cue_type:'sfx'}
+  );
   P={
     characters:[{id:'test_npc',name:'Test NPC',display_name:'Test NPC',color:'#98bda8',
-      asset_refs:{portraits:[{id:'default'},{id:'smile'}]}}],
+      asset_refs:{portraits:[{id:'default'},{id:'smile'}],
+        audio:[{id:'npc_chime',path:'res://assets/audio/sfx/npc_chime.ogg',bus:'UI'}]}}],
     locations:[{id:'test_cafe',name:'Test Café',district:'test',tags:['package'],
       rooms:[{id:'window_table',name:'Window Table'}]}],
     content:[],districts:[],travel:null,aliases:{},dismissedBundledCharacters:[],
@@ -78,6 +94,31 @@ assert.equal(exported.nodes.opening.future_runtime_field, 17,
   'unknown dialogue-node fields must survive a round trip');
 assert.equal(Object.hasOwn(exported.nodes.opening, 'sfx'), false,
   'clearing a modeled cue must remove the imported value');
+
+run([
+  "const cueEntry={node:{speaker:'test_npc'}};",
+  "globalThis.CATALOG_RESULT=JSON.stringify({",
+  "background:sceneDirectorBackgroundAsset('test_cafe.window_table')?.id,",
+  "variants:sceneDirectorVariantAssets('test_cafe.window_table').map(item=>item.id),",
+  "portraits:sceneDirectorPortraitAssets(cueEntry).map(item=>item.id),",
+  "music:sceneDirectorAudioAssets('music',null).map(item=>item.id),",
+  "ambience:sceneDirectorAudioAssets('ambience',null).map(item=>item.id),",
+  "sfx:sceneDirectorAudioAssets('sfx',cueEntry).map(item=>item.id),",
+  "known:sceneDirectorAssetControl('Music','quiet_piano','music','stage','music',cueEntry,'test_cafe.window_table','Inherit'),",
+  "custom:sceneDirectorAssetControl('Music','typo_theme','music','stage','music',cueEntry,'test_cafe.window_table','Inherit')",
+  "});"
+].join('\n'));
+const catalog = JSON.parse(context.CATALOG_RESULT);
+assert.equal(catalog.background, 'test_cafe.window_table');
+assert.deepEqual(catalog.variants, ['rain']);
+assert.deepEqual(catalog.portraits, ['default','smile']);
+assert.deepEqual(catalog.music, ['quiet_piano']);
+assert.deepEqual(catalog.ambience, ['window_rain']);
+assert.deepEqual(catalog.sfx, ['cup_down','npc_chime']);
+assert.match(catalog.known, /quiet_piano[^]*selected/);
+assert.match(catalog.known, /Registered music/);
+assert.match(catalog.custom, /value="__custom__" selected/);
+assert.match(catalog.custom, /verify it in the game asset catalog/);
 
 run(`
   P.content=[{uid:'branching',type:'conversation',id:'branching',title:'Branching',cast:['test_npc'],

@@ -110,6 +110,119 @@ function sceneDirectorCharacterColor(character){
   return character?.color||character?.asset_refs?.portraits?.[0]?.accent||'#8db9da';
 }
 
+function sceneDirectorPresentationCatalog(){
+  return typeof BUNDLED_PRESENTATION_ASSET_CATALOG!=='undefined'&&
+    BUNDLED_PRESENTATION_ASSET_CATALOG&&typeof BUNDLED_PRESENTATION_ASSET_CATALOG==='object'
+    ?BUNDLED_PRESENTATION_ASSET_CATALOG:{backgrounds:[],portraits:[],audio:[]};
+}
+
+function sceneDirectorAudioType(asset){
+  const explicit=String(asset?.cue_type||asset?.type||'').toLowerCase();
+  if(['music','ambience','sfx'].includes(explicit))return explicit;
+  const bus=String(asset?.bus||'').toLowerCase();
+  return bus==='music'?'music':bus==='ambience'?'ambience':'sfx';
+}
+
+function sceneDirectorUniqueAssets(rows){
+  const seen=new Set();
+  return rows.filter(item=>{
+    const id=String(item?.id||'');
+    if(!id||seen.has(id))return false;
+    seen.add(id);return true;
+  }).sort((a,b)=>String(a.id).localeCompare(String(b.id)));
+}
+
+function sceneDirectorPortraitAssets(entry){
+  const characterId=entry?.node?.speaker||'';
+  if(!characterId||['player','__player__','__narrator__'].includes(characterId))return [];
+  const catalog=sceneDirectorPresentationCatalog();
+  const bundled=(catalog.portraits||[]).filter(item=>item.character_id===characterId);
+  const live=Array.isArray(chr(characterId)?.asset_refs?.portraits)
+    ?chr(characterId).asset_refs.portraits.map(item=>Object.assign({character_id:characterId},item)):[];
+  return sceneDirectorUniqueAssets(live.concat(bundled));
+}
+
+function sceneDirectorAudioAssets(kind,entry){
+  const catalog=sceneDirectorPresentationCatalog();
+  const characterId=entry?.node?.speaker||'';
+  const allowedOwner=item=>!item.character_id||(characterId&&item.character_id===characterId);
+  const bundled=(catalog.audio||[]).filter(item=>allowedOwner(item)&&sceneDirectorAudioType(item)===kind);
+  const character=characterId?chr(characterId):null;
+  const live=Array.isArray(character?.asset_refs?.audio)
+    ?character.asset_refs.audio.map(item=>Object.assign({character_id:characterId},item))
+      .filter(item=>sceneDirectorAudioType(item)===kind):[];
+  return sceneDirectorUniqueAssets(live.concat(bundled));
+}
+
+function sceneDirectorBackgroundAsset(location){
+  return (sceneDirectorPresentationCatalog().backgrounds||[]).find(item=>item.id===location)||null;
+}
+
+function sceneDirectorVariantAssets(location){
+  const variants=sceneDirectorBackgroundAsset(location)?.variants;
+  return variants&&typeof variants==='object'&&!Array.isArray(variants)
+    ?Object.keys(variants).sort().map(id=>({id,path:variants[id]})):[];
+}
+
+function sceneDirectorAssetEntries(kind,entry,location){
+  if(kind==='portrait')return sceneDirectorPortraitAssets(entry);
+  if(kind==='background_variant')return sceneDirectorVariantAssets(location);
+  return sceneDirectorAudioAssets(kind,entry);
+}
+
+function sceneDirectorAssetNoun(kind,count=1){
+  const labels={
+    portrait:['portrait','portraits'],
+    background_variant:['background variant','background variants'],
+    music:['music cue','music cues'],
+    ambience:['ambience cue','ambience cues'],
+    sfx:['sound effect','sound effects']
+  };
+  const pair=labels[kind]||[pretty(kind),pretty(kind)+'s'];
+  return pair[count===1?0:1];
+}
+
+function sceneDirectorAssetStatus(kind,current,assets,location){
+  const registered=assets.find(item=>item.id===current);
+  if(current==='stop'||current==='silence')
+    return {state:'registered',text:'Runtime stop / silence cue'};
+  if(registered){
+    const owner=registered.character_id?' · '+(chr(registered.character_id)?.name||pretty(registered.character_id)):'';
+    return {state:'registered',text:'Registered '+sceneDirectorAssetNoun(kind)+owner+(registered.path?' · '+registered.path:'')};
+  }
+  if(current){
+    const subject=kind==='background_variant'?'variant':kind==='portrait'?'portrait':'audio cue';
+    return {state:'custom',text:'Custom '+subject+' · verify it in the game asset catalog before export'};
+  }
+  if(kind==='background_variant'&&!sceneDirectorBackgroundAsset(location))
+    return {state:'fallback',text:'This room uses the game fallback background'};
+  return {state:assets.length?'ready':'empty',text:assets.length+
+    ' registered '+sceneDirectorAssetNoun(kind,assets.length)+' available'};
+}
+
+function sceneDirectorBackgroundStatus(location){
+  const asset=sceneDirectorBackgroundAsset(location);
+  return asset
+    ?'<small class="scene-asset-status registered">Registered background · '+esc(asset.path||asset.id)+'</small>'
+    :'<small class="scene-asset-status fallback">Runtime fallback · add this room to vn_art.json for unique art</small>';
+}
+
+function sceneDirectorAssetControl(label,current,kind,scope,field,entry,location,emptyLabel){
+  const assets=sceneDirectorAssetEntries(kind,entry,location),known=assets.some(item=>item.id===current);
+  const builtin=['music','ambience','sfx'].includes(kind)&&['stop','silence'].includes(current);
+  const custom=Boolean(current)&&!known&&!builtin;
+  const status=sceneDirectorAssetStatus(kind,current,assets,location);
+  const options='<option value=""'+(!current?' selected':'')+'>'+esc(emptyLabel)+'</option>'+
+    (['music','ambience','sfx'].includes(kind)?'<option value="stop"'+(current==='stop'||current==='silence'?' selected':'')+'>Stop / silence</option>':'')+
+    assets.map(item=>'<option value="'+esc(item.id)+'"'+(item.id===current?' selected':'')+'>'+esc(item.id)+
+      (item.character_id?' · '+esc(chr(item.character_id)?.name||pretty(item.character_id)):'')+'</option>').join('')+
+    '<option value="__custom__"'+(custom?' selected':'')+'>Custom id…</option>';
+  return '<div class="field scene-asset-field" data-scene-asset-control><label>'+esc(label)+'</label>'+
+    '<select data-scene-asset-select data-scene-asset-scope="'+scope+'" data-scene-asset-key="'+field+'">'+options+'</select>'+
+    '<input type="text" data-scene-asset-custom value="'+esc(custom?current:'')+'" placeholder="Custom '+esc(pretty(kind).toLowerCase())+' id"'+(custom?'':' hidden')+'>'+
+    '<small class="scene-asset-status '+status.state+'" data-scene-asset-status>'+esc(status.text)+'</small></div>';
+}
+
 function sceneDirectorCharacterOptions(conversation){
   const ids=[...(conversation.cast||[])];
   sceneDirectorLines(conversation).forEach(({node})=>{
@@ -126,16 +239,6 @@ function sceneDirectorTransitionOptions(current,inheritLabel='Inherit scene'){
 function sceneDirectorPositionOptions(current){
   return SCENE_DIRECTOR_POSITIONS.map((value,index)=>'<option value="'+esc(value)+'"'+
     (value===current?' selected':'')+'>'+esc(index?'Portrait '+pretty(value):'Automatic position')+'</option>').join('');
-}
-
-function sceneDirectorPortraitOptions(entry){
-  const character=chr(entry?.node?.speaker),current=normalizeLineStage(entry.node).portrait||'';
-  const portraits=Array.isArray(character?.asset_refs?.portraits)?character.asset_refs.portraits:[];
-  const known=portraits.some(item=>item.id===current);
-  return '<option value=""'+(!current?' selected':'')+'>Automatic / default</option>'+
-    (current&&!known?'<option value="'+esc(current)+'" selected>Custom · '+esc(current)+'</option>':'')+
-    portraits.map(item=>'<option value="'+esc(item.id||'default')+'"'+
-      ((item.id||'default')===current?' selected':'')+'>'+esc(pretty(item.id||'default'))+'</option>').join('');
 }
 
 function sceneDirectorCueLabel(entry,index){
@@ -207,18 +310,18 @@ function paintSceneDirector(){
     '<aside class="scene-cue-list"><header><b>Cue sheet</b><span>'+lines.length+' line'+(lines.length===1?'':'s')+'</span></header>'+lines.map(sceneDirectorCueLabel).join('')+'</aside>'+
     '<main class="scene-director-main"><section class="scene-director-preview" id="sceneDirectorPreview">'+sceneDirectorPreviewMarkup()+'</section>'+
     '<div class="scene-director-step"><button class="btn" data-scene-step="-1"'+(lineIndex<=0?' disabled':'')+'>← Previous cue</button><span>'+(lines.length?lineIndex+1:0)+' / '+lines.length+'</span><button class="btn" data-scene-step="1"'+(lineIndex>=lines.length-1?' disabled':'')+'>Next cue →</button></div></main>'+
-    '<aside class="scene-director-controls"><section><h4>Scene</h4><div class="field"><label>Background / room</label><select data-scene-base="location">'+placeOptions(conversation.location)+'</select></div>'+
-    '<div class="two"><div class="field"><label>Opening transition</label><select data-scene-direction="transition">'+sceneDirectorTransitionOptions(direction.transition,'Runtime default')+'</select></div><div class="field"><label>Music cue</label><input type="text" data-scene-direction="music" value="'+esc(direction.music)+'" placeholder="track id"></div></div>'+
-    '<div class="field"><label>Ambience</label><input type="text" data-scene-direction="ambience" value="'+esc(direction.ambience)+'" placeholder="rain, café room tone, traffic…"></div>'+
+    '<aside class="scene-director-controls"><section><h4>Scene</h4><div class="field"><label>Background / room</label><select data-scene-base="location">'+placeOptions(conversation.location)+'</select>'+sceneDirectorBackgroundStatus(conversation.location)+'</div>'+
+    '<div class="two"><div class="field"><label>Opening transition</label><select data-scene-direction="transition">'+sceneDirectorTransitionOptions(direction.transition,'Runtime default')+'</select></div>'+sceneDirectorAssetControl('Music cue',direction.music,'music','direction','music',null,conversation.location,'Runtime default')+'</div>'+
+    sceneDirectorAssetControl('Ambience',direction.ambience,'ambience','direction','ambience',null,conversation.location,'Runtime default')+
     '<div class="field"><label>Director notes</label><textarea data-scene-direction="notes" placeholder="Lighting, pacing, camera, or performance notes">'+esc(direction.notes)+'</textarea></div></section>'+
     (entry?'<section><div class="scene-director-section-head"><h4>Selected cue</h4><button data-scene-reset>Clear overrides</button></div>'+
       '<div class="scene-line-summary"><b>'+esc(chr(entry.node.speaker)?.name||pretty(entry.node.speaker))+'</b><span>'+esc(entry.node.text||'Empty dialogue line')+'</span></div>'+
-      '<div class="two"><div class="field"><label>Expression</label><input type="text" list="sceneDirectorExpressions" data-scene-line="emotion" value="'+esc(expression)+'" placeholder="neutral"></div><div class="field"><label>Portrait</label><select data-scene-stage="portrait">'+sceneDirectorPortraitOptions(entry)+'</select></div></div>'+
+      '<div class="two"><div class="field"><label>Expression</label><input type="text" list="sceneDirectorExpressions" data-scene-line="emotion" value="'+esc(expression)+'" placeholder="neutral"></div>'+sceneDirectorAssetControl('Portrait',stage.portrait,'portrait','stage','portrait',entry,conversation.location,'Automatic / default')+'</div>'+
       '<datalist id="sceneDirectorExpressions">'+SCENE_DIRECTOR_EXPRESSIONS.map(value=>'<option value="'+esc(value)+'"></option>').join('')+'</datalist>'+
       '<div class="two"><div class="field"><label>Position</label><select data-scene-stage="position">'+sceneDirectorPositionOptions(stage.position)+'</select></div><div class="field"><label>Transition</label><select data-scene-stage="transition">'+sceneDirectorTransitionOptions(stage.transition)+'</select></div></div>'+
-      '<div class="field"><label>Background variant</label><input type="text" data-scene-stage="background_variant" value="'+esc(stage.background_variant)+'" placeholder="inherit · night · rain"></div>'+
-      '<div class="two"><div class="field"><label>Music override</label><input type="text" data-scene-stage="music" value="'+esc(stage.music)+'" placeholder="inherit"></div><div class="field"><label>Ambience override</label><input type="text" data-scene-stage="ambience" value="'+esc(stage.ambience)+'" placeholder="inherit"></div></div>'+
-      '<div class="field"><label>Sound effect</label><input type="text" data-scene-stage="sfx" value="'+esc(stage.sfx)+'" placeholder="door_close, phone_buzz…"></div>'+
+      sceneDirectorAssetControl('Background variant',stage.background_variant,'background_variant','stage','background_variant',entry,conversation.location,'Inherit main background')+
+      '<div class="two">'+sceneDirectorAssetControl('Music override',stage.music,'music','stage','music',entry,conversation.location,'Inherit scene')+sceneDirectorAssetControl('Ambience override',stage.ambience,'ambience','stage','ambience',entry,conversation.location,'Inherit scene')+'</div>'+
+      sceneDirectorAssetControl('Sound effect',stage.sfx,'sfx','stage','sfx',entry,conversation.location,'No sound effect')+
       '<p class="scene-runtime-note"><b>Live in Port Alder:</b> portrait, expression-matched poses, position, background variants, transitions, music, ambience, and SFX. Missing optional audio cues stay silent.</p></section>':'<section class="scene-director-empty">Write a line before adding cue direction.</section>')+'</aside></div>';
   wireSceneDirector();
 }
@@ -233,7 +336,7 @@ function wireSceneDirector(){
     const next=lines[index+Number(button.dataset.sceneStep)];if(next){sceneDirectorPath=next.key;paintSceneDirector();}
   });
   $('sceneDirectorBody').querySelectorAll('[data-scene-base]').forEach(control=>control.onchange=()=>{
-    conversation[control.dataset.sceneBase]=control.value;save();renderSceneDirectorPreview();
+    conversation[control.dataset.sceneBase]=control.value;save();paintSceneDirector();
   });
   $('sceneDirectorBody').querySelectorAll('[data-scene-direction]').forEach(control=>{
     const update=()=>{normalizeSceneDirection(conversation)[control.dataset.sceneDirection]=control.value;save();renderSceneDirectorPreview();};
@@ -246,6 +349,38 @@ function wireSceneDirector(){
   $('sceneDirectorBody').querySelectorAll('[data-scene-line]').forEach(control=>{
     const update=()=>{entry.node[control.dataset.sceneLine]=control.value.trim().toLowerCase();save();renderSceneDirectorPreview();};
     control.oninput=update;control.onchange=update;
+  });
+  $('sceneDirectorBody').querySelectorAll('[data-scene-asset-select]').forEach(control=>{
+    control.onchange=()=>{
+      const wrapper=control.closest('[data-scene-asset-control]');
+      const custom=wrapper.querySelector('[data-scene-asset-custom]');
+      const owner=control.dataset.sceneAssetScope==='direction'
+        ?normalizeSceneDirection(conversation):normalizeLineStage(entry.node);
+      const key=control.dataset.sceneAssetKey;
+      if(control.value==='__custom__'){
+        const status=wrapper.querySelector('[data-scene-asset-status]');
+        owner[key]='';custom.value='';custom.hidden=false;
+        status.className='scene-asset-status custom';status.textContent='Enter a custom asset id';
+        save();renderSceneDirectorPreview();custom.focus();
+        return;
+      }
+      owner[key]=control.value;save();paintSceneDirector();
+    };
+  });
+  $('sceneDirectorBody').querySelectorAll('[data-scene-asset-custom]').forEach(control=>{
+    const wrapper=control.closest('[data-scene-asset-control]');
+    const select=wrapper.querySelector('[data-scene-asset-select]');
+    const status=wrapper.querySelector('[data-scene-asset-status]');
+    const update=()=>{
+      const owner=select.dataset.sceneAssetScope==='direction'
+        ?normalizeSceneDirection(conversation):normalizeLineStage(entry.node);
+      owner[select.dataset.sceneAssetKey]=control.value.trim();
+      status.className='scene-asset-status custom';
+      status.textContent=control.value.trim()
+        ?'Custom cue · verify it in the game asset catalog before export':'Enter a custom asset id';
+      save();renderSceneDirectorPreview();
+    };
+    control.oninput=update;control.onchange=()=>{update();paintSceneDirector();};
   });
   const reset=$('sceneDirectorBody').querySelector('[data-scene-reset]');
   if(reset)reset.onclick=()=>{entry.node.stage={};save();paintSceneDirector();};

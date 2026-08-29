@@ -7,6 +7,7 @@
  "js/02a-game-locations.js",
  "js/02b-game-content-index.js",
  "js/02b-world-builder.js",
+ "js/02c-game-presentation-assets.js",
  "js/03-schedule.js",
  "js/04-ollama.js",
  "js/05-tree.js",

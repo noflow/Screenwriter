@@ -93,6 +93,14 @@ Missing optional audio assets remain safely silent until their files are added.
 Imported unknown presentation and dialogue-node fields are merged back on export so
 opening a scene in the Director never strips newer game metadata.
 
+**build.py** also creates a portable presentation catalog from the neighboring
+Godot project's content/presentation/vn_art.json and every character's asset_refs.
+The Director uses that catalog for background coverage, portrait, variant, music,
+ambience, and sound-effect selectors. Registered ids are clearly identified;
+choosing **Custom id…** remains available for assets being authored, and unresolved
+custom values stay visibly marked until the game catalog contains them. Set
+SCENEWRIGHT_GAME_PRESENTATION when the game checkout is not beside Screenwriter.
+
 The project toolbar’s **Build** button creates deployable Port Alder content packages.
 It can include the complete character/world set or only files that differ from the
 built-in game snapshot. A preflight report blocks broken references, lists warnings,
@@ -135,7 +143,7 @@ Run the focused state/player and quest-workshop regression checks with:
     manifest.json       load order (regenerate by sorting js/ filenames)
     _markup.html        shared markup template with @@CSS@@ / @@JS@@ slots
     css/app.css         all styles
-    js/                 52 modules, loaded in filename order
+    js/                 53 modules, loaded in filename order
 
 ## The modules
 
@@ -148,6 +156,7 @@ Numeric prefixes are load order, not importance.
     02-places           location package, rooms, district grouping, safe project refresh
     02a-game-locations  generated snapshot of the canonical Port Alder registry
     02b-game-content-index generated ids for game-owned quests and conversations
+    02c-game-presentation-assets generated backgrounds, variants, portraits, and audio ids
     02b-world-builder   custom stats plus a location-and-rooms creator
     03-schedule         grid <-> fixed_commitments, availability
     04-ollama           engines (Ollama, Pawan.Krd, any OpenAI-compatible), model list
