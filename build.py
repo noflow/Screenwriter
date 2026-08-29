@@ -189,12 +189,12 @@ def _presentation_audio_type(entry):
     return 'sfx'
 
 def sync_game_presentation_catalog():
-    """Bundle registered VN backgrounds, variants, portraits, and audio cue ids."""
+    """Bundle registered VN assets, shared vocabulary, and the production backlog."""
     source = game_presentation_source()
     if not source:
         if not os.path.isfile(PRESENTATION_MODULE):
             with open(PRESENTATION_MODULE, 'w', encoding='utf-8', newline='') as f:
-                f.write('const BUNDLED_PRESENTATION_ASSET_CATALOG={backgrounds:[],portraits:[],audio:[],vocabulary:{background_variants:[],portrait_expressions:[]}};\n')
+                f.write('const BUNDLED_PRESENTATION_ASSET_CATALOG={backgrounds:[],portraits:[],audio:[],vocabulary:{background_variants:[],portrait_expressions:[]},backlog:{phases:[]}};\n')
         return None
 
     with open(source, encoding='utf-8') as f:
@@ -212,6 +212,9 @@ def sync_game_presentation_catalog():
             not isinstance(entry, dict) or not entry.get('id') or not entry.get('label') for entry in entries
         ):
             sys.exit(f'invalid {vocabulary_name} vocabulary in game presentation manifest: {source}')
+    backlog = package.get('production_backlog')
+    if not isinstance(backlog, dict) or not isinstance(backlog.get('phases'), list):
+        sys.exit(f'invalid artwork production backlog in game presentation manifest: {source}')
 
     catalog = {
         'format_version': 1,
@@ -226,14 +229,19 @@ def sync_game_presentation_catalog():
             ]
             for name in ('background_variants', 'portrait_expressions')
         },
+        'backlog': backlog,
     }
     for entry in backgrounds:
         if not isinstance(entry, dict) or not entry.get('id'):
             sys.exit(f'invalid background entry in game presentation manifest: {source}')
-        catalog['backgrounds'].append({
+        row = {
             key: entry[key] for key in ('id', 'location', 'room', 'path', 'variants', 'credit')
             if key in entry
-        })
+        }
+        row['asset_status'] = entry.get('status') or (
+            'placeholder' if 'placeholder' in str(entry.get('credit', '')).lower() else 'registered'
+        )
+        catalog['backgrounds'].append(row)
     for entry in audio:
         if not isinstance(entry, dict) or not entry.get('id'):
             sys.exit(f'invalid audio entry in game presentation manifest: {source}')
@@ -256,6 +264,9 @@ def sync_game_presentation_catalog():
                     continue
                 row = {key: entry[key] for key in ('id', 'path', 'accent', 'anchor') if key in entry}
                 row['character_id'] = character_id
+                row['asset_status'] = entry.get('status') or (
+                    'placeholder' if '_fallback_portrait' in str(entry.get('path', '')) else 'registered'
+                )
                 catalog['portraits'].append(row)
             for entry in refs.get('audio', []):
                 if not isinstance(entry, dict) or not entry.get('id'):
@@ -287,6 +298,8 @@ def sync_game_presentation_catalog():
         len(catalog['backgrounds']), len(catalog['portraits']), len(catalog['audio']),
         len(catalog['vocabulary']['background_variants']),
         len(catalog['vocabulary']['portrait_expressions']),
+        len(catalog['backlog']['phases']),
+        sum(len(phase.get('assets', [])) for phase in catalog['backlog']['phases'] if isinstance(phase, dict)),
     )
 
 def main():
@@ -334,9 +347,10 @@ def main():
         quests, conversations = content_counts
         print(f"  indexed {quests} global quests and {conversations} global conversations")
     if presentation_counts:
-        backgrounds, portraits, audio, variants, expressions = presentation_counts
+        backgrounds, portraits, audio, variants, expressions, art_phases, art_assets = presentation_counts
         print(f"  catalogued {backgrounds} VN backgrounds, {portraits} portraits, and {audio} audio cues")
         print(f"  standardized {variants} planned variants and {expressions} portrait expressions")
+        print(f"  prioritized {art_assets} artwork tasks across {art_phases} production phases")
 
 if __name__ == '__main__':
     main()

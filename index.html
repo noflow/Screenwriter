@@ -23,6 +23,7 @@
     <div class="mast-group mast-tools" aria-label="Project tools">
       <button class="btn quiet" id="openEnsembleArcs">Arcs</button>
       <button class="btn quiet" id="openSceneDirector" title="Stage dialogue, portraits, backgrounds, and sound cues">Director</button>
+      <button class="btn quiet" id="openArtworkBacklog" title="Review the prioritized game artwork queue">Artwork</button>
       <button class="btn quiet" id="openScheduleWorkshop">Schedules</button>
       <button class="btn quiet" id="openMap">Map</button>
       <button class="btn quiet" id="openInspect">Inspect</button>
@@ -521,6 +522,23 @@
   <div class="sheet-body scene-director-body" id="sceneDirectorBody"></div>
 </dialog>
 
+<dialog id="artworkBacklog" aria-labelledby="artworkBacklogTitle">
+  <div class="sheet-head artwork-backlog-head">
+    <div><span class="artwork-backlog-kicker">Game-owned production plan</span><h3 id="artworkBacklogTitle">Artwork Backlog</h3></div>
+    <label>Show <select id="artworkBacklogFilter" aria-label="Filter artwork backlog">
+      <option value="all">All artwork</option>
+      <option value="needs_art">Missing and placeholders</option>
+      <option value="background">Backgrounds</option>
+      <option value="portrait_set">Portrait sets</option>
+      <option value="active">In progress and review</option>
+      <option value="ready">Ready</option>
+    </select></label>
+    <span class="sp"></span>
+    <button class="btn" id="artworkBacklogClose">Done</button>
+  </div>
+  <div class="sheet-body artwork-backlog-body" id="artworkBacklogBody"></div>
+</dialog>
+
 <dialog id="roomMapEditor">
   <div class="sheet-head">
     <h3 id="roomMapTitle">Room map</h3>
@@ -662,6 +680,7 @@
 <script src="js/11b-relationship-arc.js"></script>
 <script src="js/11c-ensemble-arc.js"></script>
 <script src="js/11d-scene-director.js"></script>
+<script src="js/11e-artwork-backlog.js"></script>
 <script src="js/12-conditions.js"></script>
 <script src="js/13-routes.js"></script>
 <script src="js/14-graph.js"></script>

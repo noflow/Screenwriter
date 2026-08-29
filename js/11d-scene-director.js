@@ -114,7 +114,7 @@ function sceneDirectorPresentationCatalog(){
   return typeof BUNDLED_PRESENTATION_ASSET_CATALOG!=='undefined'&&
     BUNDLED_PRESENTATION_ASSET_CATALOG&&typeof BUNDLED_PRESENTATION_ASSET_CATALOG==='object'
     ?BUNDLED_PRESENTATION_ASSET_CATALOG:{backgrounds:[],portraits:[],audio:[],
-      vocabulary:{background_variants:[],portrait_expressions:[]}};
+      vocabulary:{background_variants:[],portrait_expressions:[]},backlog:{phases:[]}};
 }
 
 function sceneDirectorAudioType(asset){

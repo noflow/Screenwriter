@@ -145,7 +145,7 @@ Run the focused state/player and quest-workshop regression checks with:
     manifest.json       load order (regenerate by sorting js/ filenames)
     _markup.html        shared markup template with @@CSS@@ / @@JS@@ slots
     css/app.css         all styles
-    js/                 53 modules, loaded in filename order
+    js/                 54 modules, loaded in filename order
 
 ## The modules
 
@@ -158,7 +158,7 @@ Numeric prefixes are load order, not importance.
     02-places           location package, rooms, district grouping, safe project refresh
     02a-game-locations  generated snapshot of the canonical Port Alder registry
     02b-game-content-index generated ids for game-owned quests and conversations
-    02c-game-presentation-assets generated backgrounds, variants, portraits, and audio ids
+    02c-game-presentation-assets generated backgrounds, portraits, visual vocabulary, and artwork backlog
     02b-world-builder   custom stats plus a location-and-rooms creator
     03-schedule         grid <-> fixed_commitments, availability
     04-ollama           engines (Ollama, Pawan.Krd, any OpenAI-compatible), model list
@@ -188,6 +188,7 @@ Numeric prefixes are load order, not importance.
     11b-relationship-arc flexible-length character story planning and quest readiness
     11c-ensemble-arc   multi-character graph planning, draft VN playtests, scaffolding
     11d-scene-director visual dialogue cue sheet, staging controls, and live VN preview
+    11e-artwork-backlog prioritized production phases and live placeholder/registration checks
     12-conditions       condition rows and evaluation
     13-routes           route enumeration, the walker
     14-graph            flow diagrams
