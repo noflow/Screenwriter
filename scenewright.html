@@ -8623,8 +8623,7 @@ function sceneDirectionToAuthored(direction,source){
   return Object.keys(out).length?out:undefined;
 }
 
-/** Node cues are direct game fields. Portrait and background_variant already render
-    in Port Alder; the remaining cues are forward-compatible direction metadata. */
+/** Node cues are direct game fields rendered by Port Alder's VN presentation layer. */
 function lineStageFromAuthored(node){
   if(!node||typeof node!=='object')return undefined;
   const hasCue=SCENE_DIRECTOR_NODE_FIELDS.some(key=>Object.prototype.hasOwnProperty.call(node,key));
@@ -8795,7 +8794,7 @@ function paintSceneDirector(){
       '<div class="field"><label>Background variant</label><input type="text" data-scene-stage="background_variant" value="'+esc(stage.background_variant)+'" placeholder="inherit · night · rain"></div>'+
       '<div class="two"><div class="field"><label>Music override</label><input type="text" data-scene-stage="music" value="'+esc(stage.music)+'" placeholder="inherit"></div><div class="field"><label>Ambience override</label><input type="text" data-scene-stage="ambience" value="'+esc(stage.ambience)+'" placeholder="inherit"></div></div>'+
       '<div class="field"><label>Sound effect</label><input type="text" data-scene-stage="sfx" value="'+esc(stage.sfx)+'" placeholder="door_close, phone_buzz…"></div>'+
-      '<p class="scene-runtime-note"><b>Live now:</b> portrait and background variant. Position, transitions, music, ambience, and SFX are saved as runtime-ready cues for the next presentation pass.</p></section>':'<section class="scene-director-empty">Write a line before adding cue direction.</section>')+'</aside></div>';
+      '<p class="scene-runtime-note"><b>Live in Port Alder:</b> portrait, expression-matched poses, position, background variants, transitions, music, ambience, and SFX. Missing optional audio cues stay silent.</p></section>':'<section class="scene-director-empty">Write a line before adding cue direction.</section>')+'</aside></div>';
   wireSceneDirector();
 }
 

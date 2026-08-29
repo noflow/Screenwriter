@@ -87,8 +87,9 @@ every authored conversation. Its cue sheet includes dialogue inside every branch
 with a live 16:10 preview, background/room selection, expressions, portrait variants,
 left/center/right/offstage placement, transitions, music, ambience, sound effects,
 and freeform direction notes. A **direct** control on each dialogue line opens that
-exact cue. Port Alder currently renders the authored portrait and background variant;
-the remaining cues are retained as forward-compatible runtime presentation fields.
+exact cue. Port Alder renders the authored portrait, expression-matched pose,
+position, background variant, transition, music, ambience, and sound-effect cues.
+Missing optional audio assets remain safely silent until their files are added.
 Imported unknown presentation and dialogue-node fields are merged back on export so
 opening a scene in the Director never strips newer game metadata.
 
