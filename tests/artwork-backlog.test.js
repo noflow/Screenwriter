@@ -24,18 +24,18 @@ const backlog = JSON.parse(run('JSON.stringify(artworkBacklogData())'));
 assert.equal(backlog.mode, 'room_art_first');
 assert.deepEqual(backlog.active_kinds, ['background']);
 assert.equal(backlog.room_scope.policy, 'all_mapped_rooms');
-assert.equal(backlog.room_scope.completed_locations.length, 45);
+assert.equal(backlog.room_scope.completed_locations.length, 46);
 assert.equal(backlog.audio_in_scope, false);
-assert.equal(backlog.phases.length, 39);
+assert.equal(backlog.phases.length, 40);
 assert.equal(backlog.phases[0].id, 'opening_morning');
 assert.equal(backlog.phases[0].priority, 1);
 
 const summary = JSON.parse(run('JSON.stringify(artworkBacklogSummary())'));
 assert.deepEqual(summary, {
-  total:259,
-  backgrounds:259,
+  total:264,
+  backgrounds:264,
   portraits:0,
-  statuses:{missing:0,placeholder:0,in_progress:223,review:0,ready:36}
+  statuses:{missing:0,placeholder:0,in_progress:228,review:0,ready:36}
 });
 
 run(`
@@ -81,7 +81,8 @@ run(`
     rachelTownhouse:artworkBacklogResolution(allArtwork.find(item=>item.id==='rachel_cedar_vale_townhouse.front_door')),
     cedarTownhouses:artworkBacklogResolution(allArtwork.find(item=>item.id==='cedar_vale_townhouses.entry')),
     cedarDetached:artworkBacklogResolution(allArtwork.find(item=>item.id==='cedar_vale_detached_homes.foyer')),
-    cedarCareHome:artworkBacklogResolution(allArtwork.find(item=>item.id==='cedar_vale_care_home.reception'))
+    cedarCareHome:artworkBacklogResolution(allArtwork.find(item=>item.id==='cedar_vale_care_home.reception')),
+    cedarFamilyCentre:artworkBacklogResolution(allArtwork.find(item=>item.id==='cedar_vale_family_centre.reception'))
   });
   globalThis.ALL_MARKUP=artworkBacklogMarkup('all');
   globalThis.BG_MARKUP=artworkBacklogMarkup('background');
@@ -131,8 +132,9 @@ assert.equal(resolutions.rachelTownhouse.state, 'registered');
 assert.equal(resolutions.cedarTownhouses.state, 'registered');
 assert.equal(resolutions.cedarDetached.state, 'registered');
 assert.equal(resolutions.cedarCareHome.state, 'registered');
+assert.equal(resolutions.cedarFamilyCentre.state, 'registered');
 assert.match(context.ALL_MARKUP, /Opening Morning at Hale Home/);
-assert.match(context.ALL_MARKUP, /259 prioritized assets/);
+assert.match(context.ALL_MARKUP, /264 prioritized assets/);
 assert.match(context.ALL_MARKUP, /Room-first milestone plan/);
 assert.doesNotMatch(context.ALL_MARKUP, /portrait set/);
 assert.match(context.ALL_MARKUP, /Character portraits and audio are intentionally outside the active room-art plan/);
@@ -213,6 +215,8 @@ assert.match(context.ACTIVE_MARKUP, /Cedar Vale Detached Homes Purchase, Rental,
 assert.match(context.ACTIVE_MARKUP, /Cedar Vale Detached Homes · Garage/);
 assert.match(context.ACTIVE_MARKUP, /Cedar Vale Care Home Work, Visits, and Resident-Life Route/);
 assert.match(context.ACTIVE_MARKUP, /Cedar Vale Care Home · Care Station/);
+assert.match(context.ACTIVE_MARKUP, /Cedar Vale Family Centre Childcare, Parenting, and Support Route/);
+assert.match(context.ACTIVE_MARKUP, /Cedar Vale Family Centre · Parent Group Room/);
 assert.match(context.READY_MARKUP, /8 tasks/);
 assert.match(context.READY_MARKUP, /Harbor Employment Centre · Interview Room/);
 assert.match(context.READY_MARKUP, /6 tasks/);
