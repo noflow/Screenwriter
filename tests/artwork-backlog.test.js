@@ -24,18 +24,18 @@ const backlog = JSON.parse(run('JSON.stringify(artworkBacklogData())'));
 assert.equal(backlog.mode, 'room_art_first');
 assert.deepEqual(backlog.active_kinds, ['background']);
 assert.equal(backlog.room_scope.policy, 'all_mapped_rooms');
-assert.equal(backlog.room_scope.completed_locations.length, 40);
+assert.equal(backlog.room_scope.completed_locations.length, 41);
 assert.equal(backlog.audio_in_scope, false);
-assert.equal(backlog.phases.length, 34);
+assert.equal(backlog.phases.length, 35);
 assert.equal(backlog.phases[0].id, 'opening_morning');
 assert.equal(backlog.phases[0].priority, 1);
 
 const summary = JSON.parse(run('JSON.stringify(artworkBacklogSummary())'));
 assert.deepEqual(summary, {
-  total:223,
-  backgrounds:223,
+  total:228,
+  backgrounds:228,
   portraits:0,
-  statuses:{missing:0,placeholder:0,in_progress:187,review:0,ready:36}
+  statuses:{missing:0,placeholder:0,in_progress:192,review:0,ready:36}
 });
 
 run(`
@@ -76,7 +76,8 @@ run(`
     distribution:artworkBacklogResolution(allArtwork.find(item=>item.id==='greyport_distribution.security')),
     transitDepot:artworkBacklogResolution(allArtwork.find(item=>item.id==='port_alder_transit_depot.public_counter')),
     studios:artworkBacklogResolution(allArtwork.find(item=>item.id==='greyport_studios.lobby')),
-    undertow:artworkBacklogResolution(allArtwork.find(item=>item.id==='undertow_nightclub.entry'))
+    undertow:artworkBacklogResolution(allArtwork.find(item=>item.id==='undertow_nightclub.entry')),
+    cedarVale:artworkBacklogResolution(allArtwork.find(item=>item.id==='cedar_vale_street.bus_stop'))
   });
   globalThis.ALL_MARKUP=artworkBacklogMarkup('all');
   globalThis.BG_MARKUP=artworkBacklogMarkup('background');
@@ -121,8 +122,9 @@ assert.equal(resolutions.distribution.state, 'registered');
 assert.equal(resolutions.transitDepot.state, 'registered');
 assert.equal(resolutions.studios.state, 'registered');
 assert.equal(resolutions.undertow.state, 'registered');
+assert.equal(resolutions.cedarVale.state, 'registered');
 assert.match(context.ALL_MARKUP, /Opening Morning at Hale Home/);
-assert.match(context.ALL_MARKUP, /223 prioritized assets/);
+assert.match(context.ALL_MARKUP, /228 prioritized assets/);
 assert.match(context.ALL_MARKUP, /Room-first milestone plan/);
 assert.doesNotMatch(context.ALL_MARKUP, /portrait set/);
 assert.match(context.ALL_MARKUP, /Character portraits and audio are intentionally outside the active room-art plan/);
@@ -193,6 +195,8 @@ assert.match(context.ACTIVE_MARKUP, /Greyport Studios Affordable Housing and Ind
 assert.match(context.ACTIVE_MARKUP, /Greyport Studios · Studio Unit/);
 assert.match(context.ACTIVE_MARKUP, /Undertow Nightclub Nightlife, Safety, and Employment Route/);
 assert.match(context.ACTIVE_MARKUP, /Undertow Nightclub · Quiet Room/);
+assert.match(context.ACTIVE_MARKUP, /Cedar Vale Residential Street Housing, Care, and Family Route/);
+assert.match(context.ACTIVE_MARKUP, /Cedar Vale Street · Family Block/);
 assert.match(context.READY_MARKUP, /8 tasks/);
 assert.match(context.READY_MARKUP, /Harbor Employment Centre · Interview Room/);
 assert.match(context.READY_MARKUP, /6 tasks/);
