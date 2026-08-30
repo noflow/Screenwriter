@@ -24,18 +24,18 @@ const backlog = JSON.parse(run('JSON.stringify(artworkBacklogData())'));
 assert.equal(backlog.mode, 'room_art_first');
 assert.deepEqual(backlog.active_kinds, ['background']);
 assert.equal(backlog.room_scope.policy, 'all_mapped_rooms');
-assert.equal(backlog.room_scope.completed_locations.length, 52);
+assert.equal(backlog.room_scope.completed_locations.length, 53);
 assert.equal(backlog.audio_in_scope, false);
-assert.equal(backlog.phases.length, 46);
+assert.equal(backlog.phases.length, 47);
 assert.equal(backlog.phases[0].id, 'opening_morning');
 assert.equal(backlog.phases[0].priority, 1);
 
 const summary = JSON.parse(run('JSON.stringify(artworkBacklogSummary())'));
 assert.deepEqual(summary, {
-  total:290,
-  backgrounds:290,
+  total:303,
+  backgrounds:303,
   portraits:0,
-  statuses:{missing:0,placeholder:0,in_progress:254,review:0,ready:36}
+  statuses:{missing:0,placeholder:0,in_progress:267,review:0,ready:36}
 });
 
 run(`
@@ -88,7 +88,8 @@ run(`
     northline:artworkBacklogResolution(allArtwork.find(item=>item.id==='northline_outfitters.sales_floor')),
     harborFormalwear:artworkBacklogResolution(allArtwork.find(item=>item.id==='harbor_formalwear.showroom')),
     marinerHomeGoods:artworkBacklogResolution(allArtwork.find(item=>item.id==='mariner_home_goods.furniture_floor')),
-    portAlderAuto:artworkBacklogResolution(allArtwork.find(item=>item.id==='port_alder_auto.showroom'))
+    portAlderAuto:artworkBacklogResolution(allArtwork.find(item=>item.id==='port_alder_auto.showroom')),
+    stMarenMedical:artworkBacklogResolution(allArtwork.find(item=>item.id==='st_maren_medical_center.campus_plaza'))
   });
   globalThis.ALL_MARKUP=artworkBacklogMarkup('all');
   globalThis.BG_MARKUP=artworkBacklogMarkup('background');
@@ -145,8 +146,9 @@ assert.equal(resolutions.northline.state, 'registered');
 assert.equal(resolutions.harborFormalwear.state, 'registered');
 assert.equal(resolutions.marinerHomeGoods.state, 'registered');
 assert.equal(resolutions.portAlderAuto.state, 'registered');
+assert.equal(resolutions.stMarenMedical.state, 'registered');
 assert.match(context.ALL_MARKUP, /Opening Morning at Hale Home/);
-assert.match(context.ALL_MARKUP, /290 prioritized assets/);
+assert.match(context.ALL_MARKUP, /303 prioritized assets/);
 assert.match(context.ALL_MARKUP, /Room-first milestone plan/);
 assert.doesNotMatch(context.ALL_MARKUP, /portrait set/);
 assert.match(context.ALL_MARKUP, /Character portraits and audio are intentionally outside the active room-art plan/);
@@ -241,6 +243,8 @@ assert.match(context.ACTIVE_MARKUP, /Mariner Home Goods Furniture, Décor, Kitch
 assert.match(context.ACTIVE_MARKUP, /Mariner Home Goods · Kitchen Section/);
 assert.match(context.ACTIVE_MARKUP, /Port Alder Auto Vehicle Purchase, Finance, Used Lot, and Service Route/);
 assert.match(context.ACTIVE_MARKUP, /Port Alder Auto · Service Desk/);
+assert.match(context.ACTIVE_MARKUP, /St\. Maren Medical Center Campus, Hospital Care, Diagnostics, and Family Health Route/);
+assert.match(context.ACTIVE_MARKUP, /St Maren Medical Center · Maternity/);
 assert.match(context.READY_MARKUP, /8 tasks/);
 assert.match(context.READY_MARKUP, /Harbor Employment Centre · Interview Room/);
 assert.match(context.READY_MARKUP, /6 tasks/);
