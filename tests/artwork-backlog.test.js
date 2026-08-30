@@ -24,18 +24,18 @@ const backlog = JSON.parse(run('JSON.stringify(artworkBacklogData())'));
 assert.equal(backlog.mode, 'room_art_first');
 assert.deepEqual(backlog.active_kinds, ['background']);
 assert.equal(backlog.room_scope.policy, 'all_mapped_rooms');
-assert.equal(backlog.room_scope.completed_locations.length, 60);
+assert.equal(backlog.room_scope.completed_locations.length, 61);
 assert.equal(backlog.audio_in_scope, false);
-assert.equal(backlog.phases.length, 54);
+assert.equal(backlog.phases.length, 55);
 assert.equal(backlog.phases[0].id, 'opening_morning');
 assert.equal(backlog.phases[0].priority, 1);
 
 const summary = JSON.parse(run('JSON.stringify(artworkBacklogSummary())'));
 assert.deepEqual(summary, {
-  total:336,
-  backgrounds:336,
+  total:341,
+  backgrounds:341,
   portraits:0,
-  statuses:{missing:0,placeholder:0,in_progress:300,review:0,ready:36}
+  statuses:{missing:0,placeholder:0,in_progress:305,review:0,ready:36}
 });
 
 run(`
@@ -96,7 +96,8 @@ run(`
     stMarenSexual:artworkBacklogResolution(allArtwork.find(item=>item.id==='st_maren_sexual_health.private_reception')),
     bayPharmacy:artworkBacklogResolution(allArtwork.find(item=>item.id==='bay_pharmacy.sales_floor')),
     hannahApartment:artworkBacklogResolution(allArtwork.find(item=>item.id==='hannah_medical_district_apartment.entry')),
-    crownPointBoulevard:artworkBacklogResolution(allArtwork.find(item=>item.id==='crown_point_boulevard.boulevard_entry'))
+    crownPointBoulevard:artworkBacklogResolution(allArtwork.find(item=>item.id==='crown_point_boulevard.boulevard_entry')),
+    priceCaldwell:artworkBacklogResolution(allArtwork.find(item=>item.id==='price_caldwell_law.reception'))
   });
   globalThis.ALL_MARKUP=artworkBacklogMarkup('all');
   globalThis.BG_MARKUP=artworkBacklogMarkup('background');
@@ -161,8 +162,9 @@ assert.equal(resolutions.stMarenSexual.state, 'registered');
 assert.equal(resolutions.bayPharmacy.state, 'registered');
 assert.equal(resolutions.hannahApartment.state, 'registered');
 assert.equal(resolutions.crownPointBoulevard.state, 'registered');
+assert.equal(resolutions.priceCaldwell.state, 'registered');
 assert.match(context.ALL_MARKUP, /Opening Morning at Hale Home/);
-assert.match(context.ALL_MARKUP, /336 prioritized assets/);
+assert.match(context.ALL_MARKUP, /341 prioritized assets/);
 assert.match(context.ALL_MARKUP, /Room-first milestone plan/);
 assert.doesNotMatch(context.ALL_MARKUP, /portrait set/);
 assert.match(context.ALL_MARKUP, /Character portraits and audio are intentionally outside the active room-art plan/);
@@ -273,6 +275,8 @@ assert.match(context.ACTIVE_MARKUP, /Hannah's Medical District Apartment Invitat
 assert.match(context.ACTIVE_MARKUP, /Hannah Medical District Apartment · Balcony/);
 assert.match(context.ACTIVE_MARKUP, /Crown Point Boulevard Corporate, Residential, Hotel, and Harbor Route/);
 assert.match(context.ACTIVE_MARKUP, /Crown Point Boulevard · Harbor Overlook/);
+assert.match(context.ACTIVE_MARKUP, /Price (?:&amp;|&) Caldwell Law Reception, Associate, Conference, and Executive Route/);
+assert.match(context.ACTIVE_MARKUP, /Price (?:&amp; )?Caldwell Law · Olivia Office/);
 assert.match(context.READY_MARKUP, /8 tasks/);
 assert.match(context.READY_MARKUP, /Harbor Employment Centre · Interview Room/);
 assert.match(context.READY_MARKUP, /6 tasks/);
