@@ -24,18 +24,18 @@ const backlog = JSON.parse(run('JSON.stringify(artworkBacklogData())'));
 assert.equal(backlog.mode, 'room_art_first');
 assert.deepEqual(backlog.active_kinds, ['background']);
 assert.equal(backlog.room_scope.policy, 'all_mapped_rooms');
-assert.equal(backlog.room_scope.completed_locations.length, 58);
+assert.equal(backlog.room_scope.completed_locations.length, 59);
 assert.equal(backlog.audio_in_scope, false);
-assert.equal(backlog.phases.length, 52);
+assert.equal(backlog.phases.length, 53);
 assert.equal(backlog.phases[0].id, 'opening_morning');
 assert.equal(backlog.phases[0].priority, 1);
 
 const summary = JSON.parse(run('JSON.stringify(artworkBacklogSummary())'));
 assert.deepEqual(summary, {
-  total:324,
-  backgrounds:324,
+  total:330,
+  backgrounds:330,
   portraits:0,
-  statuses:{missing:0,placeholder:0,in_progress:288,review:0,ready:36}
+  statuses:{missing:0,placeholder:0,in_progress:294,review:0,ready:36}
 });
 
 run(`
@@ -94,7 +94,8 @@ run(`
     stMarenDoctors:artworkBacklogResolution(allArtwork.find(item=>item.id==='st_maren_doctors_office.reception')),
     harborWellness:artworkBacklogResolution(allArtwork.find(item=>item.id==='harbor_wellness_therapy.reception')),
     stMarenSexual:artworkBacklogResolution(allArtwork.find(item=>item.id==='st_maren_sexual_health.private_reception')),
-    bayPharmacy:artworkBacklogResolution(allArtwork.find(item=>item.id==='bay_pharmacy.sales_floor'))
+    bayPharmacy:artworkBacklogResolution(allArtwork.find(item=>item.id==='bay_pharmacy.sales_floor')),
+    hannahApartment:artworkBacklogResolution(allArtwork.find(item=>item.id==='hannah_medical_district_apartment.entry'))
   });
   globalThis.ALL_MARKUP=artworkBacklogMarkup('all');
   globalThis.BG_MARKUP=artworkBacklogMarkup('background');
@@ -157,8 +158,9 @@ assert.equal(resolutions.stMarenDoctors.state, 'registered');
 assert.equal(resolutions.harborWellness.state, 'registered');
 assert.equal(resolutions.stMarenSexual.state, 'registered');
 assert.equal(resolutions.bayPharmacy.state, 'registered');
+assert.equal(resolutions.hannahApartment.state, 'registered');
 assert.match(context.ALL_MARKUP, /Opening Morning at Hale Home/);
-assert.match(context.ALL_MARKUP, /324 prioritized assets/);
+assert.match(context.ALL_MARKUP, /330 prioritized assets/);
 assert.match(context.ALL_MARKUP, /Room-first milestone plan/);
 assert.doesNotMatch(context.ALL_MARKUP, /portrait set/);
 assert.match(context.ALL_MARKUP, /Character portraits and audio are intentionally outside the active room-art plan/);
@@ -265,6 +267,8 @@ assert.match(context.ACTIVE_MARKUP, /St\. Maren Sexual Health Centre Private Con
 assert.match(context.ACTIVE_MARKUP, /St Maren Sexual Health · Treatment Room/);
 assert.match(context.ACTIVE_MARKUP, /Bay Pharmacy Retail, Prescription, and Private Consultation Route/);
 assert.match(context.ACTIVE_MARKUP, /Bay Pharmacy · Consultation Room/);
+assert.match(context.ACTIVE_MARKUP, /Hannah's Medical District Apartment Invitation, Recovery, and Relationship Route/);
+assert.match(context.ACTIVE_MARKUP, /Hannah Medical District Apartment · Balcony/);
 assert.match(context.READY_MARKUP, /8 tasks/);
 assert.match(context.READY_MARKUP, /Harbor Employment Centre · Interview Room/);
 assert.match(context.READY_MARKUP, /6 tasks/);
