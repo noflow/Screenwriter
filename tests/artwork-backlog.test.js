@@ -24,18 +24,18 @@ const backlog = JSON.parse(run('JSON.stringify(artworkBacklogData())'));
 assert.equal(backlog.mode, 'room_art_first');
 assert.deepEqual(backlog.active_kinds, ['background']);
 assert.equal(backlog.room_scope.policy, 'all_mapped_rooms');
-assert.equal(backlog.room_scope.completed_locations.length, 57);
+assert.equal(backlog.room_scope.completed_locations.length, 58);
 assert.equal(backlog.audio_in_scope, false);
-assert.equal(backlog.phases.length, 51);
+assert.equal(backlog.phases.length, 52);
 assert.equal(backlog.phases[0].id, 'opening_morning');
 assert.equal(backlog.phases[0].priority, 1);
 
 const summary = JSON.parse(run('JSON.stringify(artworkBacklogSummary())'));
 assert.deepEqual(summary, {
-  total:321,
-  backgrounds:321,
+  total:324,
+  backgrounds:324,
   portraits:0,
-  statuses:{missing:0,placeholder:0,in_progress:285,review:0,ready:36}
+  statuses:{missing:0,placeholder:0,in_progress:288,review:0,ready:36}
 });
 
 run(`
@@ -93,7 +93,8 @@ run(`
     stMarenClinic:artworkBacklogResolution(allArtwork.find(item=>item.id==='st_maren_community_clinic.reception')),
     stMarenDoctors:artworkBacklogResolution(allArtwork.find(item=>item.id==='st_maren_doctors_office.reception')),
     harborWellness:artworkBacklogResolution(allArtwork.find(item=>item.id==='harbor_wellness_therapy.reception')),
-    stMarenSexual:artworkBacklogResolution(allArtwork.find(item=>item.id==='st_maren_sexual_health.private_reception'))
+    stMarenSexual:artworkBacklogResolution(allArtwork.find(item=>item.id==='st_maren_sexual_health.private_reception')),
+    bayPharmacy:artworkBacklogResolution(allArtwork.find(item=>item.id==='bay_pharmacy.sales_floor'))
   });
   globalThis.ALL_MARKUP=artworkBacklogMarkup('all');
   globalThis.BG_MARKUP=artworkBacklogMarkup('background');
@@ -155,8 +156,9 @@ assert.equal(resolutions.stMarenClinic.state, 'registered');
 assert.equal(resolutions.stMarenDoctors.state, 'registered');
 assert.equal(resolutions.harborWellness.state, 'registered');
 assert.equal(resolutions.stMarenSexual.state, 'registered');
+assert.equal(resolutions.bayPharmacy.state, 'registered');
 assert.match(context.ALL_MARKUP, /Opening Morning at Hale Home/);
-assert.match(context.ALL_MARKUP, /321 prioritized assets/);
+assert.match(context.ALL_MARKUP, /324 prioritized assets/);
 assert.match(context.ALL_MARKUP, /Room-first milestone plan/);
 assert.doesNotMatch(context.ALL_MARKUP, /portrait set/);
 assert.match(context.ALL_MARKUP, /Character portraits and audio are intentionally outside the active room-art plan/);
@@ -261,6 +263,8 @@ assert.match(context.ACTIVE_MARKUP, /Harbor Wellness Therapy Counseling, Relatio
 assert.match(context.ACTIVE_MARKUP, /Harbor Wellness Therapy · Group Room/);
 assert.match(context.ACTIVE_MARKUP, /St\. Maren Sexual Health Centre Private Consultation, Testing, and Treatment Route/);
 assert.match(context.ACTIVE_MARKUP, /St Maren Sexual Health · Treatment Room/);
+assert.match(context.ACTIVE_MARKUP, /Bay Pharmacy Retail, Prescription, and Private Consultation Route/);
+assert.match(context.ACTIVE_MARKUP, /Bay Pharmacy · Consultation Room/);
 assert.match(context.READY_MARKUP, /8 tasks/);
 assert.match(context.READY_MARKUP, /Harbor Employment Centre · Interview Room/);
 assert.match(context.READY_MARKUP, /6 tasks/);
