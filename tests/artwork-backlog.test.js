@@ -24,18 +24,18 @@ const backlog = JSON.parse(run('JSON.stringify(artworkBacklogData())'));
 assert.equal(backlog.mode, 'room_art_first');
 assert.deepEqual(backlog.active_kinds, ['background']);
 assert.equal(backlog.room_scope.policy, 'all_mapped_rooms');
-assert.equal(backlog.room_scope.completed_locations.length, 48);
+assert.equal(backlog.room_scope.completed_locations.length, 49);
 assert.equal(backlog.audio_in_scope, false);
-assert.equal(backlog.phases.length, 42);
+assert.equal(backlog.phases.length, 43);
 assert.equal(backlog.phases[0].id, 'opening_morning');
 assert.equal(backlog.phases[0].priority, 1);
 
 const summary = JSON.parse(run('JSON.stringify(artworkBacklogSummary())'));
 assert.deepEqual(summary, {
-  total:273,
-  backgrounds:273,
+  total:279,
+  backgrounds:279,
   portraits:0,
-  statuses:{missing:0,placeholder:0,in_progress:237,review:0,ready:36}
+  statuses:{missing:0,placeholder:0,in_progress:243,review:0,ready:36}
 });
 
 run(`
@@ -84,7 +84,8 @@ run(`
     cedarCareHome:artworkBacklogResolution(allArtwork.find(item=>item.id==='cedar_vale_care_home.reception')),
     cedarFamilyCentre:artworkBacklogResolution(allArtwork.find(item=>item.id==='cedar_vale_family_centre.reception')),
     marinerStreet:artworkBacklogResolution(allArtwork.find(item=>item.id==='mariner_row_shopping_street.transit_stop')),
-    marinerMarket:artworkBacklogResolution(allArtwork.find(item=>item.id==='mariner_market.grocery_floor'))
+    marinerMarket:artworkBacklogResolution(allArtwork.find(item=>item.id==='mariner_market.grocery_floor')),
+    northline:artworkBacklogResolution(allArtwork.find(item=>item.id==='northline_outfitters.sales_floor'))
   });
   globalThis.ALL_MARKUP=artworkBacklogMarkup('all');
   globalThis.BG_MARKUP=artworkBacklogMarkup('background');
@@ -137,8 +138,9 @@ assert.equal(resolutions.cedarCareHome.state, 'registered');
 assert.equal(resolutions.cedarFamilyCentre.state, 'registered');
 assert.equal(resolutions.marinerStreet.state, 'registered');
 assert.equal(resolutions.marinerMarket.state, 'registered');
+assert.equal(resolutions.northline.state, 'registered');
 assert.match(context.ALL_MARKUP, /Opening Morning at Hale Home/);
-assert.match(context.ALL_MARKUP, /273 prioritized assets/);
+assert.match(context.ALL_MARKUP, /279 prioritized assets/);
 assert.match(context.ALL_MARKUP, /Room-first milestone plan/);
 assert.doesNotMatch(context.ALL_MARKUP, /portrait set/);
 assert.match(context.ALL_MARKUP, /Character portraits and audio are intentionally outside the active room-art plan/);
@@ -225,6 +227,8 @@ assert.match(context.ACTIVE_MARKUP, /Mariner Row Shopping Street Retail Discover
 assert.match(context.ACTIVE_MARKUP, /Mariner Row Shopping Street · Fashion Block/);
 assert.match(context.ACTIVE_MARKUP, /Mariner Market Grocery, Adult Retail, and Employment Route/);
 assert.match(context.ACTIVE_MARKUP, /Mariner Market · Checkout/);
+assert.match(context.ACTIVE_MARKUP, /Northline Outfitters Clothing, Wardrobe, and Employment Route/);
+assert.match(context.ACTIVE_MARKUP, /Northline Outfitters · Fitting Rooms/);
 assert.match(context.READY_MARKUP, /8 tasks/);
 assert.match(context.READY_MARKUP, /Harbor Employment Centre · Interview Room/);
 assert.match(context.READY_MARKUP, /6 tasks/);
