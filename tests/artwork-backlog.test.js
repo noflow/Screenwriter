@@ -24,18 +24,18 @@ const backlog = JSON.parse(run('JSON.stringify(artworkBacklogData())'));
 assert.equal(backlog.mode, 'room_art_first');
 assert.deepEqual(backlog.active_kinds, ['background']);
 assert.equal(backlog.room_scope.policy, 'all_mapped_rooms');
-assert.equal(backlog.room_scope.completed_locations.length, 29);
+assert.equal(backlog.room_scope.completed_locations.length, 30);
 assert.equal(backlog.audio_in_scope, false);
-assert.equal(backlog.phases.length, 23);
+assert.equal(backlog.phases.length, 24);
 assert.equal(backlog.phases[0].id, 'opening_morning');
 assert.equal(backlog.phases[0].priority, 1);
 
 const summary = JSON.parse(run('JSON.stringify(artworkBacklogSummary())'));
 assert.deepEqual(summary, {
-  total:155,
-  backgrounds:155,
+  total:161,
+  backgrounds:161,
   portraits:0,
-  statuses:{missing:0,placeholder:0,in_progress:119,review:0,ready:36}
+  statuses:{missing:0,placeholder:0,in_progress:125,review:0,ready:36}
 });
 
 run(`
@@ -65,7 +65,8 @@ run(`
     lanternStreet:artworkBacklogResolution(allArtwork.find(item=>item.id==='lantern_district_street.cinema_block')),
     laBrisa:artworkBacklogResolution(allArtwork.find(item=>item.id==='la_brisa_kitchen.dining_room')),
     tideglass:artworkBacklogResolution(allArtwork.find(item=>item.id==='tideglass_club.entry')),
-    cooperative:artworkBacklogResolution(allArtwork.find(item=>item.id==='harbor_companion_cooperative.secure_reception'))
+    cooperative:artworkBacklogResolution(allArtwork.find(item=>item.id==='harbor_companion_cooperative.secure_reception')),
+    rowan:artworkBacklogResolution(allArtwork.find(item=>item.id==='rowan_family_home.porch'))
   });
   globalThis.ALL_MARKUP=artworkBacklogMarkup('all');
   globalThis.BG_MARKUP=artworkBacklogMarkup('background');
@@ -99,8 +100,9 @@ assert.equal(resolutions.lanternStreet.state, 'registered');
 assert.equal(resolutions.laBrisa.state, 'registered');
 assert.equal(resolutions.tideglass.state, 'registered');
 assert.equal(resolutions.cooperative.state, 'registered');
+assert.equal(resolutions.rowan.state, 'registered');
 assert.match(context.ALL_MARKUP, /Opening Morning at Hale Home/);
-assert.match(context.ALL_MARKUP, /155 prioritized assets/);
+assert.match(context.ALL_MARKUP, /161 prioritized assets/);
 assert.match(context.ALL_MARKUP, /Room-first milestone plan/);
 assert.doesNotMatch(context.ALL_MARKUP, /portrait set/);
 assert.match(context.ALL_MARKUP, /Character portraits and audio are intentionally outside the active room-art plan/);
@@ -149,6 +151,8 @@ assert.match(context.ACTIVE_MARKUP, /Tideglass Club Nightlife and Social Route/)
 assert.match(context.ACTIVE_MARKUP, /Tideglass Club · Restrooms/);
 assert.match(context.ACTIVE_MARKUP, /Harbor Companion Cooperative Licensed Workplace and Safety Route/);
 assert.match(context.ACTIVE_MARKUP, /Harbor Companion Cooperative · Private Suite/);
+assert.match(context.ACTIVE_MARKUP, /Rowan Family Home Invitation and Emma Relationship Route/);
+assert.match(context.ACTIVE_MARKUP, /Rowan Family Home · Emma Bedroom/);
 assert.match(context.READY_MARKUP, /8 tasks/);
 assert.match(context.READY_MARKUP, /Harbor Employment Centre · Interview Room/);
 assert.match(context.READY_MARKUP, /6 tasks/);
