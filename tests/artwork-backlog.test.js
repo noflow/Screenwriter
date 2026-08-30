@@ -24,18 +24,18 @@ const backlog = JSON.parse(run('JSON.stringify(artworkBacklogData())'));
 assert.equal(backlog.mode, 'room_art_first');
 assert.deepEqual(backlog.active_kinds, ['background']);
 assert.equal(backlog.room_scope.policy, 'all_mapped_rooms');
-assert.equal(backlog.room_scope.completed_locations.length, 21);
+assert.equal(backlog.room_scope.completed_locations.length, 22);
 assert.equal(backlog.audio_in_scope, false);
-assert.equal(backlog.phases.length, 15);
+assert.equal(backlog.phases.length, 16);
 assert.equal(backlog.phases[0].id, 'opening_morning');
 assert.equal(backlog.phases[0].priority, 1);
 
 const summary = JSON.parse(run('JSON.stringify(artworkBacklogSummary())'));
 assert.deepEqual(summary, {
-  total:117,
-  backgrounds:117,
+  total:124,
+  backgrounds:124,
   portraits:0,
-  statuses:{missing:0,placeholder:0,in_progress:83,review:0,ready:34}
+  statuses:{missing:0,placeholder:0,in_progress:90,review:0,ready:34}
 });
 
 run(`
@@ -57,7 +57,8 @@ run(`
     cityHall:artworkBacklogResolution(allArtwork.find(item=>item.id==='port_alder_city_hall.public_lobby')),
     realty:artworkBacklogResolution(allArtwork.find(item=>item.id==='port_alder_realty.listing_gallery')),
     business:artworkBacklogResolution(allArtwork.find(item=>item.id==='harbor_business_services.lobby')),
-    cypress:artworkBacklogResolution(allArtwork.find(item=>item.id==='cypress_hall_dorm.lobby'))
+    cypress:artworkBacklogResolution(allArtwork.find(item=>item.id==='cypress_hall_dorm.lobby')),
+    maple:artworkBacklogResolution(allArtwork.find(item=>item.id==='maple_hall_dorm.lobby'))
   });
   globalThis.ALL_MARKUP=artworkBacklogMarkup('all');
   globalThis.BG_MARKUP=artworkBacklogMarkup('background');
@@ -83,8 +84,9 @@ assert.equal(resolutions.cityHall.state, 'registered');
 assert.equal(resolutions.realty.state, 'registered');
 assert.equal(resolutions.business.state, 'registered');
 assert.equal(resolutions.cypress.state, 'registered');
+assert.equal(resolutions.maple.state, 'registered');
 assert.match(context.ALL_MARKUP, /Opening Morning at Hale Home/);
-assert.match(context.ALL_MARKUP, /117 prioritized assets/);
+assert.match(context.ALL_MARKUP, /124 prioritized assets/);
 assert.match(context.ALL_MARKUP, /Room-first milestone plan/);
 assert.doesNotMatch(context.ALL_MARKUP, /portrait set/);
 assert.match(context.ALL_MARKUP, /Character portraits and audio are intentionally outside the active room-art plan/);
@@ -119,6 +121,8 @@ assert.match(context.ACTIVE_MARKUP, /Harbor Centre Business Services Workplace/)
 assert.match(context.ACTIVE_MARKUP, /Harbor Business Services · Lobby/);
 assert.match(context.ACTIVE_MARKUP, /Cypress Hall Dorm Student Housing/);
 assert.match(context.ACTIVE_MARKUP, /Cypress Hall Dorm · Available Room/);
+assert.match(context.ACTIVE_MARKUP, /Maple Hall Dorm Student Housing/);
+assert.match(context.ACTIVE_MARKUP, /Maple Hall Dorm · Available Room/);
 assert.match(context.READY_MARKUP, /8 tasks/);
 assert.match(context.READY_MARKUP, /Harbor Employment Centre · Interview Room/);
 assert.match(context.READY_MARKUP, /6 tasks/);
