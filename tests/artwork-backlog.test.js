@@ -24,18 +24,18 @@ const backlog = JSON.parse(run('JSON.stringify(artworkBacklogData())'));
 assert.equal(backlog.mode, 'room_art_first');
 assert.deepEqual(backlog.active_kinds, ['background']);
 assert.equal(backlog.room_scope.policy, 'all_mapped_rooms');
-assert.equal(backlog.room_scope.completed_locations.length, 17);
+assert.equal(backlog.room_scope.completed_locations.length, 18);
 assert.equal(backlog.audio_in_scope, false);
-assert.equal(backlog.phases.length, 11);
+assert.equal(backlog.phases.length, 12);
 assert.equal(backlog.phases[0].id, 'opening_morning');
 assert.equal(backlog.phases[0].priority, 1);
 
 const summary = JSON.parse(run('JSON.stringify(artworkBacklogSummary())'));
 assert.deepEqual(summary, {
-  total:99,
-  backgrounds:99,
+  total:103,
+  backgrounds:103,
   portraits:0,
-  statuses:{missing:0,placeholder:0,in_progress:73,review:0,ready:26}
+  statuses:{missing:0,placeholder:0,in_progress:74,review:0,ready:29}
 });
 
 run(`
@@ -53,7 +53,8 @@ run(`
     downtown:artworkBacklogResolution(allArtwork.find(item=>item.id==='harbor_centre_downtown.transit_plaza')),
     apartments:artworkBacklogResolution(allArtwork.find(item=>item.id==='harbor_centre_apartments.lobby')),
     condos:artworkBacklogResolution(allArtwork.find(item=>item.id==='harbor_view_condos.living_room')),
-    creditUnion:artworkBacklogResolution(allArtwork.find(item=>item.id==='port_alder_credit_union.atm_lobby'))
+    creditUnion:artworkBacklogResolution(allArtwork.find(item=>item.id==='port_alder_credit_union.atm_lobby')),
+    cityHall:artworkBacklogResolution(allArtwork.find(item=>item.id==='port_alder_city_hall.public_lobby'))
   });
   globalThis.ALL_MARKUP=artworkBacklogMarkup('all');
   globalThis.BG_MARKUP=artworkBacklogMarkup('background');
@@ -75,8 +76,9 @@ assert.equal(resolutions.downtown.state, 'registered');
 assert.equal(resolutions.apartments.state, 'registered');
 assert.equal(resolutions.condos.state, 'registered');
 assert.equal(resolutions.creditUnion.state, 'registered');
+assert.equal(resolutions.cityHall.state, 'registered');
 assert.match(context.ALL_MARKUP, /Opening Morning at Hale Home/);
-assert.match(context.ALL_MARKUP, /99 prioritized assets/);
+assert.match(context.ALL_MARKUP, /103 prioritized assets/);
 assert.match(context.ALL_MARKUP, /Room-first milestone plan/);
 assert.doesNotMatch(context.ALL_MARKUP, /portrait set/);
 assert.match(context.ALL_MARKUP, /Character portraits and audio are intentionally outside the active room-art plan/);
@@ -103,6 +105,8 @@ assert.match(context.ACTIVE_MARKUP, /Harbor View Condominiums Home/);
 assert.match(context.ACTIVE_MARKUP, /Harbor View Condos · Balcony/);
 assert.match(context.ACTIVE_MARKUP, /Port Alder Credit Union Banking/);
 assert.match(context.ACTIVE_MARKUP, /Port Alder Credit Union · Atm Lobby/);
+assert.match(context.ACTIVE_MARKUP, /Port Alder City Hall Civic Services/);
+assert.match(context.ACTIVE_MARKUP, /Port Alder City Hall · Public Lobby/);
 assert.match(context.READY_MARKUP, /8 tasks/);
 assert.match(context.READY_MARKUP, /Harbor Employment Centre · Interview Room/);
 assert.match(context.READY_MARKUP, /6 tasks/);
@@ -110,5 +114,6 @@ assert.match(context.READY_MARKUP, /Westshore Campus · Career Board/);
 assert.match(context.READY_MARKUP, /9 tasks/);
 assert.match(context.READY_MARKUP, /Port Alder Galleria · East Expansion/);
 assert.match(context.READY_MARKUP, /Port Alder Credit Union · Loan Office/);
+assert.match(context.READY_MARKUP, /Port Alder City Hall · Hearing Room/);
 
 console.log('Artwork backlog regression tests passed');
