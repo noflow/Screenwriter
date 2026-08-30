@@ -24,18 +24,18 @@ const backlog = JSON.parse(run('JSON.stringify(artworkBacklogData())'));
 assert.equal(backlog.mode, 'room_art_first');
 assert.deepEqual(backlog.active_kinds, ['background']);
 assert.equal(backlog.room_scope.policy, 'all_mapped_rooms');
-assert.equal(backlog.room_scope.completed_locations.length, 12);
+assert.equal(backlog.room_scope.completed_locations.length, 13);
 assert.equal(backlog.audio_in_scope, false);
-assert.equal(backlog.phases.length, 6);
+assert.equal(backlog.phases.length, 7);
 assert.equal(backlog.phases[0].id, 'opening_morning');
 assert.equal(backlog.phases[0].priority, 1);
 
 const summary = JSON.parse(run('JSON.stringify(artworkBacklogSummary())'));
 assert.deepEqual(summary, {
-  total:60,
-  backgrounds:60,
+  total:74,
+  backgrounds:74,
   portraits:0,
-  statuses:{missing:0,placeholder:0,in_progress:46,review:0,ready:14}
+  statuses:{missing:0,placeholder:0,in_progress:51,review:0,ready:23}
 });
 
 run(`
@@ -48,7 +48,8 @@ run(`
     campus:artworkBacklogResolution(allArtwork.find(item=>item.id==='westshore_campus.courtyard')),
     bayview:artworkBacklogResolution(allArtwork.find(item=>item.id==='bayview_cafe.patio')),
     marina:artworkBacklogResolution(allArtwork.find(item=>item.id==='port_alder_marina.promenade')),
-    beach:artworkBacklogResolution(allArtwork.find(item=>item.id==='alder_bay_beach.boardwalk'))
+    beach:artworkBacklogResolution(allArtwork.find(item=>item.id==='alder_bay_beach.boardwalk')),
+    galleria:artworkBacklogResolution(allArtwork.find(item=>item.id==='port_alder_galleria.main_atrium'))
   });
   globalThis.ALL_MARKUP=artworkBacklogMarkup('all');
   globalThis.BG_MARKUP=artworkBacklogMarkup('background');
@@ -65,8 +66,9 @@ assert.equal(resolutions.campus.state, 'registered');
 assert.equal(resolutions.bayview.state, 'registered');
 assert.equal(resolutions.marina.state, 'registered');
 assert.equal(resolutions.beach.state, 'registered');
+assert.equal(resolutions.galleria.state, 'registered');
 assert.match(context.ALL_MARKUP, /Opening Morning at Hale Home/);
-assert.match(context.ALL_MARKUP, /60 prioritized assets/);
+assert.match(context.ALL_MARKUP, /74 prioritized assets/);
 assert.match(context.ALL_MARKUP, /Room-first milestone plan/);
 assert.doesNotMatch(context.ALL_MARKUP, /portrait set/);
 assert.match(context.ALL_MARKUP, /Character portraits and audio are intentionally outside the active room-art plan/);
@@ -82,9 +84,13 @@ assert.match(context.ACTIVE_MARKUP, /Bayview Cafe · Patio/);
 assert.match(context.ACTIVE_MARKUP, /3 tasks/);
 assert.match(context.ACTIVE_MARKUP, /Port Alder Marina · Marina Office/);
 assert.match(context.ACTIVE_MARKUP, /Alder Bay Beach · Changing Room/);
+assert.match(context.ACTIVE_MARKUP, /5 tasks/);
+assert.match(context.ACTIVE_MARKUP, /Port Alder Galleria · Food Court/);
 assert.match(context.READY_MARKUP, /8 tasks/);
 assert.match(context.READY_MARKUP, /Harbor Employment Centre · Interview Room/);
 assert.match(context.READY_MARKUP, /6 tasks/);
 assert.match(context.READY_MARKUP, /Westshore Campus · Career Board/);
+assert.match(context.READY_MARKUP, /9 tasks/);
+assert.match(context.READY_MARKUP, /Port Alder Galleria · East Expansion/);
 
 console.log('Artwork backlog regression tests passed');
