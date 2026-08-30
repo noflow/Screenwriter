@@ -24,18 +24,18 @@ const backlog = JSON.parse(run('JSON.stringify(artworkBacklogData())'));
 assert.equal(backlog.mode, 'room_art_first');
 assert.deepEqual(backlog.active_kinds, ['background']);
 assert.equal(backlog.room_scope.policy, 'all_mapped_rooms');
-assert.equal(backlog.room_scope.completed_locations.length, 23);
+assert.equal(backlog.room_scope.completed_locations.length, 24);
 assert.equal(backlog.audio_in_scope, false);
-assert.equal(backlog.phases.length, 17);
+assert.equal(backlog.phases.length, 18);
 assert.equal(backlog.phases[0].id, 'opening_morning');
 assert.equal(backlog.phases[0].priority, 1);
 
 const summary = JSON.parse(run('JSON.stringify(artworkBacklogSummary())'));
 assert.deepEqual(summary, {
-  total:131,
-  backgrounds:131,
+  total:133,
+  backgrounds:133,
   portraits:0,
-  statuses:{missing:0,placeholder:0,in_progress:97,review:0,ready:34}
+  statuses:{missing:0,placeholder:0,in_progress:97,review:0,ready:36}
 });
 
 run(`
@@ -59,7 +59,8 @@ run(`
     business:artworkBacklogResolution(allArtwork.find(item=>item.id==='harbor_business_services.lobby')),
     cypress:artworkBacklogResolution(allArtwork.find(item=>item.id==='cypress_hall_dorm.lobby')),
     maple:artworkBacklogResolution(allArtwork.find(item=>item.id==='maple_hall_dorm.lobby')),
-    studentApartment:artworkBacklogResolution(allArtwork.find(item=>item.id==='westshore_shared_student_apartment.entry'))
+    studentApartment:artworkBacklogResolution(allArtwork.find(item=>item.id==='westshore_shared_student_apartment.entry')),
+    bookshop:artworkBacklogResolution(allArtwork.find(item=>item.id==='westshore_bookshop.sales_floor'))
   });
   globalThis.ALL_MARKUP=artworkBacklogMarkup('all');
   globalThis.BG_MARKUP=artworkBacklogMarkup('background');
@@ -87,8 +88,9 @@ assert.equal(resolutions.business.state, 'registered');
 assert.equal(resolutions.cypress.state, 'registered');
 assert.equal(resolutions.maple.state, 'registered');
 assert.equal(resolutions.studentApartment.state, 'registered');
+assert.equal(resolutions.bookshop.state, 'registered');
 assert.match(context.ALL_MARKUP, /Opening Morning at Hale Home/);
-assert.match(context.ALL_MARKUP, /131 prioritized assets/);
+assert.match(context.ALL_MARKUP, /133 prioritized assets/);
 assert.match(context.ALL_MARKUP, /Room-first milestone plan/);
 assert.doesNotMatch(context.ALL_MARKUP, /portrait set/);
 assert.match(context.ALL_MARKUP, /Character portraits and audio are intentionally outside the active room-art plan/);
@@ -137,5 +139,7 @@ assert.match(context.READY_MARKUP, /Port Alder Credit Union · Loan Office/);
 assert.match(context.READY_MARKUP, /Port Alder City Hall · Hearing Room/);
 assert.match(context.READY_MARKUP, /Port Alder Realty · Closing Room/);
 assert.match(context.READY_MARKUP, /Harbor Business Services · Break Room/);
+assert.match(context.READY_MARKUP, /Westshore Bookshop Campus Retail/);
+assert.match(context.READY_MARKUP, /Westshore Bookshop · Service Counter/);
 
 console.log('Artwork backlog regression tests passed');
