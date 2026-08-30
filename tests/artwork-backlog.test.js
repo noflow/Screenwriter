@@ -24,18 +24,18 @@ const backlog = JSON.parse(run('JSON.stringify(artworkBacklogData())'));
 assert.equal(backlog.mode, 'room_art_first');
 assert.deepEqual(backlog.active_kinds, ['background']);
 assert.equal(backlog.room_scope.policy, 'all_mapped_rooms');
-assert.equal(backlog.room_scope.completed_locations.length, 25);
+assert.equal(backlog.room_scope.completed_locations.length, 26);
 assert.equal(backlog.audio_in_scope, false);
-assert.equal(backlog.phases.length, 19);
+assert.equal(backlog.phases.length, 20);
 assert.equal(backlog.phases[0].id, 'opening_morning');
 assert.equal(backlog.phases[0].priority, 1);
 
 const summary = JSON.parse(run('JSON.stringify(artworkBacklogSummary())'));
 assert.deepEqual(summary, {
-  total:137,
-  backgrounds:137,
+  total:140,
+  backgrounds:140,
   portraits:0,
-  statuses:{missing:0,placeholder:0,in_progress:101,review:0,ready:36}
+  statuses:{missing:0,placeholder:0,in_progress:104,review:0,ready:36}
 });
 
 run(`
@@ -61,7 +61,8 @@ run(`
     maple:artworkBacklogResolution(allArtwork.find(item=>item.id==='maple_hall_dorm.lobby')),
     studentApartment:artworkBacklogResolution(allArtwork.find(item=>item.id==='westshore_shared_student_apartment.entry')),
     bookshop:artworkBacklogResolution(allArtwork.find(item=>item.id==='westshore_bookshop.sales_floor')),
-    gallery:artworkBacklogResolution(allArtwork.find(item=>item.id==='lantern_gallery.main_gallery'))
+    gallery:artworkBacklogResolution(allArtwork.find(item=>item.id==='lantern_gallery.main_gallery')),
+    lanternStreet:artworkBacklogResolution(allArtwork.find(item=>item.id==='lantern_district_street.cinema_block'))
   });
   globalThis.ALL_MARKUP=artworkBacklogMarkup('all');
   globalThis.BG_MARKUP=artworkBacklogMarkup('background');
@@ -91,8 +92,9 @@ assert.equal(resolutions.maple.state, 'registered');
 assert.equal(resolutions.studentApartment.state, 'registered');
 assert.equal(resolutions.bookshop.state, 'registered');
 assert.equal(resolutions.gallery.state, 'registered');
+assert.equal(resolutions.lanternStreet.state, 'registered');
 assert.match(context.ALL_MARKUP, /Opening Morning at Hale Home/);
-assert.match(context.ALL_MARKUP, /137 prioritized assets/);
+assert.match(context.ALL_MARKUP, /140 prioritized assets/);
 assert.match(context.ALL_MARKUP, /Room-first milestone plan/);
 assert.doesNotMatch(context.ALL_MARKUP, /portrait set/);
 assert.match(context.ALL_MARKUP, /Character portraits and audio are intentionally outside the active room-art plan/);
@@ -133,6 +135,8 @@ assert.match(context.ACTIVE_MARKUP, /Westshore Shared Student Apartment Housing/
 assert.match(context.ACTIVE_MARKUP, /Westshore Shared Student Apartment · Available Bedroom/);
 assert.match(context.ACTIVE_MARKUP, /Lantern Gallery Arts and Events Circuit/);
 assert.match(context.ACTIVE_MARKUP, /Lantern Gallery · Office/);
+assert.match(context.ACTIVE_MARKUP, /Lantern District Street Entertainment Route/);
+assert.match(context.ACTIVE_MARKUP, /Lantern District Street · Gallery Walk/);
 assert.match(context.READY_MARKUP, /8 tasks/);
 assert.match(context.READY_MARKUP, /Harbor Employment Centre · Interview Room/);
 assert.match(context.READY_MARKUP, /6 tasks/);
