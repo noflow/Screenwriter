@@ -24,18 +24,18 @@ const backlog = JSON.parse(run('JSON.stringify(artworkBacklogData())'));
 assert.equal(backlog.mode, 'room_art_first');
 assert.deepEqual(backlog.active_kinds, ['background']);
 assert.equal(backlog.room_scope.policy, 'all_mapped_rooms');
-assert.equal(backlog.room_scope.completed_locations.length, 64);
+assert.equal(backlog.room_scope.completed_locations.length, 65);
 assert.equal(backlog.audio_in_scope, false);
-assert.equal(backlog.phases.length, 58);
+assert.equal(backlog.phases.length, 59);
 assert.equal(backlog.phases[0].id, 'opening_morning');
 assert.equal(backlog.phases[0].priority, 1);
 
 const summary = JSON.parse(run('JSON.stringify(artworkBacklogSummary())'));
 assert.deepEqual(summary, {
-  total:363,
-  backgrounds:363,
+  total:371,
+  backgrounds:371,
   portraits:0,
-  statuses:{missing:0,placeholder:0,in_progress:327,review:0,ready:36}
+  statuses:{missing:0,placeholder:0,in_progress:335,review:0,ready:36}
 });
 
 run(`
@@ -100,7 +100,8 @@ run(`
     priceCaldwell:artworkBacklogResolution(allArtwork.find(item=>item.id==='price_caldwell_law.reception')),
     oliviaPenthouse:artworkBacklogResolution(allArtwork.find(item=>item.id==='olivia_crown_point_penthouse.private_elevator')),
     crownPointCondos:artworkBacklogResolution(allArtwork.find(item=>item.id==='crown_point_condos.lobby')),
-    crownPointPenthouses:artworkBacklogResolution(allArtwork.find(item=>item.id==='crown_point_penthouses.private_elevator'))
+    crownPointPenthouses:artworkBacklogResolution(allArtwork.find(item=>item.id==='crown_point_penthouses.private_elevator')),
+    crownPointHotel:artworkBacklogResolution(allArtwork.find(item=>item.id==='crown_point_hotel_spa.lobby'))
   });
   globalThis.ALL_MARKUP=artworkBacklogMarkup('all');
   globalThis.BG_MARKUP=artworkBacklogMarkup('background');
@@ -169,8 +170,9 @@ assert.equal(resolutions.priceCaldwell.state, 'registered');
 assert.equal(resolutions.oliviaPenthouse.state, 'registered');
 assert.equal(resolutions.crownPointCondos.state, 'registered');
 assert.equal(resolutions.crownPointPenthouses.state, 'registered');
+assert.equal(resolutions.crownPointHotel.state, 'registered');
 assert.match(context.ALL_MARKUP, /Opening Morning at Hale Home/);
-assert.match(context.ALL_MARKUP, /363 prioritized assets/);
+assert.match(context.ALL_MARKUP, /371 prioritized assets/);
 assert.match(context.ALL_MARKUP, /Room-first milestone plan/);
 assert.doesNotMatch(context.ALL_MARKUP, /portrait set/);
 assert.match(context.ALL_MARKUP, /Character portraits and audio are intentionally outside the active room-art plan/);
@@ -289,6 +291,8 @@ assert.match(context.ACTIVE_MARKUP, /Crown Point Condominiums Purchase, Viewing,
 assert.match(context.ACTIVE_MARKUP, /Crown Point Condos · Pool/);
 assert.match(context.ACTIVE_MARKUP, /Crown Point Penthouses Purchase, Viewing, and Private Residence Route/);
 assert.match(context.ACTIVE_MARKUP, /Crown Point Penthouses · Terrace/);
+assert.match(context.ACTIVE_MARKUP, /Crown Point Hotel &amp; Spa Guest, Wellness, Events, and Staff Route/);
+assert.match(context.ACTIVE_MARKUP, /Crown Point Hotel Spa · Ballroom/);
 assert.match(context.READY_MARKUP, /8 tasks/);
 assert.match(context.READY_MARKUP, /Harbor Employment Centre · Interview Room/);
 assert.match(context.READY_MARKUP, /6 tasks/);
